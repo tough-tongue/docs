@@ -1,0 +1,521 @@
+---
+title: "Enterprise Account Guide"
+description: "Set up team workspaces, manage permissions, track usage, and deploy voice AI at scale"
+---
+
+# Enterprise Account Guide
+
+**Deploy voice AI training across your organization with branded workspaces, team management, and enterprise-grade access control.**
+
+An Enterprise Account enables teams to use ToughTongue AI together within a shared organizational workspace. You get a branded subdomain, member management with different permission levels, usage quotas, organization-wide analytics, and fine-grained control over who can access which scenarios.
+
+<Note>
+**Last updated:** December 30, 2025
+</Note>
+
+---
+
+## Quick Start
+
+<Steps>
+  <Step title="Create Organization">
+    Go to **Account Settings → Organizations** → "Create Organization"
+    
+    **Important:** Uncheck "Make page public" to enable Enterprise features
+  </Step>
+  
+  <Step title="Add Members">
+    **Account Settings → Members → Add Member** → assign roles (View, Admin, Owner)
+  </Step>
+  
+  <Step title="Create Scenario">
+    Set org-wide permissions or keep private
+  </Step>
+  
+  <Step title="Share Access">
+    Grant individual access via "Manage Access" if needed
+  </Step>
+</Steps>
+
+**That's it.** Members can now access your subdomain and practice with shared scenarios.
+
+---
+
+## Permission Model Overview
+
+Our permission model works like **Google Drive**:
+
+<CardGroup cols={3}>
+  <Card title="Access Control" icon="lock">
+    Only explicitly added users can access your subdomain. No implicit access.
+  </Card>
+  
+  <Card title="Content Ownership" icon="user-shield">
+    Scenario creators control their content. Admins can't access unless shared.
+  </Card>
+  
+  <Card title="Embedding Exception" icon="code">
+    Embedded scenarios (iframe/API) allow access without org membership.
+  </Card>
+</CardGroup>
+
+This separation ensures administrative oversight doesn't compromise content privacy. **Just like Google Docs, a Workspace admin can't read your documents unless you share them.**
+
+---
+
+## Your Organization's Landing Page
+
+### Branded Subdomain
+
+Your organization gets its own subdomain: **`{your-slug}.app.toughtongueai.com`**
+
+Every scenario, course, and session lives under this subdomain, creating a cohesive branded experience for your team.
+
+### Customization
+
+Customize through **Account Settings → Organizations → Edit (Pencil Icon)**:
+
+<Tabs>
+  <Tab title="Basic Information">
+    - **Name:** Your organization's display name
+    - **Brand URL (Slug):** Custom subdomain (lowercase, numbers, hyphens only)
+    - **Description:** Markdown-supported description
+    - **FAQ:** Markdown-supported frequently asked questions
+    - **Public/Private Toggle:** For enterprise, keep this private
+  </Tab>
+  
+  <Tab title="Brand Assets">
+    - **Logo:** Displayed in header and landing page
+    - **Cover Image:** Banner at the top of your landing page
+    - **Social Links:** Icons linking to your resources
+  </Tab>
+  
+  <Tab title="Content Selection">
+    Choose which scenarios and courses to highlight. Members can always access your full library, but the landing page showcases what matters most.
+  </Tab>
+</Tabs>
+
+### Access Control
+
+Enterprise subdomain access is **segregated by design**. Only users you explicitly add can access your subdomain.
+
+If someone tries to visit `yourcompany.app.toughtongueai.com` without being a member, they'll be denied access. Your scenarios, courses, and training data remain private to your organization.
+
+---
+
+## Member Management
+
+### Understanding Roles
+
+<CardGroup cols={3}>
+  <Card title="Member (View)" icon="eye">
+    **For:** Students, trainees, sales reps, employees
+    
+    **Can:**
+    - Access shared resources
+    - See personal quota and usage
+    
+    **Cannot:**
+    - View org analytics
+    - Manage members
+    - Change org settings
+  </Card>
+  
+  <Card title="Admin" icon="user-cog">
+    **For:** L&D team, training managers, curriculum designers
+    
+    **Can:**
+    - Manage members (add, remove, roles, quotas)
+    - Access org-wide analytics
+    - Configure landing page and branding
+    
+    **Example:** Instructional designer creating training scenarios for sales team
+  </Card>
+  
+  <Card title="Owner" icon="crown">
+    **For:** Organization creator
+    
+    **Can:** Same as Admin
+    
+    **Note:** Functionally identical to Admin
+  </Card>
+</CardGroup>
+
+<Warning>
+**Important:** Admins and Owners have organizational privileges but do **not** automatically have access to scenario content. Content access is always controlled by the scenario creator.
+</Warning>
+
+### Managing Quotas
+
+Every member can be assigned a usage quota (minutes they're allowed to use). If you don't specify a quota when adding a member, they receive the default organizational quota.
+
+Members can see their remaining quota on the billing page.
+
+### Adding Members
+
+<Tabs>
+  <Tab title="Individual Add">
+    Navigate to **Account Settings → Members → Add Member**
+    
+    Provide:
+    - **Email** (required)
+    - **Name** (optional)
+    - **Role:** View, Read, or Edit
+    - **Quota** (optional)
+    
+    If the email doesn't have a ToughTongue AI account, we'll create one automatically.
+  </Tab>
+  
+  <Tab title="Bulk Upload (CSV)">
+    Click "Bulk Upload" and upload a CSV:
+    
+    ```csv
+    email,name,role,quota_minutes
+    john@example.com,John Doe,view,25.0
+    jane@example.com,Jane Smith,edit,100.0
+    ```
+    
+    **Valid roles:** `view`, `read`, `edit`, `owner`
+  </Tab>
+</Tabs>
+
+**Editing Members:** Update roles, adjust quotas, or remove members anytime via the edit icon in the members table.
+
+---
+
+## Scenario Access Control
+
+Scenarios are the core content in ToughTongue AI. Enterprise gives you fine-grained control over who can access, edit, and interact with each scenario.
+
+### Organization-Wide Permissions
+
+When you create a scenario, you can set organization-wide permissions:
+
+<CardGroup cols={3}>
+  <Card title="Interact + View Own" icon="user">
+    Practice and see only personal history.
+    
+    **Best for:** Training where privacy matters; each trainee sees only their own performance.
+  </Card>
+  
+  <Card title="Interact + View All" icon="users">
+    Practice and see everyone's sessions.
+    
+    **Best for:** Collaborative learning; classroom settings where reviewing peers adds value.
+  </Card>
+  
+  <Card title="Interact + Edit + View All" icon="users-cog">
+    Full collaborative access.
+    
+    **Best for:** Small teams building content together.
+  </Card>
+</CardGroup>
+
+### Individual Access Grants
+
+You can also choose **not** to grant organization-wide access. Then, use the **"Manage Access"** feature to add individual users by email and assign them a specific permission level (View, Read, or Edit).
+
+<Note>
+**Example Use Case:** You're running a leadership development program for senior managers. You don't want the general employee population to access these sensitive scenarios, so you create them as private and grant access only to program participants.
+</Note>
+
+If a scenario has org-wide "view" access but you grant a specific user "edit" access, that user can edit even though others can only view.
+
+---
+
+## Courses: Organizing Your Content
+
+As your scenario library grows, organization becomes critical. **Courses let you group scenarios into structured learning paths.**
+
+### What is a Course?
+
+A curated list of scenarios, optionally combined with static content like videos or reading materials. Displayed on a dedicated "Course" page in your navigation.
+
+### Why Use Courses?
+
+<CardGroup cols={2}>
+  <Card title="Structured Learning" icon="route">
+    Create guided paths like "Sales Onboarding," "Customer Service Essentials," or "Interview Prep Series"
+  </Card>
+  
+  <Card title="Progress Tracking" icon="chart-line">
+    Users see which scenarios they've completed and which are pending
+  </Card>
+  
+  <Card title="Easier Discovery" icon="search">
+    Browse by topic or program instead of searching individual scenarios
+  </Card>
+  
+  <Card title="Mixed Content" icon="layer-group">
+    Combine AI roleplay with instructional videos, reading materials, or assessments
+  </Card>
+</CardGroup>
+
+### Creating a Course
+
+<Steps>
+  <Step title="Navigate to Course Page">
+    Find the Course section in your navigation
+  </Step>
+  
+  <Step title="Click 'Create Course'">
+    Start the course creation flow
+  </Step>
+  
+  <Step title="Add Details">
+    - Name, description, and cover image
+    - Select scenarios to include
+    - Optionally add static content (videos)
+    - Arrange content in desired sequence
+  </Step>
+</Steps>
+
+**Courses inherit the same permission model as scenarios.** Make them organization-wide or restrict to specific users.
+
+---
+
+## Billing & Usage Management
+
+Enterprise billing provides organizational oversight and individual transparency.
+
+### The View Toggle
+
+Admins and Owners see a **Switch to Org / Switch to Personal** toggle on the billing page:
+
+<Tabs>
+  <Tab title="Organization View">
+    - Master wallet balance
+    - Org-wide usage
+    - All org transactions
+    - Top up credits here
+  </Tab>
+  
+  <Tab title="Personal View">
+    - Your individual quota
+    - Personal usage
+    - Remaining balance within the org
+  </Tab>
+</Tabs>
+
+**Members only see their personal quota.**
+
+### Wallet Structure
+
+<CardGroup cols={3}>
+  <Card title="Organization Quota" icon="building">
+    Main budget; sessions deduct from here.
+    
+    **Visible to:** Admins/Owners
+  </Card>
+  
+  <Card title="Member Quota" icon="user">
+    Per-user allocation from org budget.
+    
+    Usage counts against both quota and master wallet.
+    
+    **Visible to:** Individual member
+  </Card>
+  
+  <Card title="Personal (outside org)" icon="wallet">
+    Separate wallet if user has personal account.
+    
+    **Visible to:** Individual only
+  </Card>
+</CardGroup>
+
+### Usage Transparency
+
+**All members see:**
+- Total sessions completed
+- Total minutes used
+- First usage date
+- Breakdown by scenario
+
+**Admins/Owners also see:**
+- Total sessions across all members
+- Total minutes consumed
+- Average session duration
+- Top scenarios by usage
+
+---
+
+## Creator Analytics
+
+The Creator Analytics page shows how scenarios are being used, who's engaging, and how effective they are at driving learning outcomes.
+
+### Accessing Analytics
+
+**Sidebar → Creator Analytics**
+
+Admins/Owners can toggle to organization-wide view.
+
+### What You Can Track
+
+<CardGroup cols={2}>
+  <Card title="Scenario Overview" icon="table">
+    Sortable table with total sessions, duration, average length, creation date, public/private status
+  </Card>
+  
+  <Card title="Usage Over Time" icon="chart-area">
+    Visualizations of session volume and trends
+  </Card>
+  
+  <Card title="Top Scenarios" icon="trophy">
+    Most popular or engaging content
+  </Card>
+  
+  <Card title="Date Filtering" icon="calendar">
+    Last 7 days, 30 days, quarter, all time, or custom range
+  </Card>
+</CardGroup>
+
+### Exporting Data
+
+<Tabs>
+  <Tab title="Scenarios CSV">
+    **Contains:** Scenario-level stats (name, dates, session count, duration)
+    
+    **Best for:** Executive reports and high-level overviews
+  </Tab>
+  
+  <Tab title="Sessions CSV">
+    **Contains:** Detailed records (user email, timestamps, duration, completion, analysis)
+    
+    **Best for:** LMS import, custom reports, and ROI measurement
+  </Tab>
+</Tabs>
+
+### L&D Insights
+
+<AccordionGroup>
+  <Accordion title="Engagement Metrics">
+    Which scenarios are actually used? Identify high-effort, low-usage content to reprioritize.
+  </Accordion>
+  
+  <Accordion title="Completion Rates">
+    Low completion may indicate scenarios that are too long, difficult, or not engaging.
+  </Accordion>
+  
+  <Accordion title="Time Investment">
+    Understand real training costs and justify skill development investment.
+  </Accordion>
+  
+  <Accordion title="Individual Progress">
+    For cohort programs, identify who's keeping up and who needs support.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## API Integration
+
+Enterprise resources are available via APIs.
+
+### Personal Access Tokens (PAT)
+
+Your API key for authenticating requests.
+
+**Creating a PAT:**
+
+<Steps>
+  <Step title="Navigate to Developer Tools">
+    Sidebar → Developer Tools
+  </Step>
+  
+  <Step title="Go to API Keys Tab">
+    Find the API Keys section
+  </Step>
+  
+  <Step title="Create New Token">
+    Click "Create New Token"
+    
+    Name it descriptively (e.g., "LMS Integration" or "Analytics Script")
+  </Step>
+</Steps>
+
+### The X-TT-ORG Header
+
+Include your organization's ID to access org resources:
+
+```bash
+curl -X POST https://api.toughtongueai.com/api/public/test \
+  -H "Authorization: Bearer YOUR_PAT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "X-TT-ORG: YOUR_ORG_ID" \
+  -d '{"input": "check"}'
+```
+
+Find your organization ID in Developer Tools.
+
+<Warning>
+**Without `X-TT-ORG` header:** Returns only your personal resources
+
+**With `X-TT-ORG` header:** Returns organization resources (subject to your permissions)
+</Warning>
+
+### API Playground
+
+Test endpoints without writing code in Developer Tools:
+
+<Steps>
+  <Step>Select your PAT token</Step>
+  <Step>Choose an endpoint</Step>
+  <Step>Fill in parameters</Step>
+  <Step>Click "Send Request"</Step>
+</Steps>
+
+<Note>
+The playground doesn't automatically include `X-TT-ORG`. Add it manually for org context.
+</Note>
+
+### Scenario Access Tokens (SAT)
+
+For embedding private scenarios in external applications (company intranet, customer portal).
+
+<CardGroup cols={4}>
+  <Card title="Lifespan" icon="clock">
+    Short-lived (1 hour)
+  </Card>
+  
+  <Card title="Scope" icon="crosshairs">
+    Tied to specific scenario
+  </Card>
+  
+  <Card title="Auth" icon="unlock">
+    Allows anonymous/unauthenticated access
+  </Card>
+  
+  <Card title="Generation" icon="server">
+    Server-side using your PAT
+  </Card>
+</CardGroup>
+
+<Warning>
+**Important:** SATs cannot be used with `X-TT-ORG`. They're for single-scenario access only.
+
+Contact us for guidance on programmatic access to private org scenarios.
+</Warning>
+
+### Available Endpoints
+
+All endpoints support org context via `X-TT-ORG` and honor the permission system:
+
+- **Scenarios:** List, get, create, update
+- **Sessions:** List, get (with filters)
+- **Balance:** Check wallet balance
+- **Collections:** List, get courses
+- **Purchases:** Create checkout sessions
+
+---
+
+## Getting Help
+
+For technical questions, API integration help, or bug reports:
+
+📧 **[help@getarchieai.com](mailto:help@getarchieai.com)**
+
+---
+
+<Card title="Ready to set up your organization?" icon="rocket">
+  **[Create Organization →](https://app.toughtongueai.com/settings)** or **[Watch Setup Video →](https://www.loom.com/share/2a7b0a70ac25430cb9fd57440a772cfa)**
+</Card>

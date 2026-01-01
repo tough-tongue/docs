@@ -1,0 +1,199 @@
+---
+title: API Overview
+description: Complete reference for the ToughTongue AI REST API
+---
+
+# API Overview
+
+The ToughTongue AI API provides programmatic access to all platform features. Build custom integrations, automate workflows, and create powerful voice-based applications.
+
+## Base URL
+
+```
+https://api.toughtongueai.com/api/public
+```
+
+## Authentication
+
+All API requests require authentication using a Bearer token:
+
+```bash
+curl https://api.toughtongueai.com/api/public/scenarios \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+[Learn more about authentication →](/concepts/authentication)
+
+## Core Resources
+
+<CardGroup cols={2}>
+  <Card title="Scenarios" icon="wand-magic-sparkles" href="/api-reference/scenarios">
+    Create and manage conversation scenarios
+  </Card>
+  <Card title="Sessions" icon="comments" href="/api-reference/sessions">
+    Track and analyze conversation sessions
+  </Card>
+  <Card title="Analytics" icon="chart-line" href="/api-reference/analytics">
+    Access advanced analytics and reporting
+  </Card>
+  <Card title="Integrations" icon="plug" href="/guides/api-integration">
+    Meeting bots, SIP calls, and more
+  </Card>
+</CardGroup>
+
+## Quick Reference
+
+### Scenarios
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/scenarios` | GET | List all scenarios |
+| `/scenarios` | POST | Create new scenario |
+| `/scenarios/{id}` | GET | Get scenario details |
+| `/scenarios/{id}` | PATCH | Update scenario |
+| `/scenarios/{id}` | DELETE | Delete scenario |
+| `/featured-scenarios` | GET | List featured scenarios |
+
+### Sessions
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/sessions` | GET | List sessions |
+| `/sessions/{id}` | GET | Get session details |
+| `/sessions/analyze` | POST | Analyze session |
+| `/v2/sessions` | POST | Create session programmatically |
+
+### Utilities
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/test` | POST | Test API token |
+| `/balance` | GET | Check wallet balance |
+
+## OpenAPI Specification
+
+Download the complete OpenAPI spec:
+
+<Card title="OpenAPI 3.1 Specification" icon="file-code" href="/api-reference/openapi.json">
+  Use with Postman, Insomnia, or code generators
+</Card>
+
+## Code Examples
+
+<CodeGroup>
+```javascript JavaScript
+const response = await fetch(
+  'https://api.toughtongueai.com/api/public/scenarios',
+  {
+    headers: {
+      'Authorization': 'Bearer YOUR_API_TOKEN',
+      'Content-Type': 'application/json'
+    }
+  }
+);
+
+const scenarios = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.toughtongueai.com/api/public/scenarios',
+    headers={
+        'Authorization': f'Bearer {api_token}',
+        'Content-Type': 'application/json'
+    }
+)
+
+scenarios = response.json()
+```
+
+```bash cURL
+curl https://api.toughtongueai.com/api/public/scenarios \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+## Rate Limits
+
+| Plan | Rate Limit |
+|------|------------|
+| Free | 100 requests/minute |
+| Pro | 1,000 requests/minute |
+| Enterprise | Custom |
+
+Handle rate limits with retry logic:
+
+```javascript
+async function fetchWithRetry(url, options) {
+  const response = await fetch(url, options);
+  
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('Retry-After') || 60;
+    await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+    return fetchWithRetry(url, options);
+  }
+  
+  return response;
+}
+```
+
+## Error Handling
+
+API errors follow standard HTTP status codes:
+
+| Status | Meaning |
+|--------|---------|
+| 200 | Success |
+| 400 | Bad Request - Invalid parameters |
+| 401 | Unauthorized - Invalid API token |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Not Found - Resource doesn't exist |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Internal Server Error |
+
+Error response format:
+
+```json
+{
+  "error": "Error message",
+  "details": {
+    "field": "Additional context"
+  }
+}
+```
+
+## SDKs & Libraries
+
+<Note>
+  Official SDKs coming soon! Currently, use standard HTTP clients with the REST API.
+</Note>
+
+## Webhooks
+
+Subscribe to events for real-time updates:
+
+- Session started
+- Session completed
+- Analysis ready
+
+[Learn more about webhooks →](/guides/webhooks)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scenarios API" href="/api-reference/scenarios">
+    Full scenarios endpoint documentation
+  </Card>
+  <Card title="Sessions API" href="/api-reference/sessions">
+    Full sessions endpoint documentation
+  </Card>
+  <Card title="Quickstart" href="/quickstart">
+    Build your first integration
+  </Card>
+  <Card title="Examples" href="/examples/interview-prep">
+    See real-world implementations
+  </Card>
+</CardGroup>

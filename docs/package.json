@@ -1,0 +1,14 @@
+{
+  "name": "tt-starter-docs",
+  "version": "1.0.0",
+  "description": "ToughTongue AI Starter Templates Documentation",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "mintlify dev",
+    "preview": "mintlify dev",
+    "broken-links": "mintlify broken-links"
+  },
+  "devDependencies": {
+    "mintlify": "^4.0.359"
+  }
+}

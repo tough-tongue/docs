@@ -1,0 +1,463 @@
+---
+title: "Firebase Authentication Setup"
+description: "Add user authentication to your ToughTongue AI integration with Firebase"
+---
+
+# Firebase Authentication Setup
+
+This guide shows you how to add Firebase Authentication to the Next.js starter template, enabling user sign-up, sign-in, and protected routes.
+
+## Why Firebase Auth?
+
+<CardGroup cols={3}>
+  <Card title="Easy Setup" icon="rocket">
+    Get authentication running in under 10 minutes
+  </Card>
+
+  <Card title="Multiple Providers" icon="users">
+    Email/password, Google, GitHub, and more
+  </Card>
+
+  <Card title="Free Tier" icon="dollar-sign">
+    10K auth operations/month free
+  </Card>
+</CardGroup>
+
+---
+
+## Step 1: Create Firebase Project
+
+<Steps>
+  <Step title="Go to Firebase Console">
+    Visit [Firebase Console](https://console.firebase.google.com/) and click "Add project"
+  </Step>
+  
+  <Step title="Project Setup">
+    - Enter a project name
+    - (Optional) Enable Google Analytics
+    - Click "Create project"
+  </Step>
+  
+  <Step title="Add Web App">
+    - Click the web icon (`</>`) to add a web app
+    - Register your app name
+    - Copy the Firebase config object (you'll need this next)
+  </Step>
+</Steps>
+
+---
+
+## Step 2: Enable Authentication Methods
+
+<Steps>
+  <Step title="Navigate to Authentication">
+    In the Firebase Console, go to **Build → Authentication → Get Started**
+  </Step>
+
+  <Step title="Enable Email/Password">
+    - Go to "Sign-in method" tab - Click on "Email/Password" - Enable and save
+  </Step>
+
+  <Step title="(Optional) Enable Google Sign-In">
+    - Click on "Google" - Enable and provide project support email - Save
+  </Step>
+</Steps>
+
+---
+
+## Step 3: Configure Your App
+
+### Add Firebase to package.json
+
+The Next.js starter already includes Firebase:
+
+```json package.json
+{
+  "dependencies": {
+    "firebase": "^10.14.0"
+    // ... other dependencies
+  }
+}
+```
+
+If you're starting from scratch:
+
+```bash
+pnpm add firebase
+```
+
+### Set Environment Variables
+
+Create `.env.local`:
+
+```bash .env.local
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+<Warning>Never commit `.env.local` to version control. Add it to `.gitignore`.</Warning>
+
+---
+
+## Step 4: Initialize Firebase
+
+The starter template includes `lib/firebase.ts`:
+
+```typescript lib/firebase.ts
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+export { app, auth, db };
+```
+
+---
+
+## Step 5: Create Auth Context
+
+The starter includes `app/auth/AuthContext.tsx` with:
+
+- `useAuth()` hook for accessing auth state
+- `signIn()`, `signUp()`, `signInWithGoogle()`, `logout()` methods
+- Automatic auth state synchronization
+
+```typescript Usage Example
+"use client";
+
+import { useAuth } from "./auth/AuthContext";
+
+export default function ProfilePage() {
+  const { user, logout } = useAuth();
+
+  if (!user) {
+    return <p>Not signed in</p>;
+  }
+
+  return (
+    <div>
+      <p>Welcome, {user.email}!</p>
+      <button onClick={logout}>Sign Out</button>
+    </div>
+  );
+}
+```
+
+---
+
+## Step 6: Wrap Your App with AuthProvider
+
+Update `app/layout.tsx`:
+
+```typescript app/layout.tsx
+import { AuthProvider } from "./auth/AuthContext";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+---
+
+## Step 7: Use Auth Pages
+
+The starter includes pre-built auth pages:
+
+### Sign In Page
+
+`/auth/signin` - Email/password + Google sign-in
+
+```typescript
+// Already included at app/auth/signin/page.tsx
+```
+
+### Sign Up Page
+
+`/auth/signup` - Create new account with email/password + Google
+
+```typescript
+// Already included at app/auth/signup/page.tsx
+```
+
+---
+
+## Protecting Routes
+
+### Client-Side Protection
+
+```typescript app/dashboard/page.tsx
+"use client";
+
+import { useAuth } from "../auth/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function DashboardPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/signin");
+    }
+  }, [user, loading, router]);
+
+  if (loading) return <p>Loading...</p>;
+  if (!user) return null;
+
+  return <div>Protected content</div>;
+}
+```
+
+### Server-Side Protection (Middleware)
+
+Create `middleware.ts`:
+
+```typescript middleware.ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  // Check for auth token in cookies
+  const token = request.cookies.get("auth-token");
+
+  // Redirect to sign-in if no token
+  if (!token && request.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/profile/:path*"],
+};
+```
+
+---
+
+## Storing User Sessions
+
+Associate ToughTongue AI sessions with users:
+
+```typescript app/practice/page.tsx
+"use client";
+
+import { useAuth } from "../auth/AuthContext";
+import { useEffect } from "react";
+
+export default function PracticePage() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data.event === "onStop") {
+        // Store session with user ID
+        await fetch("/api/sessions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: event.data.sessionId,
+            userId: user?.uid,
+            userEmail: user?.email,
+          }),
+        });
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [user]);
+
+  return (
+    <iframe
+      src={`https://app.toughtongueai.com/embed/YOUR_SCENARIO_ID?email=${user?.email}`}
+      width="100%"
+      height="600px"
+      allow="microphone"
+    />
+  );
+}
+```
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Security Rules">
+    Configure Firestore security rules to ensure users can only access their own data:
+    
+    ```javascript
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /users/{userId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+        match /sessions/{sessionId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+      }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Password Requirements">
+    Firebase enforces minimum 6-character passwords by default. Consider adding client-side validation for stronger passwords:
+    
+    ```typescript
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError('Password must contain an uppercase letter');
+      return;
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Email Verification">
+    Send verification emails after sign-up:
+    
+    ```typescript
+    import { sendEmailVerification } from 'firebase/auth';
+    
+    await createUserWithEmailAndPassword(auth, email, password);
+    await sendEmailVerification(auth.currentUser!);
+    ```
+  </Accordion>
+  
+  <Accordion title="Error Handling">
+    Firebase auth errors have specific codes. Handle them gracefully:
+    
+    ```typescript
+    try {
+      await signIn(email, password);
+    } catch (err: any) {
+      switch (err.code) {
+        case 'auth/user-not-found':
+          setError('No account found with this email');
+          break;
+        case 'auth/wrong-password':
+          setError('Incorrect password');
+          break;
+        case 'auth/too-many-requests':
+          setError('Too many failed attempts. Try again later');
+          break;
+        default:
+          setError('Failed to sign in');
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Alternative: Using Clerk
+
+The Next.js starter also supports Clerk as an alternative to Firebase. Clerk offers:
+
+- More UI components out of the box
+- Built-in user management dashboard
+- More authentication providers
+- Higher pricing
+
+To use Clerk instead, see the existing Clerk integration in `middleware.ts` and update your environment variables.
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Firebase config not loading">
+    Ensure all environment variables are prefixed with `NEXT_PUBLIC_` for client-side access.
+    Restart your dev server after adding env vars.
+  </Accordion>
+
+  <Accordion title="Google Sign-In not working">
+    - Verify you've enabled Google provider in Firebase Console - Add your domain to authorized
+    domains in Firebase Console → Authentication → Settings - For localhost, `localhost` and
+    `127.0.0.1` should be authorized by default
+  </Accordion>
+
+  <Accordion title="Redirect loops">
+    Check your middleware configuration. Make sure protected routes don't redirect to themselves.
+  </Accordion>
+
+  <Accordion title="'auth/operation-not-allowed'">
+    This means the authentication method hasn't been enabled in Firebase Console. Go to
+    Authentication → Sign-in method and enable the provider.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Add User Profiles"
+    icon="user"
+    href="https://firebase.google.com/docs/firestore/quickstart"
+  >
+    Store additional user data in Firestore
+  </Card>
+
+  <Card
+    title="Email Verification"
+    icon="envelope"
+    href="https://firebase.google.com/docs/auth/web/manage-users#send_a_user_a_verification_email"
+  >
+    Verify user email addresses
+  </Card>
+
+  <Card
+    title="Password Reset"
+    icon="key"
+    href="https://firebase.google.com/docs/auth/web/manage-users#send_a_password_reset_email"
+  >
+    Implement password reset flow
+  </Card>
+
+  <Card
+    title="Social Providers"
+    icon="share-nodes"
+    href="https://firebase.google.com/docs/auth/web/start#next_steps"
+  >
+    Add GitHub, Twitter, Facebook auth
+  </Card>
+</CardGroup>
+
+---
+
+<Card title="Need help?" icon="question">
+  Join our [Discord community](https://discord.com/invite/jfq2wVAP) or email
+  **help@getarchieai.com**
+</Card>

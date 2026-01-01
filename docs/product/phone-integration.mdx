@@ -1,0 +1,333 @@
+---
+title: "Phone Integration"
+description: "Connect phone numbers to ToughTongue AI so your voice agents can make and receive real phone calls"
+---
+
+# Phone Integration
+
+**Connect your phone numbers to ToughTongue AI so your voice agents can make and receive real phone calls.**
+
+<iframe
+  src="https://www.loom.com/embed/f5d5dd9bf3a541f1980d75b9e8a4d495"
+  frameBorder="0"
+  allowFullScreen
+  style={{width: '100%', height: '400px'}}
+/>
+
+---
+
+## What You'll Be Able to Do
+
+<CardGroup cols={2}>
+  <Card title="Outbound Calls" icon="phone-arrow-up-right">
+    ✅ Your AI agents place outbound calls to any phone number
+  </Card>
+  
+  <Card title="Batch Calling" icon="layer-group">
+    ✅ Upload a CSV and call multiple numbers at once
+  </Card>
+  
+  <Card title="Inbound Calls" icon="phone-arrow-down-left">
+    🔜 Your AI agents answer calls on your phone numbers (coming soon)
+  </Card>
+</CardGroup>
+
+---
+
+## What You'll Need
+
+<Steps>
+  <Step title="Phone Number">
+    A phone number from a telephony provider (Twilio, Plivo, Exotel, Telnyx, Vonage, etc.)
+  </Step>
+  
+  <Step title="Provider Dashboard Access">
+    Access to your provider's dashboard for configuration
+  </Step>
+  
+  <Step title="Setup Time">
+    10-15 minutes to complete the setup process
+  </Step>
+</Steps>
+
+---
+
+## Quick Vocabulary
+
+<CardGroup cols={2}>
+  <Card title="SIP Trunk" icon="network-wired">
+    A virtual phone line that connects your telephony provider to ToughTongue AI over the internet
+  </Card>
+  
+  <Card title="Origination" icon="arrow-right-to-bracket">
+    Routes incoming calls from your provider to ToughTongue AI
+  </Card>
+  
+  <Card title="Termination" icon="arrow-right-from-bracket">
+    Routes outgoing calls from ToughTongue AI to your provider
+  </Card>
+  
+  <Card title="E.164 Format" icon="hashtag">
+    International phone number format (e.g., +12345678900)
+  </Card>
+</CardGroup>
+
+---
+
+## Setup Process
+
+These 4 steps work for all major providers.
+
+### Step 1: Create a SIP Trunk
+
+Go to your telephony provider's dashboard and create a new SIP trunk.
+
+**What to look for:**
+- It might be called "SIP Trunk," "Connection," or "SIP Domain"
+- Give it a clear name like `toughtongue-production` so you remember what it's for
+
+This trunk is the communication bridge between your provider and ToughTongue AI.
+
+### Step 2: Set Up Termination (For Outbound Calls)
+
+Configure how ToughTongue AI will send outbound calls through your provider.
+
+**Create credentials:**
+
+<CodeGroup>
+```plaintext SIP Username
+ttai_outbound_user
+(Choose something secure)
+```
+
+```plaintext SIP Password
+Use a strong password: 
+- At least 12 characters
+- Mix of uppercase, lowercase, numbers, symbols
+```
+</CodeGroup>
+
+**Save your Termination URI:** Your provider will show you a termination endpoint (something like `yourname.pstn.twilio.com`). Copy this—you'll need it in Step 4.
+
+These credentials let ToughTongue AI authenticate when placing calls on your behalf.
+
+### Step 3: Assign Your Phone Number
+
+Link the phone number(s) you want to use to this SIP trunk.
+
+<Tabs>
+  <Tab title="Twilio">
+    **Phone Numbers → Select number → Configure → SIP Trunk**
+  </Tab>
+  
+  <Tab title="Telnyx">
+    **Numbers → Click number → Assign to Connection**
+  </Tab>
+  
+  <Tab title="Vonage">
+    **Numbers section in SIP setup wizard**
+  </Tab>
+  
+  <Tab title="Plivo">
+    **Numbers → Add to Endpoint**
+  </Tab>
+  
+  <Tab title="Exotel">
+    **Phone Numbers → Connect to SIP Trunk**
+  </Tab>
+</Tabs>
+
+You can assign multiple numbers to the same trunk if needed.
+
+### Step 4: Connect the Number in ToughTongue AI
+
+Now bring it all together in your ToughTongue AI dashboard.
+
+<Steps>
+  <Step title="Navigate to SIP Configuration">
+    Go to **Scenario Details → Phone Call → SIP Configuration**
+  </Step>
+  
+  <Step title="Fill in Details">
+    - **Phone Number:** Your number in +E.164 format (e.g., `+12125551234`)
+    - **Termination URI:** The endpoint from Step 2
+    - **SIP Username:** From Step 2
+    - **SIP Password:** From Step 2
+  </Step>
+  
+  <Step title="Save Configuration">
+    Click **Save**
+  </Step>
+</Steps>
+
+**That's it!** Your phone number is now live and connected to your AI agents.
+
+---
+
+## Making Calls
+
+### Single Call
+
+From your scenario's Phone Call page:
+
+<Steps>
+  <Step>Enter the phone number (in E.164 format)</Step>
+  <Step>Optionally add the person's name for personalization</Step>
+  <Step>Click to place the call</Step>
+</Steps>
+
+### Batch Calls
+
+Upload a CSV file to call multiple numbers at once:
+
+<Steps>
+  <Step title="Navigate to Batch Upload">
+    Go to **Phone Call → Batch Upload**
+  </Step>
+  
+  <Step title="Upload CSV">
+    ```csv
+    phone_number,user_name
+    +12125551234,John Doe
+    +13105559876,Jane Smith
+    +14155551212,Bob Johnson
+    ```
+  </Step>
+  
+  <Step title="Initiate Calls">
+    All calls will use the same scenario. Calls are queued and placed automatically.
+  </Step>
+</Steps>
+
+Perfect for sales outreach, appointment reminders, or training exercises at scale.
+
+---
+
+## How Calls Flow
+
+### Outbound Calls
+
+```mermaid
+graph LR
+    A[AI Scenario] --> B[ToughTongue AI]
+    B --> C[Your Provider<br/>via Termination URI]
+    C --> D[Recipient]
+```
+
+**When your AI agent places a call:**
+Caller → AI Scenario → ToughTongue AI → Your Provider (via Termination URI) → Recipient
+
+### Inbound Calls (Coming Soon)
+
+```mermaid
+graph LR
+    A[Caller] --> B[Your Provider]
+    B --> C[SIP Trunk]
+    C --> D[ToughTongue AI]
+    D --> E[Your AI Agent Answers]
+```
+
+**When someone calls your number:**
+Caller → Your Provider → SIP Trunk → ToughTongue AI → Your AI Agent Answers
+
+---
+
+## Frequently Asked Questions
+
+### Setup & Configuration
+
+<AccordionGroup>
+  <Accordion title="Will I know if my setup is wrong before making a call?">
+    No, ToughTongue AI can't validate your configuration until a call is attempted. We recommend making a test call immediately after setup to verify everything works.
+  </Accordion>
+  
+  <Accordion title="Do I need to create a separate SIP trunk for each number?">
+    No, you can assign multiple numbers to the same SIP trunk. One trunk can handle many numbers.
+  </Accordion>
+</AccordionGroup>
+
+### Provider-Specific
+
+<AccordionGroup>
+  <Accordion title="I'm using Twilio. Any specific tips?">
+    - When creating your SIP trunk, make sure to enable call transfer and check "Enable PSTN transfer"
+    - For your credentials, Twilio requires strong passwords (12+ characters)
+    - Your termination URI will look like: `yourname.pstn.twilio.com`
+  </Accordion>
+  
+  <Accordion title="Any recommendations for India?">
+    If you're operating in India, you'll need a provider that supports Indian telephony infrastructure.
+    
+    **Recommended Providers:**
+    - **IVRS Solution:** Validated integration. Email **support@toughtongueai.com** to get connected
+    - **Plivo or Exotel:** Both provide Indian phone numbers and routing
+      - Plivo's termination URI format: `yourname.sip.plivo.com`
+      - Exotel provides termination details via their support team
+  </Accordion>
+  
+  <Accordion title="I need help with a custom telephony setup. Who should I contact?">
+    Reach out to our support team at **support@toughtongueai.com** or through your dashboard.
+    
+    We can help with:
+    - Non-standard SIP configurations
+    - Static IP requirements
+    - Mutual TLS setups
+    - Regional restrictions
+    - Custom routing needs
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Sales Outreach" icon="phone-volume">
+    Automate cold calling at scale. AI handles initial conversations, qualifies leads, and books meetings with warm prospects.
+  </Card>
+  
+  <Card title="Appointment Reminders" icon="calendar-check">
+    Reduce no-shows with AI-powered reminder calls. Confirm appointments, reschedule if needed, and collect feedback.
+  </Card>
+  
+  <Card title="Customer Support" icon="headset">
+    Handle high-volume support calls. AI triages issues, provides solutions for common problems, and escalates complex cases.
+  </Card>
+  
+  <Card title="Training & Certification" icon="certificate">
+    Conduct phone-based assessments and training at scale. AI evaluates responses and provides certification.
+  </Card>
+</CardGroup>
+
+---
+
+## Pricing
+
+Phone integration costs vary by provider and usage:
+
+- **ToughTongue AI:** Minutes consumed from your balance (same as web sessions)
+- **Telephony Provider:** Charges per minute (typically $0.01-0.05/min for US numbers)
+
+**Example:**
+- 100 calls × 5 min avg = 500 minutes
+- ToughTongue AI: ~$10 (500 min × $0.02/min)
+- Twilio: ~$15 (500 min × $0.03/min)
+- **Total:** ~$25 for 100 calls
+
+---
+
+## Need Help?
+
+For setup assistance or questions:
+
+- 📧 **Email:** support@toughtongueai.com
+- 💬 **Dashboard:** Click "Support" in your ToughTongue AI dashboard
+- 📚 **Community:** [Join Discord](https://discord.com/invite/NfTPT3HsSj)
+
+We're here to help you get connected!
+
+---
+
+<Card title="Ready to connect your phone?" icon="phone">
+  **[Start Setup →](https://app.toughtongueai.com)** or **[Contact Support →](mailto:support@toughtongueai.com)**
+</Card>

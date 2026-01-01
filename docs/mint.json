@@ -1,0 +1,132 @@
+{
+  "name": "ToughTongue AI Documentation",
+  "logo": {
+    "dark": "https://www.toughtongueai.com/logo-dark.png",
+    "light": "https://www.toughtongueai.com/logo-light.png"
+  },
+  "favicon": "https://www.toughtongueai.com/favicon.ico",
+  "colors": {
+    "primary": "#6366f1",
+    "light": "#818cf8",
+    "dark": "#4f46e5",
+    "anchors": {
+      "from": "#6366f1",
+      "to": "#818cf8"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "ToughTongue AI",
+      "url": "https://www.toughtongueai.com"
+    },
+    {
+      "name": "App",
+      "url": "https://app.toughtongueai.com"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://app.toughtongueai.com"
+  },
+  "anchors": [
+    {
+      "name": "API Playground",
+      "icon": "code",
+      "url": "https://app.toughtongueai.com/api-playground"
+    },
+    {
+      "name": "Developer Portal",
+      "icon": "terminal",
+      "url": "https://app.toughtongueai.com/developer"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.com/invite/jfq2wVAP"
+    },
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/tough-tongue/tt-starter"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": ["introduction", "quickstart"]
+    },
+    {
+      "group": "Product Documentation",
+      "pages": [
+        {
+          "group": "Use Cases",
+          "pages": [
+            "use-cases/sales-coaching",
+            "use-cases/enterprise-account",
+            "examples/interview-prep",
+            "examples/customer-service"
+          ]
+        },
+        {
+          "group": "Integrations",
+          "pages": ["product/google-meet-integration", "product/phone-integration"]
+        }
+      ]
+    },
+    {
+      "group": "Developer Documentation",
+      "pages": [
+        {
+          "group": "Core Concepts",
+          "pages": ["concepts/scenarios", "concepts/sessions", "concepts/authentication"]
+        },
+        {
+          "group": "Guides",
+          "pages": [
+            "guides/embedding",
+            "guides/api-integration",
+            "guides/webhooks",
+            "guides/meeting-bots"
+          ]
+        },
+        {
+          "group": "Starter Templates",
+          "pages": ["starters/overview", "starters/flask", "starters/nextjs"]
+        }
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/overview",
+        "api-reference/scenarios",
+        "api-reference/sessions",
+        "api-reference/analytics"
+      ]
+    },
+    {
+      "group": "Examples & Resources",
+      "pages": ["examples/sales-training", "troubleshooting"]
+    }
+  ],
+  "footerSocials": {
+    "discord": "https://discord.com/invite/jfq2wVAP",
+    "github": "https://github.com/tough-tongue/tt-starter",
+    "twitter": "https://twitter.com/toughtongueai",
+    "linkedin": "https://www.linkedin.com/company/toughtongue-ai"
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
+  "search": {
+    "prompt": "Search documentation..."
+  },
+  "api": {
+    "baseUrl": "https://api.toughtongueai.com/api/public",
+    "auth": {
+      "method": "bearer"
+    }
+  }
+}

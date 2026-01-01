@@ -1,0 +1,470 @@
+---
+title: Iframe Embedding
+description: Embed ToughTongue AI conversations in your application
+---
+
+# Iframe Embedding
+
+The fastest way to add ToughTongue AI to your application is through iframe embedding. This guide covers everything from basic embedding to advanced customization.
+
+## Basic Embedding
+
+### Minimal Example
+
+```html
+<iframe
+  src="https://app.toughtongueai.com/embed/YOUR_SCENARIO_ID"
+  width="100%"
+  height="600px"
+  frameborder="0"
+  allow="microphone"
+></iframe>
+```
+
+<Warning>
+  **HTTPS Required**: Microphone access requires HTTPS in production. Use `http://localhost` for local development.
+</Warning>
+
+## Embed Variants
+
+ToughTongue AI offers three embed types:
+
+<Tabs>
+  <Tab title="Full Embed (Default)">
+    Complete interface with all features:
+    
+    ```html
+    <iframe
+      src="https://app.toughtongueai.com/embed/SCENARIO_ID"
+      width="100%"
+      height="800px"
+      allow="microphone"
+    ></iframe>
+    ```
+    
+    **Includes**: User login, conversation interface, results display
+  </Tab>
+  
+  <Tab title="Basic Embed">
+    Simplified interface, conversation-focused:
+    
+    ```html
+    <iframe
+      src="https://app.toughtongueai.com/embed/basic/SCENARIO_ID"
+      width="100%"
+      height="600px"
+      allow="microphone"
+    ></iframe>
+    ```
+    
+    **Includes**: Conversation interface only
+  </Tab>
+  
+  <Tab title="Minimal Embed">
+    Ultra-compact, just the essentials:
+    
+    ```html
+    <iframe
+      src="https://app.toughtongueai.com/embed/minimal/SCENARIO_ID"
+      width="100%"
+      height="300px"
+      allow="microphone"
+    ></iframe>
+    ```
+    
+    **Includes**: Microphone button and status only
+  </Tab>
+</Tabs>
+
+## Customization Options
+
+Customize appearance and behavior with URL parameters:
+
+### Visual Customization
+
+<ParamField path="color" type="string" default="indigo-500">
+  Accent color for buttons and highlights
+  
+  ```html
+  ?color=violet-500
+  ```
+  
+  Available colors: `violet-500`, `blue-500`, `green-500`, `red-500`, `amber-500`
+</ParamField>
+
+<ParamField path="bg" type="string" default="white">
+  Background color
+  
+  ```html
+  ?bg=black
+  ```
+  
+  Options: `white`, `black`, `gray`, custom hex values
+</ParamField>
+
+<ParamField path="showPulse" type="boolean" default="true">
+  Show animated pulse effect
+  
+  ```html
+  ?showPulse=false
+  ```
+</ParamField>
+
+<ParamField path="hidePoweredBy" type="boolean" default="false">
+  Hide "Powered by ToughTongue AI" branding
+  
+  ```html
+  ?hidePoweredBy=true
+  ```
+  
+  <Info>Available on Pro and Enterprise plans</Info>
+</ParamField>
+
+### User Pre-Population
+
+<ParamField path="userName" type="string">
+  Pre-fill user's name
+  
+  ```html
+  ?userName=John%20Doe
+  ```
+</ParamField>
+
+<ParamField path="userEmail" type="string">
+  Pre-fill user's email
+  
+  ```html
+  ?userEmail=john@example.com
+  ```
+</ParamField>
+
+### Behavior Options
+
+<ParamField path="skipPrecheck" type="boolean" default="false">
+  Skip microphone pre-check
+  
+  ```html
+  ?skipPrecheck=true
+  ```
+</ParamField>
+
+<ParamField path="autoStart" type="boolean" default="false">
+  Automatically start conversation
+  
+  ```html
+  ?autoStart=true
+  ```
+</ParamField>
+
+### Combined Example
+
+```html
+<iframe
+  src="https://app.toughtongueai.com/embed/SCENARIO_ID?color=violet-500&bg=black&userName=John%20Doe&userEmail=john@example.com&skipPrecheck=true"
+  width="100%"
+  height="600px"
+  frameborder="0"
+  allow="microphone"
+></iframe>
+```
+
+## Event Handling
+
+Listen for iframe events to track user progress:
+
+```javascript
+window.addEventListener('message', (event) => {
+  // Security: Verify origin
+  if (event.origin !== 'https://app.toughtongueai.com') return;
+  
+  const { event: eventType, sessionId, timestamp } = event.data;
+  
+  switch (eventType) {
+    case 'onStart':
+      console.log('Conversation started:', sessionId);
+      // Track analytics, show timer, etc.
+      break;
+      
+    case 'onStop':
+      console.log('Conversation ended:', sessionId);
+      // Fetch results, redirect to review page, etc.
+      fetchAnalysis(sessionId);
+      break;
+      
+    case 'onTerminated':
+      console.log('Conversation terminated:', sessionId);
+      // Handle unexpected end
+      break;
+  }
+});
+```
+
+### Event Payload
+
+```typescript
+interface IframeEvent {
+  event: 'onStart' | 'onStop' | 'onTerminated';
+  sessionId: string;
+  timestamp: number;  // Unix timestamp (ms)
+}
+```
+
+## Full Integration Example
+
+<CodeGroup>
+```html Vanilla JS
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interview Practice</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f3f4f6;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Technical Interview Practice</h1>
+    
+    <iframe
+      id="conversation"
+      src="https://app.toughtongueai.com/embed/YOUR_SCENARIO_ID?color=violet-500"
+      allow="microphone"
+    ></iframe>
+    
+    <div class="status" id="status">
+      Ready to start...
+    </div>
+  </div>
+  
+  <script>
+    let currentSessionId = null;
+    
+    window.addEventListener('message', async (event) => {
+      if (event.origin !== 'https://app.toughtongueai.com') return;
+      
+      const { event: eventType, sessionId, timestamp } = event.data;
+      const statusEl = document.getElementById('status');
+      
+      if (eventType === 'onStart') {
+        currentSessionId = sessionId;
+        statusEl.innerHTML = `
+          <strong>✅ Session Started</strong><br>
+          Session ID: ${sessionId}<br>
+          Started: ${new Date(timestamp).toLocaleTimeString()}
+        `;
+      } else if (eventType === 'onStop') {
+        statusEl.innerHTML = `
+          <strong>🎉 Session Completed!</strong><br>
+          Analyzing conversation...
+        `;
+        
+        // Fetch analysis
+        const analysis = await fetchAnalysis(sessionId);
+        statusEl.innerHTML = `
+          <strong>✨ Analysis Complete</strong><br>
+          Overall Score: ${analysis.overall_score}/100<br>
+          <a href="/results/${sessionId}">View Detailed Results →</a>
+        `;
+      }
+    });
+    
+    async function fetchAnalysis(sessionId) {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId })
+      });
+      return await response.json();
+    }
+  </script>
+</body>
+</html>
+```
+
+```jsx React
+import { useEffect, useState } from 'react';
+
+export default function ConversationEmbed() {
+  const [sessionId, setSessionId] = useState(null);
+  const [status, setStatus] = useState('ready');
+  const [analysis, setAnalysis] = useState(null);
+  
+  const scenarioId = 'YOUR_SCENARIO_ID';
+  
+  useEffect(() => {
+    const handleMessage = async (event) => {
+      if (event.origin !== 'https://app.toughtongueai.com') return;
+      
+      const { event: eventType, sessionId, timestamp } = event.data;
+      
+      if (eventType === 'onStart') {
+        setSessionId(sessionId);
+        setStatus('active');
+      } else if (eventType === 'onStop') {
+        setStatus('analyzing');
+        
+        // Fetch analysis
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          body: JSON.stringify({ session_id: sessionId })
+        });
+        const data = await response.json();
+        setAnalysis(data);
+        setStatus('complete');
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+  
+  return (
+    <div className="container">
+      <h1>Technical Interview Practice</h1>
+      
+      <iframe
+        src={`https://app.toughtongueai.com/embed/${scenarioId}?color=violet-500`}
+        width="100%"
+        height="600px"
+        frameBorder="0"
+        allow="microphone"
+      />
+      
+      {status === 'active' && (
+        <div className="status">
+          ✅ Session in progress: {sessionId}
+        </div>
+      )}
+      
+      {status === 'analyzing' && (
+        <div className="status">
+          Analyzing your conversation...
+        </div>
+      )}
+      
+      {status === 'complete' && analysis && (
+        <div className="results">
+          <h2>Your Results</h2>
+          <p>Overall Score: {analysis.overall_score}/100</p>
+          <a href={`/results/${sessionId}`}>View Detailed Analysis →</a>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+</CodeGroup>
+
+## Responsive Design
+
+Make the iframe responsive:
+
+```css
+.iframe-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 75%; /* 4:3 Aspect Ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.iframe-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+```
+
+```html
+<div class="iframe-container">
+  <iframe
+    src="https://app.toughtongueai.com/embed/SCENARIO_ID"
+    allow="microphone"
+  ></iframe>
+</div>
+```
+
+## Security Considerations
+
+<AccordionGroup>
+  <Accordion title="Verify Message Origin">
+    Always verify the origin of postMessage events:
+    
+    ```javascript
+    if (event.origin !== 'https://app.toughtongueai.com') {
+      console.warn('Ignored message from untrusted origin');
+      return;
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Content Security Policy">
+    Add CSP headers to allow iframe embedding:
+    
+    ```
+    Content-Security-Policy: frame-src https://app.toughtongueai.com;
+    ```
+  </Accordion>
+  
+  <Accordion title="HTTPS Only">
+    Always use HTTPS in production for microphone access.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Microphone not working">
+    - Ensure you're using HTTPS
+    - Check browser permissions
+    - Verify `allow="microphone"` attribute is present
+    - Test in Chrome or Firefox (best supported)
+  </Accordion>
+  
+  <Accordion title="Iframe not loading">
+    - Verify scenario ID is correct
+    - Ensure scenario `is_public` is set to `true`
+    - Check browser console for errors
+    - Verify no CSP blocking the iframe
+  </Accordion>
+  
+  <Accordion title="Events not firing">
+    - Verify message event listener is set up correctly
+    - Check origin verification isn't blocking messages
+    - Ensure iframe has loaded before sending messages
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Integration" href="/guides/api-integration">
+    Build custom integrations with the API
+  </Card>
+  <Card title="Starter Templates" href="/starters/overview">
+    See complete implementation examples
+  </Card>
+</CardGroup>

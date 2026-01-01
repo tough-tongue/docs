@@ -1,0 +1,210 @@
+---
+title: Sessions
+description: Understanding conversation sessions and analysis
+---
+
+# Sessions
+
+A session represents a single conversation between a user and the AI. Every time someone starts a conversation with your scenario, a new session is created.
+
+## Session Lifecycle
+
+<Steps>
+  <Step title="Session Created">
+    User starts a conversation → `onStart` event fired → Session ID generated
+  </Step>
+  
+  <Step title="Conversation Happens">
+    Real-time voice conversation between user and AI
+  </Step>
+  
+  <Step title="Session Ends">
+    User or AI ends conversation → `onStop` event fired → Session saved
+  </Step>
+  
+  <Step title="Analysis Available">
+    AI analyzes the conversation → Insights, transcript, and metrics available
+  </Step>
+</Steps>
+
+## Session Data Structure
+
+```json
+{
+  "id": "session_abc123",
+  "scenario_id": "scenario_xyz789",
+  "user_email": "user@example.com",
+  "created_at": "2024-01-15T10:30:00Z",
+  "duration": 420,
+  "status": "completed",
+  "transcript": "...",
+  "analysis": {
+    "overall_score": 85,
+    "strengths": [...],
+    "improvements": [...]
+  }
+}
+```
+
+## Retrieving Sessions
+
+### List All Sessions
+
+```javascript
+const response = await fetch(
+  `https://api.toughtongueai.com/api/public/sessions?scenario_id=${scenarioId}`,
+  {
+    headers: { 'Authorization': 'Bearer YOUR_API_TOKEN' }
+  }
+);
+const sessions = await response.json();
+```
+
+### Get Session Details
+
+```javascript
+const response = await fetch(
+  `https://api.toughtongueai.com/api/public/sessions/${sessionId}`,
+  {
+    headers: { 'Authorization': 'Bearer YOUR_API_TOKEN' }
+  }
+);
+const session = await response.json();
+```
+
+## Session Analysis
+
+Request AI-powered analysis of a conversation:
+
+<CodeGroup>
+```javascript JavaScript
+const response = await fetch(
+  'https://api.toughtongueai.com/api/public/sessions/analyze',
+  {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer YOUR_API_TOKEN',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ session_id: sessionId })
+  }
+);
+
+const analysis = await response.json();
+```
+
+```python Python
+response = requests.post(
+    'https://api.toughtongueai.com/api/public/sessions/analyze',
+    headers={'Authorization': f'Bearer {api_token}'},
+    json={'session_id': session_id}
+)
+analysis = response.json()
+```
+</CodeGroup>
+
+### Analysis Output
+
+```json
+{
+  "session_id": "abc123",
+  "analysis": {
+    "overall_score": 85,
+    "communication_clarity": 90,
+    "problem_solving": 80,
+    "professionalism": 85,
+    "strengths": [
+      "Clear and articulate responses",
+      "Good active listening skills"
+    ],
+    "areas_for_improvement": [
+      "Could ask more clarifying questions",
+      "Response time could be faster"
+    ],
+    "detailed_feedback": "The conversation showed strong...",
+    "transcript_analysis": {...}
+  }
+}
+```
+
+## Iframe Events
+
+Listen for session events when using iframe embedding:
+
+```javascript
+window.addEventListener('message', (event) => {
+  if (event.origin !== 'https://app.toughtongueai.com') return;
+  
+  const { event: eventType, sessionId, timestamp } = event.data;
+  
+  switch (eventType) {
+    case 'onStart':
+      console.log('Session started:', sessionId);
+      // Store session ID, start timer, etc.
+      break;
+      
+    case 'onStop':
+      console.log('Session ended:', sessionId);
+      // Fetch analysis, redirect to results, etc.
+      break;
+      
+    case 'onTerminated':
+      console.log('Session terminated:', sessionId);
+      // Handle unexpected termination
+      break;
+  }
+});
+```
+
+[Learn more about embedding →](/guides/embedding)
+
+## Filtering Sessions
+
+Filter by user, date range, or scenario:
+
+```javascript
+const params = new URLSearchParams({
+  scenario_id: 'scenario_123',
+  user_email: 'user@example.com',
+  start_date: '2024-01-01',
+  end_date: '2024-01-31'
+});
+
+const response = await fetch(
+  `https://api.toughtongueai.com/api/public/sessions?${params}`,
+  {
+    headers: { 'Authorization': 'Bearer YOUR_API_TOKEN' }
+  }
+);
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Store Session IDs">
+    Always store the session ID when you receive the `onStart` event. You'll need it for analysis and retrieval.
+  </Accordion>
+  
+  <Accordion title="Handle Analysis Asynchronously">
+    Analysis can take a few seconds. Consider showing a loading state or processing it in the background.
+  </Accordion>
+  
+  <Accordion title="Cache Results">
+    Cache analysis results to avoid unnecessary API calls for the same session.
+  </Accordion>
+  
+  <Accordion title="Privacy Considerations">
+    Sessions contain conversation transcripts. Ensure you have user consent and comply with privacy regulations.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" href="/api-reference/sessions">
+    Full session API documentation
+  </Card>
+  <Card title="Analytics" href="/api-reference/analytics">
+    Advanced analytics and reporting
+  </Card>
+</CardGroup>

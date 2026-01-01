@@ -1,0 +1,290 @@
+---
+title: Flask Minimal Starter
+description: Complete guide to the Flask-based starter template
+---
+
+# Flask Minimal Starter
+
+The Flask Minimal starter is a lightweight, Python-based application that demonstrates how to integrate ToughTongue AI into a Flask web application. It's perfect for developers who prefer Python and want a simple, straightforward integration.
+
+## Architecture
+
+The Flask Minimal starter follows a clean, modular architecture:
+
+```
+flask-minimal/
+├── app.py                 # Main Flask application (static file server)
+├── api/
+│   └── index.py          # API routes for ToughTongue AI integration
+├── www/                   # Frontend assets
+│   ├── index.html        # Main HTML page
+│   ├── app.js            # Main application logic (Preact)
+│   ├── assessment.js     # Assessment page with iframe handling
+│   ├── config.js         # Configuration (scenario ID, API endpoints)
+│   ├── styles.css        # Application styling
+│   └── components/
+│       └── results.js    # Results display component
+├── requirements.txt      # Python dependencies
+└── vercel.json          # Vercel deployment configuration
+```
+
+## Features
+
+- **Server-side API proxy**: Secure API calls through Flask backend
+- **Iframe integration**: Embed ToughTongue AI conversations
+- **Session management**: Track and analyze conversation sessions
+- **Preact-based UI**: Lightweight React alternative without build tools
+- **Vercel-ready**: Pre-configured for serverless deployment
+
+## Setup
+
+### 1. Install Dependencies
+
+```bash
+cd flask-minimal
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 2. Configure Environment Variables
+
+Create a `.env` file in the `flask-minimal/` directory:
+
+```env
+TTAI_TOKEN=your_api_token_here
+API_BASE_URL=https://api.toughtongueai.com/api/public
+PORT=8008
+```
+
+### 3. Update Configuration
+
+Edit `www/config.js` to set your scenario ID:
+
+```javascript
+export const toughTongueConfig = {
+  baseUrl: "https://app.toughtongueai.com",
+  scenarioId: "YOUR_SCENARIO_ID_HERE",
+  defaultStyles: {
+    name: "Personality Assessment",
+    color: "indigo-500",
+    background: "white",
+  },
+};
+```
+
+### 4. Run the Application
+
+```bash
+python app.py
+```
+
+The application will start at `http://localhost:8008`.
+
+## Project Structure
+
+### Backend (`api/index.py`)
+
+The Flask API provides two main endpoints:
+
+#### POST `/api/analyze`
+
+Analyzes a completed session:
+
+```javascript
+fetch('/api/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ session_id: 'SESSION_ID' })
+})
+```
+
+#### GET `/api/sessions/<session_id>`
+
+Retrieves session details:
+
+```javascript
+fetch(`/api/sessions/${sessionId}`)
+```
+
+### Frontend (`www/`)
+
+#### `app.js`
+
+Main application entry point using Preact:
+- Displays personality types
+- Handles navigation
+- Manages state with Preact hooks
+
+#### `assessment.js`
+
+Assessment page component:
+- Embeds ToughTongue AI iframe
+- Listens for iframe events (`onStart`, `onStop`)
+- Manages session state
+- Handles analysis requests
+
+#### `config.js`
+
+Centralized configuration:
+- Personality types data
+- ToughTongue AI configuration
+- API endpoint URLs
+
+## Integration Guide
+
+### Step 1: Embed the Iframe
+
+The iframe is automatically embedded in `assessment.js`:
+
+```javascript
+const buildIframeUrl = () => {
+  let baseUrl = `${toughTongueConfig.baseUrl}/embed/${toughTongueConfig.scenarioId}`;
+  const params = new URLSearchParams();
+  params.append("name", toughTongueConfig.defaultStyles.name);
+  params.append("color", toughTongueConfig.defaultStyles.color);
+  params.append("bg", toughTongueConfig.defaultStyles.background);
+  params.append("pulse", "true");
+  params.append("transcribe", "true");
+  return `${baseUrl}?${params.toString()}`;
+};
+```
+
+### Step 2: Listen for Events
+
+Handle iframe events in `assessment.js`:
+
+```javascript
+useEffect(() => {
+  const handleMessage = async (event) => {
+    const data = event.data;
+    if (data && data.event) {
+      switch (data.event) {
+        case "onStart":
+          // Session started
+          setSessionData({
+            sessionId: data.sessionId,
+            status: "started",
+            timestamp: data.timestamp,
+          });
+          break;
+        case "onStop":
+          // Session completed
+          setSessionData(prev => ({
+            ...prev,
+            status: "completed",
+            timestamp: data.timestamp,
+          }));
+          break;
+      }
+    }
+  };
+  window.addEventListener("message", handleMessage);
+  return () => window.removeEventListener("message", handleMessage);
+}, []);
+```
+
+### Step 3: Analyze Sessions
+
+After a session completes, analyze it:
+
+```javascript
+const analyzeSession = async (sessionId) => {
+  const response = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: sessionId })
+  });
+  return await response.json();
+};
+```
+
+## Customization
+
+### Styling
+
+Modify `www/styles.css` to customize the appearance. The starter uses a clean, modern design with:
+
+- Responsive layout
+- Card-based UI components
+- Smooth transitions
+- Dark mode support (via CSS variables)
+
+### Adding New Features
+
+1. **New API endpoints**: Add routes in `api/index.py`
+2. **New components**: Create files in `www/components/`
+3. **New pages**: Add components in `app.js` with routing logic
+
+## Deployment
+
+### Vercel Deployment
+
+The project includes `vercel.json` for serverless deployment:
+
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    },
+    { "src": "www/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "api/index.py" },
+    { "src": "/(.*)", "dest": "/www/$1" }
+  ]
+}
+```
+
+**Steps:**
+
+1. Install Vercel CLI: `pnpm add -g vercel`
+2. Set environment variables in Vercel dashboard
+3. Deploy: `vercel --prod`
+
+### Other Platforms
+
+For other platforms (Heroku, Railway, etc.):
+
+1. Ensure Python 3.9+ is available
+2. Set environment variables
+3. Configure the start command: `python app.py`
+4. Ensure port is configurable via `PORT` environment variable
+
+## Troubleshooting
+
+### API Token Issues
+
+- Verify `TTAI_TOKEN` is set correctly
+- Check token hasn't expired
+- Ensure token has necessary permissions
+
+### Iframe Not Loading
+
+- Verify scenario ID is correct
+- Check scenario is set to `is_public: true`
+- Review browser console for errors
+- Ensure CORS is properly configured
+
+### Static Files Not Serving
+
+- Check `WWW_DIR` path in `app.py`
+- Verify file permissions
+- Ensure files exist in `www/` directory
+
+## Best Practices
+
+1. **Security**: Never expose API tokens in client-side code
+2. **Error Handling**: Always handle API errors gracefully
+3. **Loading States**: Show loading indicators during API calls
+4. **Session Management**: Store session IDs securely
+5. **Environment Variables**: Use `.env` files (never commit them)
+
+## Next Steps
+
+- Explore the [API Integration Guide](/integration/api-reference)
+- Learn about [Deployment Options](/integration/deployment)
+- Check out the [Next.js Minimal Starter](/starters/nextjs-minimal) for more advanced features

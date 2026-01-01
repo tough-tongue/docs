@@ -1,0 +1,341 @@
+---
+title: Scenarios
+description: Understanding and creating conversation scenarios
+---
+
+# Scenarios
+
+Scenarios are the foundation of ToughTongue AI. A scenario defines the context, behavior, and rules for an AI conversation.
+
+## What is a Scenario?
+
+A scenario is a configuration that tells the AI:
+
+- **Who** it should act as (role/persona)
+- **How** it should behave (tone, style, approach)
+- **What** topics to focus on
+- **Why** the conversation is happening (context)
+
+<Frame>
+  ```mermaid graph LR A[Scenario] --> B[AI Instructions] A --> C[Context/Documents] A -->
+  D[Evaluation Criteria] B --> E[Conversation] C --> E D --> F[Analysis] E --> F ```
+</Frame>
+
+## Key Components
+
+### Name & Description
+
+- **Name**: Internal identifier for your scenario
+- **Description**: Team-facing notes about the scenario's purpose
+- **User-Friendly Description**: What users see before starting
+
+```json
+{
+  "name": "Customer Support - Billing Issues",
+  "description": "Train agents on handling billing disputes",
+  "user_friendly_description": "Practice resolving customer billing concerns with empathy and efficiency"
+}
+```
+
+### AI Instructions
+
+The most important part - tells the AI how to behave:
+
+<CodeGroup>
+```text Good Example
+You are Sarah, a frustrated customer who received an unexpected charge of $299 on your credit card from TechCorp. You've been a customer for 3 years and this is your first issue.
+
+Behavior Guidelines:
+
+- Start frustrated but not aggressive
+- Become calmer if the agent shows empathy
+- Ask clarifying questions about the charge
+- Want a refund or detailed explanation
+- Mention you're considering canceling if not resolved
+
+Keep the conversation realistic and allow the agent to guide the resolution.
+
+````
+
+```text Bad Example
+You are a customer service trainer. Talk to the agent.
+````
+
+</CodeGroup>
+
+<Tip>
+  **Pro Tips for AI Instructions:** - Be specific about the role and context - Define the emotional
+  tone and how it should evolve - Set clear objectives for the conversation - Include constraints
+  (time, topics, difficulty) - Mention when to wrap up the conversation
+</Tip>
+
+### Context & Documents
+
+Upload PDFs or provide text context to give the AI additional knowledge:
+
+<AccordionGroup>
+  <Accordion title="Product Documentation">
+    Upload product manuals, specifications, or guidelines for the AI to reference during
+    conversations.
+  </Accordion>
+
+  <Accordion title="Company Policies">
+    Provide company policies, procedures, or FAQs that the AI should follow or reference.
+  </Accordion>
+
+  <Accordion title="Training Materials">
+    Add training documents or rubrics to ensure conversations align with your methodology.
+  </Accordion>
+</AccordionGroup>
+
+```json
+{
+  "pdf_context": "base64_encoded_pdf_here"
+}
+```
+
+### Evaluation Criteria (Rubric)
+
+Define how conversations should be evaluated:
+
+```json
+{
+  "rubrik": {
+    "criteria": [
+      {
+        "name": "Empathy",
+        "description": "Shows understanding and care for customer concerns",
+        "weight": 0.3
+      },
+      {
+        "name": "Problem Solving",
+        "description": "Effectively identifies and resolves the issue",
+        "weight": 0.4
+      },
+      {
+        "name": "Communication",
+        "description": "Clear, professional, and appropriate language",
+        "weight": 0.3
+      }
+    ]
+  }
+}
+```
+
+## Scenario Types
+
+### 1. Interview Preparation
+
+```json
+{
+  "name": "Senior React Developer Interview",
+  "ai_instructions": "You are a senior engineering manager conducting a technical interview. Ask about React hooks, performance optimization, and architecture decisions. Be thorough but fair.",
+  "is_public": true
+}
+```
+
+**Best for**: Job seekers, career coaching platforms
+
+### 2. Sales Training
+
+```json
+{
+  "name": "Enterprise SaaS Sales Call",
+  "ai_instructions": "You are a CTO at a 500-person company evaluating project management software. You're skeptical about switching from your current tool. Focus on integration concerns and ROI.",
+  "is_public": true
+}
+```
+
+**Best for**: Sales enablement, CRM platforms
+
+### 3. Customer Service
+
+```json
+{
+  "name": "Difficult Customer Interaction",
+  "ai_instructions": "You are an upset customer whose order arrived damaged. You want a refund immediately and are threatening to leave a bad review. Calm down if treated with respect and empathy.",
+  "is_public": true
+}
+```
+
+**Best for**: Support training, LMS platforms
+
+### 4. Language Learning
+
+```json
+{
+  "name": "Spanish Conversation Practice - Restaurant",
+  "ai_instructions": "You are a waiter at a restaurant in Barcelona. Speak only in Spanish. Help the learner practice ordering food, asking questions, and making polite conversation. Correct major grammar mistakes gently.",
+  "is_public": true
+}
+```
+
+**Best for**: Language learning apps, EdTech
+
+## Creating Scenarios
+
+<Tabs>
+  <Tab title="Dashboard">
+    1. Go to [app.toughtongueai.com/scenarios](https://app.toughtongueai.com/scenarios)
+    2. Click **"New Scenario"**
+    3. Fill in all fields
+    4. Toggle settings as needed
+    5. Click **"Create"**
+  </Tab>
+  
+  <Tab title="API">
+    ```javascript
+    const response = await fetch('https://api.toughtongueai.com/api/public/scenarios', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer YOUR_API_TOKEN',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: 'Your Scenario Name',
+        description: 'Internal description',
+        user_friendly_description: 'What users see',
+        ai_instructions: 'Detailed AI behavior instructions...',
+        is_public: true,
+        is_recording: true,
+        restrict_analysis: false
+      })
+    });
+    
+    const scenario = await response.json();
+    ```
+    
+    [See full API reference →](/api-reference/scenarios)
+  </Tab>
+</Tabs>
+
+## Configuration Options
+
+### Privacy & Access
+
+| Option      | Description                                              |
+| ----------- | -------------------------------------------------------- |
+| `is_public` | Anyone with the link can access (required for embedding) |
+| `passcode`  | Require a password to start conversations                |
+
+### Recording & Analysis
+
+| Option              | Description                            |
+| ------------------- | -------------------------------------- |
+| `is_recording`      | Save audio recordings of conversations |
+| `restrict_analysis` | Disable AI analysis features           |
+
+### Organization
+
+| Option        | Description                             |
+| ------------- | --------------------------------------- |
+| `org_id`      | Associate scenario with an organization |
+| `permissions` | Define who can access and modify        |
+
+## Best Practices
+
+<Card title="Writing Effective AI Instructions" icon="lightbulb">
+  <AccordionGroup>
+    <Accordion title="1. Set Clear Context">
+      Start with who the AI is, their background, and the situation: ✅ "You are Dr. Smith, a family
+      physician with 20 years of experience..." ❌ "You are a doctor."
+    </Accordion>
+
+    <Accordion title="2. Define Objectives">
+      What should happen in this conversation? ✅ "Your goal is to understand the patient's symptoms
+      and provide preliminary advice..." ❌ "Talk to the patient."
+    </Accordion>
+
+    <Accordion title="3. Set Boundaries">
+      What topics or behaviors to avoid: ✅ "Do not provide specific medical diagnoses. Recommend
+      seeing a specialist for serious symptoms." ❌ No boundaries set
+    </Accordion>
+
+    <Accordion title="4. Include Evolution">
+      How should the AI's tone or approach change during the conversation? ✅ "Start defensive, but
+      become more open to solutions if the sales person shows understanding..." ❌ Static behavior
+      throughout
+    </Accordion>
+  </AccordionGroup>
+</Card>
+
+## Managing Scenarios
+
+### Listing Scenarios
+
+```javascript
+const response = await fetch("https://api.toughtongueai.com/api/public/scenarios", {
+  headers: {
+    Authorization: "Bearer YOUR_API_TOKEN",
+  },
+});
+
+const scenarios = await response.json();
+```
+
+### Updating Scenarios
+
+```javascript
+const response = await fetch(`https://api.toughtongueai.com/api/public/scenarios/${scenarioId}`, {
+  method: "PATCH",
+  headers: {
+    Authorization: "Bearer YOUR_API_TOKEN",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name: "Updated Name",
+    ai_instructions: "Updated instructions...",
+  }),
+});
+```
+
+### Deleting Scenarios
+
+```javascript
+await fetch(`https://api.toughtongueai.com/api/public/scenarios/${scenarioId}`, {
+  method: "DELETE",
+  headers: {
+    Authorization: "Bearer YOUR_API_TOKEN",
+  },
+});
+```
+
+## Featured Scenarios
+
+Make scenarios discoverable in the marketplace:
+
+```javascript
+// Get featured scenarios
+const response = await fetch("https://api.toughtongueai.com/api/public/featured-scenarios");
+const featured = await response.json();
+```
+
+## Examples
+
+<CardGroup cols={2}>
+  <Card title="Interview Prep" href="/examples/interview-prep">
+    Complete interview preparation scenario
+  </Card>
+  <Card title="Sales Training" href="/examples/sales-training">
+    Enterprise sales conversation example
+  </Card>
+  <Card title="Customer Service" href="/examples/customer-service">
+    Customer support training scenario
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Steps>
+  <Step title="Create Your First Scenario">
+    Follow the [Quickstart Guide](/quickstart) to create and test a scenario
+  </Step>
+
+  <Step title="Learn About Sessions">
+    Understand how [sessions work](/concepts/sessions) and how to analyze them
+  </Step>
+
+  <Step title="Embed in Your App">
+    Follow the [Embedding Guide](/guides/embedding) to add scenarios to your application
+  </Step>
+</Steps>

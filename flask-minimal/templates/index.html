@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToughTongue AI - Flask Starter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .features {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-center;
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1f2937;
+        }
+        
+        .feature-desc {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+        
+        .how-it-works {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        
+        .step-content p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        .step-content code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #667eea;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+            background: white;
+        }
+        
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="badge">🚀 Built with ToughTongue AI</div>
+        <h1>Voice AI Training,<br>Made Simple</h1>
+        <p class="subtitle">
+            Build production-ready voice AI agents for sales coaching, interview prep, and leadership development. 
+            No pipeline maintenance required.
+        </p>
+        <div class="cta-buttons">
+            <a href="/assessment" class="btn btn-primary">Try Demo Assessment</a>
+            <a href="https://docs.toughtongueai.com" class="btn btn-secondary" target="_blank">Documentation</a>
+        </div>
+        <p style="opacity: 0.7; font-size: 14px;">This is a Flask starter template. Customize it for your use case.</p>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features">
+        <h2 class="section-title">Everything You Need to Build Voice AI Apps</h2>
+        <p class="section-subtitle">This starter template includes best practices for integrating ToughTongue AI</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Iframe Embedding</h3>
+                <p class="feature-desc">
+                    Drop ToughTongue AI scenarios into your app with a single iframe. Handle lifecycle events seamlessly.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Session Analysis</h3>
+                <p class="feature-desc">
+                    Fetch detailed conversation analysis via API. Display insights, transcripts, and coaching feedback.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Secure API Routes</h3>
+                <p class="feature-desc">
+                    Server-side API proxies keep your API key secure. Never expose tokens to clients.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Modern UI</h3>
+                <p class="feature-desc">
+                    Built with Preact for fast, lightweight components. Customize the design to match your brand.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3 class="feature-title">Responsive Design</h3>
+                <p class="feature-desc">
+                    Works beautifully on desktop, tablet, and mobile. Practice voice AI anywhere.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 class="feature-title">Deploy Anywhere</h3>
+                <p class="feature-desc">
+                    Works on Vercel, Railway, Heroku, or traditional hosting. Includes Vercel config.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="how-it-works">
+        <h2 class="section-title">How This Template Works</h2>
+        <p class="section-subtitle">A complete integration example with ToughTongue AI</p>
+        
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Embed Voice AI Scenarios</h3>
+                <p>
+                    Use iframes to embed any scenario from ToughTongue AI. Users practice conversations 
+                    right in your app. Configure with query parameters for branding.
+                </p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Listen to Lifecycle Events</h3>
+                <p>
+                    JavaScript event listeners capture when sessions start, stop, and provide session IDs. 
+                    Use <code>window.addEventListener('message', handler)</code> to track user activity.
+                </p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Fetch Analysis via API</h3>
+                <p>
+                    Flask API routes proxy requests to ToughTongue AI, keeping your API key secure on the server. 
+                    Get transcripts, coaching insights, and performance metrics.
+                </p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Display Results & Track Progress</h3>
+                <p>
+                    Show users their performance, areas for improvement, and progress over time. 
+                    Store data in your preferred database.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="hero" style="padding: 60px 20px;">
+        <h2 style="font-size: 36px; margin-bottom: 20px;">Ready to Build Your Voice AI App?</h2>
+        <p class="subtitle" style="margin-bottom: 30px;">Get your ToughTongue AI API key and start building in minutes</p>
+        <div class="cta-buttons">
+            <a href="https://app.toughtongueai.com/developer" class="btn btn-primary" target="_blank">Get API Key</a>
+            <a href="https://docs.toughtongueai.com" class="btn btn-secondary" target="_blank">Read Documentation</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p style="margin-bottom: 12px;">
+            Built with ❤️ using 
+            <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a>, 
+            <a href="https://preactjs.com" target="_blank">Preact</a>, and 
+            <a href="https://www.toughtongueai.com" target="_blank">ToughTongue AI</a>
+        </p>
+        <p style="font-size: 14px;">
+            <a href="https://docs.toughtongueai.com" target="_blank">Documentation</a> • 
+            <a href="https://github.com/tough-tongue/tt-starter" target="_blank">GitHub</a> • 
+            <a href="https://discord.com/invite/jfq2wVAP" target="_blank">Discord</a>
+        </p>
+    </footer>
+</body>
+</html>
