@@ -1,0 +1,225 @@
+---
+title: Starter Templates
+description: Production-ready templates to jump-start your integration
+---
+
+Get up and running quickly with our starter templates. Choose the one that matches your tech stack.
+
+## Available Templates
+
+<CardGroup cols={2}>
+  <Card title="Next.js Starter" icon="react" href="/starters/nextjs" color="#6366f1">
+    **TypeScript + Next.js** ✅ Ready
+    
+    Complete personality discovery app
+    
+    - Next.js 15 App Router
+    - TypeScript & React 19
+    - Firebase Authentication
+    - Tailwind CSS + shadcn/ui
+    - Admin dashboard
+    - Progress tracking
+  </Card>
+  
+  <Card title="Flask Starter" icon="python" href="/starters/flask" color="#fbbf24">
+    **Python + Flask** 🚧 In Progress
+    
+    Lightweight Python template
+    
+    - Flask 2.0+ backend
+    - Preact frontend
+    - No build tools required
+    - Vercel-ready
+    - Simple & straightforward
+  </Card>
+</CardGroup>
+
+---
+
+## Quick Comparison
+
+| Feature | Next.js Starter | Flask Starter |
+|---------|----------------|---------------|
+| **Status** | ✅ Ready | 🚧 In Progress |
+| **Language** | TypeScript | Python |
+| **Framework** | Next.js 15 | Flask |
+| **Frontend** | React 19 | Preact |
+| **Authentication** | Firebase | Coming Soon |
+| **State Management** | Zustand | Preact Hooks |
+| **Styling** | Tailwind CSS | CSS |
+| **Type Safety** | ✅ Full | ❌ No |
+| **Best For** | Production apps | Simple prototypes |
+
+---
+
+## Next.js Starter (Recommended)
+
+### What's Included
+
+The Next.js starter is a **complete personality discovery application**:
+
+<AccordionGroup>
+  <Accordion title="🧠 MBTI Personality Test" icon="brain">
+    - Interactive AI-powered assessment
+    - Automatic result analysis and storage
+    - MBTI type extraction and display
+    - Retake functionality
+  </Accordion>
+  
+  <Accordion title="💬 AI Personality Coach" icon="comment">
+    - Personalized coaching based on your type
+    - Dynamic variable passing (personality type, user info)
+    - Session history tracking
+    - Progress monitoring
+  </Accordion>
+  
+  <Accordion title="📊 Progress Dashboard" icon="chart-line">
+    - Test completion status with MBTI type
+    - Coaching session history
+    - Statistics and achievements
+    - Data refresh functionality
+  </Accordion>
+  
+  <Accordion title="👨‍💼 Admin Panel" icon="shield">
+    - Token-protected access
+    - App statistics dashboard
+    - Data export (JSON)
+    - Clear data options
+    - Configuration viewer
+  </Accordion>
+  
+  <Accordion title="🔐 Firebase Authentication" icon="lock">
+    - Email/password sign-in
+    - Google OAuth
+    - Protected routes
+    - User context throughout app
+  </Accordion>
+  
+  <Accordion title="🎨 Interactive UI" icon="palette">
+    - Beautiful landing page
+    - 16 MBTI types with detailed info
+    - Clickable type cards with modal dialogs
+    - Character emojis and descriptions
+    - Responsive design
+  </Accordion>
+</AccordionGroup>
+
+### Quick Start
+
+```bash
+cd nextjs-minimal
+pnpm install
+cp .env.example .env.local
+# Add your credentials to .env.local
+pnpm dev
+```
+
+[View complete guide →](/starters/nextjs)
+
+---
+
+## Flask Starter (Coming Soon)
+
+<Note>
+  **🚧 In Progress**: The Flask starter is being updated with modern patterns and better integration examples.
+</Note>
+
+### Current Status
+
+The Flask starter provides basic integration but is being enhanced. For now, we recommend using the Next.js starter for production applications.
+
+### What's Coming
+
+- Updated architecture
+- Better frontend components
+- Optional Firebase integration
+- Complete documentation
+- More examples
+
+[View preview guide →](/starters/flask)
+
+---
+
+## Which Template Should I Use?
+
+<Tabs>
+  <Tab title="Use Next.js If...">
+    ✅ You want a **production-ready** application
+    
+    ✅ You prefer **TypeScript** and modern JavaScript
+    
+    ✅ You need **authentication** (Firebase)
+    
+    ✅ You want **type safety** across your codebase
+    
+    ✅ You're building a **scalable** application
+    
+    ✅ You want **modern UI** components (Tailwind + shadcn/ui)
+    
+    ✅ You need **state management** (Zustand)
+  </Tab>
+  
+  <Tab title="Use Flask If...">
+    ⏳ You prefer **Python** backend
+    
+    ⏳ You want **minimal dependencies**
+    
+    ⏳ You need a **simple** prototype
+    
+    ⏳ You're comfortable with basic HTML/CSS/JS
+    
+    <Note>**Note**: Flask starter is in progress. Consider Next.js for immediate use.</Note>
+  </Tab>
+</Tabs>
+
+---
+
+## Getting Credentials
+
+Both templates require ToughTongue AI credentials:
+
+<Steps>
+  <Step title="Create Account">
+    Sign up at [ToughTongue AI](https://www.toughtongueai.com/)
+  </Step>
+  
+  <Step title="Get API Key">
+    Visit [Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys)
+    
+    Click "Create New API Key"
+  </Step>
+  
+  <Step title="Get Scenario ID">
+    Create a scenario in [ToughTongue AI Dashboard](https://app.toughtongueai.com/)
+    
+    Or use the public MBTI assessment scenario included in Next.js starter
+  </Step>
+</Steps>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Next.js Complete Guide" href="/starters/nextjs" icon="react">
+    Start building with the Next.js template
+  </Card>
+  
+  <Card title="Firebase Authentication" href="/starters/firebase-auth" icon="fire">
+    Set up Firebase auth in your app
+  </Card>
+  
+  <Card title="API Reference" href="/api-reference/overview" icon="code">
+    Explore ToughTongue AI API
+  </Card>
+  
+  <Card title="Troubleshooting" href="/guides/troubleshooting" icon="wrench">
+    Common issues and solutions
+  </Card>
+</CardGroup>
+
+---
+
+<Card title="Need help?" icon="question">
+  Join our [Discord community](https://discord.com/invite/jfq2wVAP) or email **help@getarchieai.com**
+</Card>

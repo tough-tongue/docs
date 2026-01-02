@@ -1,45 +1,56 @@
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ROUTES, MBTI_TYPES, MBTI_TYPE_DETAILS, type MBTIType } from "@/lib/constants";
+import { AppConfig } from "@/lib/config";
 
 export default function Home() {
+  const [selectedType, setSelectedType] = useState<MBTIType | null>(null);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 md:py-32">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="mb-6 inline-flex items-center rounded-full bg-indigo-100 px-4 py-1.5 text-sm font-medium text-indigo-700">
-            <span className="mr-2">🚀</span>
-            Built with ToughTongue AI
+          <div className="mb-6 inline-flex items-center rounded-full bg-purple-100 px-4 py-1.5 text-sm font-medium text-purple-700">
+            <span className="mr-2">🧠</span>
+            MBTI Personality Assessment
           </div>
 
           <h1 className="mb-6 text-5xl font-bold tracking-tight text-gray-900 md:text-7xl">
-            Voice AI Training,{" "}
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Made Simple
-            </span>
+            {AppConfig.app.name}
           </h1>
 
           <p className="mb-10 text-xl text-gray-600 md:text-2xl">
-            Build production-ready voice AI agents for sales coaching, interview prep, and
-            leadership development. No pipeline maintenance required.
+            Discover your unique MBTI personality type through AI-powered conversations. Take the
+            comprehensive test and get personalized coaching to better understand yourself.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/analysis">
-              <Button size="lg" className="w-full sm:w-auto">
-                Try Demo Analysis
+            <Link href={ROUTES.PERSONALITY_TEST}>
+              <Button size="lg" className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700">
+                Take Personality Test
               </Button>
             </Link>
-            <Link href="/course">
+            <Link href={ROUTES.PERSONALITY_COACH}>
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                View Course Example
+                Talk to Your Coach
               </Button>
             </Link>
           </div>
 
           <p className="mt-6 text-sm text-gray-500">
-            This is a Next.js starter template. Customize it for your use case.
+            Takes approximately 10-15 minutes • Completely free
           </p>
         </div>
       </section>
@@ -47,61 +58,35 @@ export default function Home() {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
-            Everything You Need to Build Voice AI Apps
-          </h2>
+          <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">How It Works</h2>
           <p className="text-lg text-gray-600">
-            This starter template includes best practices for integrating ToughTongue AI
+            A simple 3-step process to discover your personality type
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3">
           <Card>
             <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100">
-                <svg
-                  className="h-6 w-6 text-indigo-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
+              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
+                <span className="text-2xl">1️⃣</span>
               </div>
-              <CardTitle>Iframe Embedding</CardTitle>
+              <CardTitle>Take the Test</CardTitle>
               <CardDescription>
-                Drop ToughTongue AI scenarios into your app with a single iframe. Handle lifecycle
-                events seamlessly.
+                Have a natural conversation with our AI to assess your personality traits across all
+                MBTI dimensions.
               </CardDescription>
             </CardHeader>
           </Card>
 
           <Card>
             <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
-                <svg
-                  className="h-6 w-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
+              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100">
+                <span className="text-2xl">2️⃣</span>
               </div>
-              <CardTitle>Session Analysis</CardTitle>
+              <CardTitle>Get Your Results</CardTitle>
               <CardDescription>
-                Fetch detailed conversation analysis via API. Display insights, transcripts, and
-                coaching feedback.
+                Receive a comprehensive analysis of your personality type with detailed insights and
+                characteristics.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -109,275 +94,176 @@ export default function Home() {
           <Card>
             <CardHeader>
               <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-pink-100">
-                <svg
-                  className="h-6 w-6 text-pink-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
+                <span className="text-2xl">3️⃣</span>
               </div>
-              <CardTitle>Firebase Auth</CardTitle>
+              <CardTitle>Talk to Your Coach</CardTitle>
               <CardDescription>
-                Built-in authentication with email/password and Google sign-in. Protect your routes
-                with ease.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
-                <svg
-                  className="h-6 w-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                  />
-                </svg>
-              </div>
-              <CardTitle>API Routes</CardTitle>
-              <CardDescription>
-                Server-side API proxies for secure token handling. Never expose your ToughTongue AI
-                key to clients.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-yellow-100">
-                <svg
-                  className="h-6 w-6 text-yellow-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                  />
-                </svg>
-              </div>
-              <CardTitle>Zustand State</CardTitle>
-              <CardDescription>
-                Clean state management for session data, analysis results, and user preferences.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-                <svg
-                  className="h-6 w-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                  />
-                </svg>
-              </div>
-              <CardTitle>Tailwind + shadcn/ui</CardTitle>
-              <CardDescription>
-                Beautiful, accessible UI components. Customize the design system to match your
-                brand.
+                Discuss your results with an AI coach who understands your personality type and can
+                provide personalized guidance.
               </CardDescription>
             </CardHeader>
           </Card>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* MBTI Types Overview */}
       <section className="container mx-auto px-4 py-20">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
-              How This Template Works
+              16 Personality Types
             </h2>
             <p className="text-lg text-gray-600">
-              A complete integration example with ToughTongue AI
+              Based on the Myers-Briggs Type Indicator (MBTI) framework
             </p>
           </div>
 
-          <div className="space-y-8">
-            <div className="flex gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white font-bold">
-                1
-              </div>
-              <div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">
-                  Embed Voice AI Scenarios
-                </h3>
-                <p className="text-gray-600">
-                  Use the{" "}
-                  <code className="rounded bg-gray-100 px-2 py-1 text-sm">ToughTongueIframe</code>{" "}
-                  component to embed any scenario from ToughTongue AI. Users practice conversations
-                  right in your app.
-                </p>
-              </div>
-            </div>
+          {/* Personality Types Image */}
+          <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+            <Image
+              src="/images/personality-types-cover.png"
+              alt="16 MBTI Personality Types"
+              width={1200}
+              height={675}
+              className="w-full h-auto"
+              priority
+            />
+          </div>
 
-            <div className="flex gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white font-bold">
-                2
-              </div>
-              <div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">
-                  Listen to Lifecycle Events
-                </h3>
-                <p className="text-gray-600">
-                  The{" "}
-                  <code className="rounded bg-gray-100 px-2 py-1 text-sm">
-                    useSessionManagement
-                  </code>{" "}
-                  hook captures when sessions start, stop, and provides session IDs for analysis.
-                </p>
-              </div>
-            </div>
+          <p className="text-center text-gray-600 mb-6">
+            Click on any personality type to learn more about its characteristics
+          </p>
 
-            <div className="flex gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white font-bold">
-                3
-              </div>
-              <div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">Fetch Analysis via API</h3>
-                <p className="text-gray-600">
-                  Server-side API routes proxy requests to ToughTongue AI, keeping your API key
-                  secure. Get transcripts, coaching insights, and performance metrics.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white font-bold">
-                4
-              </div>
-              <div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">
-                  Display Results & Track Progress
-                </h3>
-                <p className="text-gray-600">
-                  Show users their performance, areas for improvement, and progress over time. Store
-                  data in Firebase or your preferred database.
-                </p>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {MBTI_TYPES.map((type) => {
+              const details = MBTI_TYPE_DETAILS[type];
+              return (
+                <button
+                  key={type}
+                  onClick={() => setSelectedType(type)}
+                  className="group rounded-lg border-2 border-gray-200 bg-white p-4 text-center font-semibold text-gray-700 transition-all hover:border-purple-500 hover:shadow-md hover:scale-105 cursor-pointer"
+                >
+                  <div className="text-3xl mb-2">{details.character}</div>
+                  <div className="text-lg">{type}</div>
+                  <div className="text-xs text-gray-500 mt-1 group-hover:text-purple-600">
+                    {details.nickname}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 p-12 text-center text-white">
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Ready to Build Your Voice AI App?</h2>
-          <p className="mb-8 text-lg text-indigo-100">
-            Get your ToughTongue AI API key and start building in minutes
+        <div className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-r from-purple-600 to-indigo-600 p-12 text-center text-white">
+          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Ready to Discover Yourself?</h2>
+          <p className="mb-8 text-lg text-purple-100">
+            Start your journey to self-discovery with our AI-powered personality assessment
           </p>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href="https://app.toughtongueai.com/developer"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
-                Get API Key
-              </Button>
-            </a>
-            <a href="https://docs.toughtongueai.com" target="_blank" rel="noopener noreferrer">
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full border-white text-white hover:bg-white hover:text-indigo-600 sm:w-auto"
-              >
-                Read Documentation
-              </Button>
-            </a>
-          </div>
+          <Link href={ROUTES.PERSONALITY_TEST}>
+            <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+              Get Started Now
+            </Button>
+          </Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-gray-200 py-12">
         <div className="container mx-auto px-4 text-center text-gray-600">
-          <p className="mb-4">
-            Built with ❤️ using{" "}
-            <a
-              href="https://nextjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-600 hover:underline"
-            >
-              Next.js
-            </a>
-            ,{" "}
-            <a
-              href="https://firebase.google.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-600 hover:underline"
-            >
-              Firebase
-            </a>
-            , and{" "}
+          <p className="mb-2">
+            Built with{" "}
             <a
               href="https://www.toughtongueai.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 hover:underline"
+              className="text-purple-600 hover:underline"
             >
               ToughTongue AI
             </a>
           </p>
           <p className="text-sm">
             <a
-              href="https://docs.toughtongueai.com"
+              href="https://docs.toughtongueai.com/developer/starters/nextjs"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-indigo-600"
+              className="hover:text-purple-600"
             >
-              Documentation
-            </a>
-            {" • "}
-            <a
-              href="https://github.com/tough-tongue/tt-starter"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-indigo-600"
-            >
-              GitHub
-            </a>
-            {" • "}
-            <a
-              href="https://discord.com/invite/jfq2wVAP"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-indigo-600"
-            >
-              Discord
+              Template Documentation
             </a>
           </p>
         </div>
       </footer>
+
+      {/* Personality Type Details Dialog */}
+      <Dialog open={selectedType !== null} onOpenChange={() => setSelectedType(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedType && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-5xl">{MBTI_TYPE_DETAILS[selectedType].character}</span>
+                  <div>
+                    <DialogTitle className="text-2xl">
+                      {selectedType} - {MBTI_TYPE_DETAILS[selectedType].name}
+                    </DialogTitle>
+                    <p className="text-purple-600 font-semibold">
+                      {MBTI_TYPE_DETAILS[selectedType].nickname}
+                    </p>
+                  </div>
+                </div>
+                <DialogDescription className="text-base text-gray-700 leading-relaxed">
+                  {MBTI_TYPE_DETAILS[selectedType].description}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 mt-4">
+                {/* Key Traits */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Key Traits</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {MBTI_TYPE_DETAILS[selectedType].traits.map((trait) => (
+                      <span
+                        key={trait}
+                        className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+                      >
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Strengths */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Strengths</h4>
+                  <ul className="space-y-1">
+                    {MBTI_TYPE_DETAILS[selectedType].strengths.map((strength) => (
+                      <li key={strength} className="flex items-center text-gray-700">
+                        <span className="mr-2 text-green-600">✓</span>
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Call to Action */}
+                <div className="pt-4 border-t">
+                  <p className="text-sm text-gray-600 mb-3">
+                    Want to discover your personality type?
+                  </p>
+                  <Link href={ROUTES.PERSONALITY_TEST}>
+                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                      Take the Personality Test
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,0 +1,161 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "ToughTongue AI",
+  "colors": {
+    "primary": "#6366f1",
+    "light": "#818cf8",
+    "dark": "#4f46e5"
+  },
+  "favicon": "/public/favicon.ico",
+  "logo": {
+    "light": "/public/logo-light.svg",
+    "dark": "/public/logo-dark.svg",
+    "href": "https://www.toughtongueai.com"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "🚧 Beta",
+        "href": "/getting-started/introduction"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Go to App",
+      "href": "https://app.toughtongueai.com"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": ["getting-started/introduction"]
+          },
+          {
+            "group": "Product Documentation",
+            "pages": [
+              {
+                "group": "Key Features",
+                "pages": [
+                  "product/scenario-studio",
+                  "product/conversation-experience",
+                  "product/post-session-analysis"
+                ]
+              },
+              {
+                "group": "Enterprise Account",
+                "pages": [
+                  "product/enterprise-overview",
+                  "product/enterprise-members",
+                  "product/enterprise-billing"
+                ]
+              },
+              {
+                "group": "Special Features",
+                "pages": ["product/google-meet-integration", "product/phone-integration"]
+              },
+              {
+                "group": "Use Cases",
+                "pages": ["product/use-cases/sales-coaching", "product/use-cases/create-course"]
+              }
+            ]
+          },
+          {
+            "group": "Developer Documentation",
+            "pages": [
+              "developer/overview",
+              {
+                "group": "Integration",
+                "pages": ["developer/iframe", "developer/api", "developer/authentication"]
+              },
+              {
+                "group": "Guides",
+                "pages": ["developer/guides/webhooks", "developer/guides/troubleshooting"]
+              },
+              {
+                "group": "Starter Templates",
+                "pages": [
+                  "developer/starters/overview",
+                  "developer/starters/nextjs",
+                  "developer/starters/firebase-auth",
+                  "developer/starters/flask"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "api-reference/overview",
+              {
+                "group": "Scenarios",
+                "pages": [
+                  "api-reference/endpoints/list-scenarios",
+                  "api-reference/endpoints/create-scenario"
+                ]
+              },
+              {
+                "group": "Sessions",
+                "pages": [
+                  "api-reference/endpoints/list-sessions",
+                  "api-reference/endpoints/analyze-session"
+                ]
+              },
+              {
+                "group": "Utilities",
+                "pages": ["api-reference/endpoints/test-token"]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Community",
+          "href": "https://discord.com/invite/NfTPT3HsSj",
+          "icon": "discord"
+        },
+        {
+          "anchor": "Developer Portal",
+          "href": "https://app.toughtongueai.com/developer/",
+          "icon": "terminal"
+        }
+      ]
+    }
+  },
+  "api": {
+    "openapi": "api-reference/openapi.json",
+    "playground": {
+      "display": "interactive"
+    },
+    "mdx": {
+      "server": "https://api.toughtongueai.com/api/public",
+      "auth": {
+        "method": "bearer",
+        "name": "Authorization",
+        "inputPrefix": "Bearer "
+      }
+    }
+  },
+  "search": {
+    "prompt": "Search documentation..."
+  },
+  "footer": {
+    "socials": {
+      "discord": "https://discord.com/invite/NfTPT3HsSj",
+      "linkedin": "https://www.linkedin.com/company/tough-tongue-ai/",
+      "github": "https://github.com/tough-tongue/docs"
+    }
+  }
+}

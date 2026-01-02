@@ -1,17 +1,16 @@
-# Next.js ToughTongue AI Starter Template
+# Discover Your Personality - Next.js Starter Template
 
-A production-ready Next.js application showcasing how to integrate ToughTongue AI for voice-based training scenarios. Built with TypeScript, React 19, Next.js 15, Firebase Authentication, Supabase middleware, and Tailwind CSS.
+A production-ready personality assessment app built with Next.js 15, ToughTongue AI, Firebase Authentication, and TypeScript. Users can take an MBTI personality test, get personalized coaching, and track their progress.
 
-## ✨ What This Template Includes
+## ✨ Features
 
-- **🎤 ToughTongue AI Integration**: Complete iframe embedding with session management and analysis
+- **🧠 MBTI Personality Test**: Interactive AI-powered assessment to discover your personality type
+- **💬 Personality Coach**: AI coach that provides personalized guidance based on your type
+- **📊 Progress Dashboard**: Track test results and coaching session history
 - **🔐 Firebase Authentication**: Email/password + Google OAuth sign-in
-- **⚡ Next.js 15 App Router**: Modern React Server Components
-- **🎨 Tailwind CSS + shadcn/ui**: Beautiful, customizable UI components
-- **📊 Zustand State Management**: Lightweight state management for sessions and analysis
-- **🛡️ Supabase Middleware**: Session handling and server-side utilities
-- **🔒 Secure API Routes**: Server-side proxying to keep your API keys safe
-- **📱 Responsive Design**: Works perfectly on mobile, tablet, and desktop
+- **💾 Local Storage**: Results saved in browser localStorage for persistence
+- **👨‍💼 Admin Panel**: Secure admin dashboard for data management
+- **⚡ Modern Stack**: Next.js 15 App Router, React 19, TypeScript, Tailwind CSS
 
 ## 🚀 Quick Start (5 minutes)
 
@@ -50,12 +49,11 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-# Optional: Supabase Configuration (for future database features)
-# NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Admin Configuration (change for production!)
+ADMIN_TOKEN=your_secure_admin_token_here
 ```
 
-**Where to get your credentials:**
+**Where to get credentials:**
 
 #### 🎤 ToughTongue AI API Key
 
@@ -71,27 +69,19 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 4. Go to Project Settings → General → Your apps → Web app
 5. Copy the config values into your `.env.local`
 
-#### 📦 Supabase (Optional - for future database features)
+### Step 3: Update Scenario IDs (Optional)
 
-1. Go to [Supabase Dashboard](https://app.supabase.com/)
-2. Create a new project
-3. Go to Settings → API to get your URL and anon key
+The template includes a default personality test scenario. To use your own scenarios:
 
-### Step 3: Update Scenario IDs
-
-The template includes placeholder scenario IDs. Replace them with your own:
-
-**In `app/analysis/components/ToughTongueIframe.tsx`** (around line 15):
+1. Open `lib/constants.ts`
+2. Update the `SCENARIOS` object with your scenario IDs:
 
 ```typescript
-const scenarioId = "YOUR_SCENARIO_ID_HERE"; // ← Replace this
+export const SCENARIOS = {
+  PERSONALITY_TEST: "your_personality_test_scenario_id",
+  PERSONALITY_COACH: "your_personality_coach_scenario_id",
+} as const;
 ```
-
-**To get a scenario ID:**
-
-1. Go to [ToughTongue AI Dashboard](https://app.toughtongueai.com/)
-2. Create a new scenario or open an existing one
-3. Copy the scenario ID from the URL or scenario settings
 
 ### Step 4: Run the Development Server
 
@@ -107,160 +97,88 @@ Visit [http://localhost:3000](http://localhost:3000) 🎉
 nextjs-minimal/
 ├── app/
 │   ├── page.tsx                         # Landing page
-│   ├── layout.tsx                       # Root layout with AuthContext
-│   ├── globals.css                      # Global styles
+│   ├── layout.tsx                       # Root layout with auth
 │   │
-│   ├── auth/                            # Authentication pages
-│   │   ├── AuthContext.tsx              # Firebase auth context provider
+│   ├── personality-test/
+│   │   └── page.tsx                     # MBTI personality test
+│   │
+│   ├── personality-coach/
+│   │   └── page.tsx                     # AI personality coach
+│   │
+│   ├── progress/
+│   │   └── page.tsx                     # Progress dashboard
+│   │
+│   ├── admin/
+│   │   └── page.tsx                     # Admin panel (token-protected)
+│   │
+│   ├── auth/
+│   │   ├── AuthContext.tsx              # Firebase auth provider
 │   │   ├── signin/page.tsx              # Sign-in page
 │   │   └── signup/page.tsx              # Sign-up page
 │   │
-│   ├── analysis/                        # Session analysis demo
-│   │   ├── page.tsx                     # Analysis page
-│   │   ├── hooks/
-│   │   │   └── useSessionManagement.ts  # Custom hook for session lifecycle
-│   │   └── components/
-│   │       ├── ToughTongueIframe.tsx    # Iframe embed component
-│   │       ├── SessionInformation.tsx   # Display session info
-│   │       ├── DataDisplay.tsx          # Display analysis results
-│   │       └── ErrorDisplay.tsx         # Error handling component
-│   │
-│   ├── course/                          # Course example page
-│   │   ├── page.tsx                     # Course layout
-│   │   └── CourseClient.tsx             # Course client component
-│   │
-│   ├── api/tough-tongue/                # API routes (secure server-side)
-│   │   ├── scenarios/route.ts           # Create scenarios
-│   │   └── sessions/
-│   │       ├── [sessionId]/route.ts     # Get session details
-│   │       └── analyze/route.ts         # Analyze completed session
-│   │
-│   └── store/
-│       └── sessionStore.ts              # Zustand state management
+│   └── api/tough-tongue/                # API routes (server-side)
+│       ├── scenarios/route.ts           # Create scenarios
+│       └── sessions/
+│           ├── [sessionId]/route.ts     # Get session details
+│           └── analyze/route.ts         # Analyze session
 │
 ├── components/
 │   ├── ui/                              # shadcn/ui components
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   └── scroll-area.tsx
-│   ├── course/
-│   │   └── CourseSidebar.tsx            # Course navigation sidebar
-│   ├── FeatureCard.tsx
-│   ├── Header.tsx
-│   └── MediaEmbed.tsx                   # Embed YouTube, Loom, ToughTongue
+│   ├── AdminTokenBanner.tsx             # Security warning banner
+│   └── Header.tsx                       # Navigation header
 │
 ├── lib/
+│   ├── config.ts                        # Centralized env config
+│   ├── constants.ts                     # App constants & scenario IDs
 │   ├── firebase.ts                      # Firebase initialization
-│   ├── firebase/
-│   │   └── firestore.ts                 # Firestore utilities
-│   ├── supabase/                        # Supabase utilities
-│   │   ├── client.ts                    # Browser client
-│   │   ├── server.ts                    # Server client
-│   │   ├── middleware.ts                # Session middleware
-│   │   └── types.ts                     # TypeScript types
 │   └── utils.ts                         # Utility functions
 │
-├── middleware.ts                        # Next.js middleware (Supabase)
-├── .env.example                         # Environment variable template
-├── .env.local                           # Your local config (git-ignored)
 └── package.json
 ```
 
-## 🎯 How It Works
+## 🎯 How the App Works
 
-### 1. **Embedding ToughTongue AI Scenarios**
+### 1. **Landing Page** (`/`)
+- Welcomes users to the personality discovery journey
+- Explains the MBTI assessment
+- Call-to-action buttons to take test or talk to coach
 
-The `ToughTongueIframe` component embeds scenarios into your app:
+### 2. **Personality Test** (`/personality-test`)
+- Embeds ToughTongue AI personality assessment scenario
+- Listens for session completion events
+- Automatically analyzes results via API
+- Saves results to localStorage
+- Shows previous test results if completed
+- Allows retaking the test
 
-```typescript
-import ToughTongueIframe from "./components/ToughTongueIframe";
+### 3. **Personality Coach** (`/personality-coach`)
+- Embeds ToughTongue AI coaching scenario
+- Personalizes conversation with user's MBTI type (if test taken)
+- Tracks all coaching sessions in localStorage
+- Shows session history
 
-<ToughTongueIframe />;
-```
+### 4. **Progress Dashboard** (`/progress`)
+- Displays personality test results (with MBTI type)
+- Lists all coaching sessions with timestamps
+- Shows statistics (tests completed, sessions, etc.)
+- Allows refreshing/updating session data
+- Quick actions to retake test or start new session
 
-Or embed directly with an iframe:
+### 5. **Admin Panel** (`/admin`)
+- Protected by ADMIN_TOKEN
+- Shows app statistics
+- Allows exporting all data as JSON
+- Clear individual data types or all data
+- Security warnings if using default token
 
-```typescript
-<iframe
-  src={`https://app.toughtongueai.com/embed/${scenarioId}?bg=black`}
-  width="100%"
-  height="600px"
-  allow="microphone"
-/>
-```
-
-### 2. **Listening to Session Events**
-
-The `useSessionManagement` hook automatically listens for iframe events:
-
-```typescript
-import useSessionManagement from "./hooks/useSessionManagement";
-
-const { sessionId, sessionData, analyzeSession } = useSessionManagement();
-
-// Hook automatically handles:
-// - onStart events (session started)
-// - onStop events (session completed, stores session ID)
-```
-
-### 3. **Analyzing Sessions**
-
-After a session completes, fetch detailed analysis:
-
-```typescript
-const { analyzeSession, sessionAnalysis, loading, error } = useSessionManagement();
-
-// Call this after session completes
-await analyzeSession();
-
-// Access results
-console.log(sessionAnalysis);
-```
-
-### 4. **API Routes (Secure Server-Side Proxying)**
-
-API routes keep your API keys secure by handling requests server-side:
-
-**Example: `app/api/tough-tongue/sessions/analyze/route.ts`**
-
-```typescript
-export async function POST(req: Request) {
-  const { session_id } = await req.json();
-  const apiKey = process.env.TOUGH_TONGUE_API_KEY;
-
-  const response = await fetch("https://api.toughtongueai.com/api/public/sessions/analyze", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({ session_id }),
-  });
-
-  return NextResponse.json(await response.json());
-}
-```
-
-Your frontend calls `/api/tough-tongue/sessions/analyze` instead of the ToughTongue API directly.
-
-### 5. **State Management with Zustand**
-
-The `sessionStore` manages session state across components:
-
-```typescript
-import { useSessionStore } from "@/app/store/sessionStore";
-
-const { sessionId, sessionData, sessionAnalysis, setSessionId } = useSessionStore();
-```
+### 6. **Admin Token Banner**
+- Appears on all pages if using default admin token
+- Reminds admins to set custom ADMIN_TOKEN
+- Dismissible but reappears on page refresh
 
 ## 🔐 Authentication Flow
 
-The template uses **Firebase Authentication** with email/password and Google OAuth:
-
-### Sign Up / Sign In
-
-- **Sign Up**: `/auth/signup`
-- **Sign In**: `/auth/signin`
+The template uses **Firebase Authentication**:
 
 ### Using Auth in Components
 
@@ -269,11 +187,10 @@ The template uses **Firebase Authentication** with email/password and Google OAu
 import { useAuth } from "@/app/auth/AuthContext";
 
 function MyComponent() {
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
 
-  if (!user) {
-    return <p>Please sign in</p>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (!user) return <p>Please sign in</p>;
 
   return (
     <div>
@@ -284,61 +201,106 @@ function MyComponent() {
 }
 ```
 
-### Protecting Routes
+## 💾 Data Storage
 
-Add authentication checks in your page components:
+The app uses **browser localStorage** for data persistence:
+
+- **Personality Test Results**: Stored with full analysis data
+- **Coach Sessions**: Array of all coaching session metadata
+- **Session IDs**: For potential future sync/retrieval
+
+### Storage Keys (in `lib/constants.ts`)
 
 ```typescript
-"use client";
-import { useAuth } from "@/app/auth/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-
-export default function ProtectedPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/auth/signin");
-    }
-  }, [user, loading, router]);
-
-  if (loading) return <p>Loading...</p>;
-  if (!user) return null;
-
-  return <div>Protected content</div>;
-}
+export const STORAGE_KEYS = {
+  PERSONALITY_TEST_RESULT: "personality_test_result",
+  PERSONALITY_TEST_SESSION_ID: "personality_test_session_id",
+  PERSONALITY_TEST_COMPLETED_AT: "personality_test_completed_at",
+  COACH_SESSIONS: "coach_sessions",
+} as const;
 ```
 
-## 📡 API Routes Reference
+### Accessing Stored Data
+
+```typescript
+import { STORAGE_KEYS } from "@/lib/constants";
+
+// Get personality test result
+const result = localStorage.getItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT);
+const testData = result ? JSON.parse(result) : null;
+
+// Get coach sessions
+const sessions = localStorage.getItem(STORAGE_KEYS.COACH_SESSIONS);
+const coachHistory = sessions ? JSON.parse(sessions) : [];
+```
+
+## 🎨 Customization
+
+### Change App Name and Description
+
+Edit `lib/config.ts`:
+
+```typescript
+export const APP_NAME = "Your App Name";
+export const APP_DESCRIPTION = "Your app description";
+```
+
+### Add New Scenarios
+
+1. Get scenario ID from ToughTongue AI
+2. Add to `lib/constants.ts`:
+
+```typescript
+export const SCENARIOS = {
+  PERSONALITY_TEST: "existing_id",
+  PERSONALITY_COACH: "existing_id",
+  YOUR_NEW_SCENARIO: "new_scenario_id",
+} as const;
+```
+
+3. Create a new page in `app/your-scenario/page.tsx`
+4. Use the scenario URL: `SCENARIO_URLS.YOUR_NEW_SCENARIO`
+
+### Styling
+
+The project uses Tailwind CSS. Customize:
+
+- **`tailwind.config.ts`**: Theme configuration
+- **`app/globals.css`**: Global styles
+- **Component files**: Use Tailwind classes directly
+
+### Adding Pages
+
+1. Create directory in `app/`
+2. Add `page.tsx`
+3. Update navigation in `components/Header.tsx`
+4. Add route to `ROUTES` in `lib/constants.ts`
+
+## 📡 API Routes
 
 ### `POST /api/tough-tongue/scenarios`
 
-Create a new ToughTongue AI scenario:
+Create a new scenario:
 
 ```typescript
 const response = await fetch("/api/tough-tongue/scenarios", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: "Customer Support Training",
-    description: "Practice handling customer complaints",
-    ai_instructions: "You are a frustrated customer...",
-    user_friendly_description: "Practice de-escalation techniques",
+    name: "Scenario Name",
+    description: "Description",
+    ai_instructions: "AI instructions...",
   }),
 });
-
-const { scenario_id } = await response.json();
 ```
 
 ### `GET /api/tough-tongue/sessions/[sessionId]`
 
-Get detailed session information:
+Get session details:
 
 ```typescript
 const response = await fetch(`/api/tough-tongue/sessions/${sessionId}`);
-const sessionData = await response.json();
+const data = await response.json();
 ```
 
 ### `POST /api/tough-tongue/sessions/analyze`
@@ -351,112 +313,56 @@ const response = await fetch("/api/tough-tongue/sessions/analyze", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ session_id: sessionId }),
 });
-
 const analysis = await response.json();
 ```
 
-## 🎨 Customization
+## 👨‍💼 Admin Panel
 
-### Changing Scenarios
+Access the admin panel at `/admin` with your ADMIN_TOKEN.
 
-Update scenario IDs in your components:
+### Default Admin Token
 
-```typescript
-// In ToughTongueIframe.tsx or any component
-const scenarioId = "your-new-scenario-id";
-```
+By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 
-### Styling with Tailwind
+**⚠️ IMPORTANT**: Change this for production! Set a custom `ADMIN_TOKEN` in your environment variables.
 
-The project uses Tailwind CSS. Customize:
+### Admin Features
 
-- **`tailwind.config.ts`**: Theme configuration
-- **`app/globals.css`**: Global styles
-- **Component files**: Use Tailwind classes directly
-
-### Adding New Pages
-
-1. Create a directory in `app/`
-2. Add `page.tsx`
-3. Export a default component
-
-```typescript
-// app/dashboard/page.tsx
-export default function Dashboard() {
-  return <div>My Dashboard</div>;
-}
-```
-
-### Adding New API Routes
-
-1. Create route file in `app/api/`
-2. Export HTTP method handlers
-
-```typescript
-// app/api/my-endpoint/route.ts
-import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({ message: "Hello!" });
-}
-
-export async function POST(req: Request) {
-  const body = await req.json();
-  return NextResponse.json({ received: body });
-}
-```
+- View app statistics (tests, sessions, storage)
+- Export all data as JSON
+- Clear test data
+- Clear coach session data
+- Clear all data
+- View configuration (scenario IDs)
 
 ## 🚢 Deployment
 
 ### Deploy to Vercel (Recommended)
 
-Next.js is optimized for Vercel:
-
 1. **Push to GitHub**
 
 2. **Import in Vercel:**
-
    - Go to [Vercel Dashboard](https://vercel.com/dashboard)
    - Click "New Project"
    - Import your repository
    - **Important**: Set root directory to `nextjs-minimal`
 
 3. **Add Environment Variables:**
-
    - Go to Project Settings → Environment Variables
    - Add all variables from your `.env.local`
+   - **⚠️ Set a secure `ADMIN_TOKEN` for production!**
 
 4. **Deploy:**
    - Click "Deploy"
    - Vercel will auto-deploy on future git pushes
 
-### Deploy to Other Platforms
-
-For Netlify, Railway, Render, etc.:
-
-1. Build command: `pnpm build`
-2. Start command: `pnpm start`
-3. Node version: 18+
-4. Root directory: `nextjs-minimal`
-5. Add environment variables in platform settings
-
 ## 🛠️ Troubleshooting
-
-### ❌ `ERR_PNPM_NO_MATCHING_VERSION`
-
-**Solution**: The dependency versions have been updated. Run:
-
-```bash
-rm -rf node_modules pnpm-lock.yaml
-pnpm install
-```
 
 ### ❌ Firebase Configuration Errors
 
 **Error**: `Firebase: Error (auth/invalid-api-key)`
 
 **Solution**:
-
 1. Double-check all Firebase config values in `.env.local`
 2. Ensure you've enabled Email/Password and Google authentication in Firebase Console
 3. Restart dev server: `pnpm dev`
@@ -464,55 +370,43 @@ pnpm install
 ### ❌ ToughTongue AI Session Not Starting
 
 **Possible causes:**
-
 1. Invalid API key in `.env.local`
-2. Scenario ID not configured (still says `YOUR_SCENARIO_ID_HERE`)
+2. Scenario ID not configured
 3. Browser blocking microphone permission
 
 **Solution**:
-
-1. Verify API keys in [Developer Portal](https://app.toughtongueai.com/developer)
-2. Update scenario ID in `app/analysis/components/ToughTongueIframe.tsx`
+1. Verify `TOUGH_TONGUE_API_KEY` in [Developer Portal](https://app.toughtongueai.com/developer)
+2. Check scenario IDs in `lib/constants.ts`
 3. Allow microphone access when prompted
 
-### ❌ TypeScript Errors
+### ❌ Admin Panel Won't Accept Token
 
-Run type checking:
+**Solution**:
+1. Check `ADMIN_TOKEN` in `.env.local`
+2. Restart dev server after changing environment variables
+3. If using default token, ensure you're entering: `TTAI-STARTER-ADMIN-TOKEN`
 
-```bash
-pnpm build
-```
+### ❌ Data Not Persisting
 
-Common fixes:
+**Cause**: localStorage is browser-specific
 
-- Ensure all imports are correct
-- Check `tsconfig.json` paths
-- Restart TypeScript server in your IDE
-
-### ❌ Module Not Found Errors
-
-Clear Next.js cache:
-
-```bash
-rm -rf .next
-pnpm dev
-```
+**Solution**:
+- Data is stored per-browser
+- Clearing browser data will delete saved results
+- For production, consider adding database sync (Firebase/Supabase)
 
 ## 📚 Learn More
 
 - **[ToughTongue AI Documentation](https://docs.toughtongueai.com)**
-- **[API Reference](https://docs.toughtongueai.com/api)**
 - **[Next.js Documentation](https://nextjs.org/docs)**
 - **[Firebase Documentation](https://firebase.google.com/docs)**
 - **[Tailwind CSS](https://tailwindcss.com/docs)**
-- **[shadcn/ui](https://ui.shadcn.com)**
 
 ## 💬 Support & Community
 
 - **[Developer Community Discord](https://discord.com/invite/jfq2wVAP)**
 - **[API Playground](https://app.toughtongueai.com/api-playground)**
 - **[Email Support](mailto:help@getarchieai.com)**
-- **[GitHub Issues](https://github.com/tough-tongue/tt-starter/issues)**
 
 ## 📝 License
 
@@ -520,4 +414,4 @@ MIT License - feel free to use this template for any project!
 
 ---
 
-Built with ❤️ by the ToughTongue AI team
+Built with ❤️ using Next.js, ToughTongue AI, and Firebase

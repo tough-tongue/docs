@@ -1,0 +1,415 @@
+---
+title: Next.js Starter Template
+description: "Discover Your Personality - A complete MBTI personality assessment app"
+---
+
+A production-ready **personality discovery application** built with Next.js 15, TypeScript, React 19, Firebase Authentication, and ToughTongue AI. Users can take an MBTI personality test, get personalized AI coaching, and track their progress.
+
+## What's Included
+
+<CardGroup cols={2}>
+  <Card title="MBTI Personality Test" icon="brain">
+    Interactive AI-powered assessment to discover personality type
+  </Card>
+
+  <Card title="AI Personality Coach" icon="comment">
+    Personalized coaching based on your personality type
+  </Card>
+
+  <Card title="Progress Dashboard" icon="chart-line">
+    Track test results and coaching session history
+  </Card>
+
+  <Card title="Admin Panel" icon="shield">
+    Secure dashboard for data management
+  </Card>
+</CardGroup>
+
+## Tech Stack
+
+- **Next.js 15** - App Router with React Server Components
+- **TypeScript** - Full type safety
+- **React 19** - Latest React features
+- **Firebase Auth** - Email/password + Google OAuth
+- **Tailwind CSS** - Modern styling with shadcn/ui components
+- **Zustand** - Lightweight state management
+- **localStorage** - Browser-based data persistence
+
+---
+
+## Quick Start
+
+<Steps>
+  <Step title="Install Dependencies">```bash cd nextjs-minimal pnpm install ```</Step>
+
+  <Step title="Configure Environment">
+    Copy `.env.example` to `.env.local` and add your credentials: ```bash cp .env.example .env.local
+    ``` Required variables: ```env TOUGH_TONGUE_API_KEY=your_api_key_here
+    NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+    ADMIN_TOKEN=your_secure_admin_token ```
+  </Step>
+
+  <Step title="Get Your Credentials">
+    **ToughTongue AI**: Get API key from [Developer
+    Portal](https://app.toughtongueai.com/developer?tab=api-keys) **Firebase**: Create project at
+    [Firebase Console](https://console.firebase.google.com/) See [Firebase Authentication
+    Setup](/starters/firebase-auth) for detailed instructions
+  </Step>
+
+  <Step title="Run the App">
+    ```bash pnpm dev ``` Visit [http://localhost:3000](http://localhost:3000)
+  </Step>
+</Steps>
+
+---
+
+## Application Structure
+
+### Pages
+
+<CardGroup cols={2}>
+  <Card title="Landing Page" icon="home">
+    `/` - Personality discovery homepage with interactive MBTI type explorer
+  </Card>
+
+  <Card title="Personality Test" icon="clipboard-check">
+    `/personality-test` - Complete MBTI assessment with ToughTongue AI
+  </Card>
+
+  <Card title="Personality Coach" icon="user">
+    `/personality-coach` - AI coaching personalized to your type
+  </Card>
+
+  <Card title="Progress Dashboard" icon="chart-bar">
+    `/progress` - View test results and coaching history
+  </Card>
+
+  <Card title="Admin Panel" icon="lock">
+    `/admin` - Token-protected data management dashboard
+  </Card>
+
+  <Card title="Authentication" icon="key">
+    `/auth/signin` and `/auth/signup` - Firebase authentication pages
+  </Card>
+</CardGroup>
+
+### Project Structure
+
+```
+nextjs-minimal/
+├── app/
+│   ├── page.tsx                         # Landing page
+│   ├── personality-test/page.tsx        # MBTI test
+│   ├── personality-coach/page.tsx       # AI coach
+│   ├── progress/page.tsx                # Dashboard
+│   ├── admin/page.tsx                   # Admin panel
+│   ├── auth/
+│   │   ├── AuthContext.tsx              # Firebase auth provider
+│   │   ├── signin/page.tsx
+│   │   └── signup/page.tsx
+│   └── api/tough-tongue/                # API routes
+│       ├── scenarios/route.ts
+│       └── sessions/
+│           ├── [sessionId]/route.ts
+│           └── analyze/route.ts
+├── components/
+│   ├── ui/                              # shadcn/ui components
+│   ├── AdminTokenBanner.tsx             # Security warning
+│   └── Header.tsx
+├── lib/
+│   ├── config.ts                        # Centralized configuration
+│   ├── constants.ts                     # Scenario IDs & MBTI data
+│   └── firebase.ts                      # Firebase initialization
+└── package.json
+```
+
+---
+
+## Key Features
+
+### 1. Centralized Configuration
+
+All environment variables are loaded through `lib/config.ts`:
+
+```typescript lib/config.ts
+export const AppConfig = {
+  app: {
+    name: "Discover Your Personality",
+    description: "...",
+  },
+  toughTongue: {
+    apiKey: process.env.TOUGH_TONGUE_API_KEY || "",
+  },
+  firebase: {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
+    // ... all Firebase config
+  },
+  admin: {
+    token: process.env.ADMIN_TOKEN || "TTAI-STARTER-ADMIN-TOKEN",
+    defaultToken: "TTAI-STARTER-ADMIN-TOKEN",
+    isUsingDefaultToken: ...,
+  },
+};
+```
+
+### 2. Interactive MBTI Type Explorer
+
+The landing page features:
+
+- Cover image showcasing all 16 personality types
+- Clickable type cards with character emojis
+- Detailed modal dialogs with traits and strengths
+- Beautiful UI with smooth animations
+
+### 3. localStorage Data Persistence
+
+The app stores data in browser localStorage:
+
+- Personality test results with MBTI type
+- All coaching session history
+- Timestamps and session metadata
+
+```typescript
+import { STORAGE_KEYS } from "@/lib/constants";
+
+// Save test result
+localStorage.setItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT, JSON.stringify(result));
+
+// Get test result
+const stored = localStorage.getItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT);
+const result = stored ? JSON.parse(stored) : null;
+```
+
+### 4. Admin Panel with Token Protection
+
+Access the admin dashboard at `/admin` using your `ADMIN_TOKEN`:
+
+**Features:**
+
+- View app statistics (tests completed, sessions, storage usage)
+- Export all data as JSON
+- Clear individual data types or all data
+- View configuration (scenario IDs)
+- Security warnings for default token
+
+**Default token**: `TTAI-STARTER-ADMIN-TOKEN` (⚠️ Change for production!)
+
+### 5. Admin Security Banner
+
+A yellow warning banner appears on all pages when using the default admin token, reminding you to set a custom `ADMIN_TOKEN` environment variable.
+
+---
+
+## Integration Examples
+
+### Using Firebase Auth
+
+```typescript Component Example
+"use client";
+import { useAuth } from "@/app/auth/AuthContext";
+
+export default function MyComponent() {
+  const { user, loading, signOut } = useAuth();
+
+  if (loading) return <p>Loading...</p>;
+  if (!user) return <p>Please sign in</p>;
+
+  return (
+    <div>
+      <p>Welcome, {user.email}</p>
+      <button onClick={signOut}>Sign Out</button>
+    </div>
+  );
+}
+```
+
+### Listening to ToughTongue AI Events
+
+```typescript Session Management
+useEffect(() => {
+  const handleMessage = async (event: MessageEvent) => {
+    if (event.origin !== "https://app.toughtongueai.com") return;
+
+    const { type, data } = event.data;
+
+    if (type === "onStart") {
+      console.log("Session started:", data.session_id);
+    } else if (type === "onStop") {
+      console.log("Session completed:", data.session_id);
+      // Analyze the session
+      await analyzeSession(data.session_id);
+    }
+  };
+
+  window.addEventListener("message", handleMessage);
+  return () => window.removeEventListener("message", handleMessage);
+}, []);
+```
+
+### Calling API Routes
+
+```typescript API Integration
+// Analyze a session
+const response = await fetch("/api/tough-tongue/sessions/analyze", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ session_id: sessionId }),
+});
+const analysis = await response.json();
+
+// Get session details
+const session = await fetch(`/api/tough-tongue/sessions/${sessionId}`);
+const data = await session.json();
+```
+
+---
+
+## Customization
+
+### Change App Branding
+
+Edit `lib/config.ts`:
+
+```typescript
+export const AppConfig = {
+  app: {
+    name: "Your App Name",
+    description: "Your app description",
+  },
+  // ...
+};
+```
+
+### Update Scenario IDs
+
+Edit `lib/constants.ts`:
+
+```typescript
+export const SCENARIOS = {
+  PERSONALITY_TEST: "your_test_scenario_id",
+  PERSONALITY_COACH: "your_coach_scenario_id",
+} as const;
+```
+
+### Add New Pages
+
+1. Create directory in `app/`
+2. Add `page.tsx`
+3. Update navigation in `components/Header.tsx`
+4. Add route to `ROUTES` in `lib/constants.ts`
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+<Steps>
+  <Step title="Push to GitHub">Ensure your code is in a Git repository</Step>
+
+  <Step title="Import in Vercel">
+    - Go to [Vercel Dashboard](https://vercel.com/dashboard) - Click "New Project" - Import your
+    repository - Set root directory to `nextjs-minimal`
+  </Step>
+
+  <Step title="Add Environment Variables">
+    Add all variables from `.env.local` to Vercel project settings **⚠️ Important**: Set a secure
+    `ADMIN_TOKEN` for production!
+  </Step>
+
+  <Step title="Deploy">Click "Deploy" - Vercel will auto-deploy on future pushes</Step>
+</Steps>
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Firebase: Error (auth/invalid-api-key)">
+    **Solution:** - Double-check all Firebase config values in `.env.local` - Ensure you've enabled
+    Email/Password and Google auth in Firebase Console - Restart dev server: `pnpm dev`
+  </Accordion>
+
+  <Accordion title="ToughTongue AI session not starting">
+    **Possible causes:** - Invalid API key in `.env.local` - Scenario ID not configured in
+    `lib/constants.ts` - Browser blocking microphone permission **Solution:** - Verify
+    `TOUGH_TONGUE_API_KEY` in Developer Portal - Check scenario IDs in `lib/constants.ts` - Allow
+    microphone access when prompted
+  </Accordion>
+
+  <Accordion title="Admin panel won't accept token">
+    **Solution:** - Check `ADMIN_TOKEN` in `.env.local` - Restart dev server after changing
+    environment variables - Default token is: `TTAI-STARTER-ADMIN-TOKEN`
+  </Accordion>
+
+  <Accordion title="Data not persisting">
+    **Explanation:** Data is stored in browser localStorage (per-browser, per-domain) **Note:** -
+    Clearing browser data will delete saved results - Data doesn't sync across browsers - For
+    production, consider adding database sync
+  </Accordion>
+
+  <Accordion title="Build errors">
+    **Solution:** ```bash rm -rf .next node_modules pnpm-lock.yaml pnpm install pnpm build ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Best Practices
+
+<Check>**Secure API Keys**: All ToughTongue AI API calls go through server-side routes</Check>
+<Check>**Type Safety**: Full TypeScript coverage across the app</Check>
+<Check>**Error Handling**: Comprehensive error states and user feedback</Check>
+<Check>**Loading States**: Clear loading indicators during async operations</Check>
+<Check>**Responsive Design**: Mobile-first, works on all screen sizes</Check>
+<Check>**Admin Security**: Change default admin token for production</Check>
+
+---
+
+## Learn More
+
+<CardGroup cols={3}>
+  <Card title="Firebase Setup" icon="fire" href="/starters/firebase-auth">
+    Detailed Firebase authentication guide
+  </Card>
+
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    ToughTongue AI API documentation
+  </Card>
+
+  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
+    Common issues and solutions
+  </Card>
+</CardGroup>
+
+---
+
+## Demo App: "Discover Your Personality"
+
+The template implements a complete personality assessment application:
+
+### Features
+
+- **Interactive Landing Page** with MBTI type explorer
+- **Comprehensive Test** using ToughTongue AI scenario
+- **Personalized Coaching** with dynamic personality type context
+- **Progress Tracking** with statistics and session history
+- **Admin Dashboard** for data management
+
+### User Flow
+
+1. **Land on homepage** → Learn about MBTI types (click to explore)
+2. **Take personality test** → AI-powered conversation assessment
+3. **Get results** → MBTI type with detailed analysis
+4. **Talk to coach** → Personalized guidance based on type
+5. **Track progress** → View all sessions and results
+
+---
+
+<Card title="Ready to start?" icon="rocket">
+  Clone the repository and follow the Quick Start guide above!
+</Card>

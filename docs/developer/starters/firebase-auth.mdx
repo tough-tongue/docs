@@ -1,0 +1,406 @@
+---
+title: "Firebase Authentication Setup"
+description: "Add user authentication to the Next.js starter template with Firebase"
+---
+
+This guide shows you how Firebase Authentication works in the Next.js starter template, which comes with pre-built authentication pages and context providers.
+
+<Note>
+  The Next.js starter template **already includes** Firebase Authentication setup. This guide explains how it works and how to configure it.
+</Note>
+
+## Why Firebase Auth?
+
+<CardGroup cols={3}>
+  <Card title="Easy Setup" icon="rocket">
+    Configure and run in under 10 minutes
+  </Card>
+
+  <Card title="Multiple Providers" icon="users">
+    Email/password, Google, GitHub, and more
+  </Card>
+
+  <Card title="Free Tier" icon="dollar-sign">
+    10K monthly active users free
+  </Card>
+</CardGroup>
+
+---
+
+## Step 1: Create Firebase Project
+
+<Steps>
+  <Step title="Go to Firebase Console">
+    Visit [Firebase Console](https://console.firebase.google.com/) and click "Add project"
+  </Step>
+  
+  <Step title="Project Setup">
+    - Enter a project name (e.g., "my-personality-app")
+    - Disable Google Analytics (not needed for auth)
+    - Click "Create project"
+  </Step>
+  
+  <Step title="Add Web App">
+    - Click the **⚙️ gear icon** → "Project settings"
+    - Scroll to "Your apps" section
+    - Click the **`</>`** (Web) icon
+    - Register app name (e.g., "Web App")
+    - **Copy the config object** - you'll need this next!
+  </Step>
+</Steps>
+
+---
+
+## Step 2: Enable Authentication Methods
+
+<Steps>
+  <Step title="Navigate to Authentication">
+    In Firebase Console sidebar, click **Authentication** → **Get Started**
+  </Step>
+
+  <Step title="Enable Email/Password">
+    - Go to "Sign-in method" tab
+    - Click on "Email/Password"
+    - Toggle **Enable**
+    - Save
+  </Step>
+
+  <Step title="Enable Google Sign-In (Recommended)">
+    - Click on "Google"
+    - Toggle **Enable**
+    - Enter your project support email
+    - Save
+  </Step>
+</Steps>
+
+---
+
+## Step 3: Configure Your App
+
+The Next.js starter uses a centralized configuration system in `lib/config.ts`.
+
+### Set Environment Variables
+
+Create or update `.env.local`:
+
+```bash .env.local
+# Firebase Configuration (Required)
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
+```
+
+<Warning>
+  All Firebase config variables must be prefixed with `NEXT_PUBLIC_` to be accessible in the browser.
+  Never commit `.env.local` to version control!
+</Warning>
+
+---
+
+## How It Works
+
+### Firebase Initialization (`lib/firebase.ts`)
+
+The starter automatically initializes Firebase using `AppConfig`:
+
+```typescript lib/firebase.ts
+import { AppConfig } from "./config";
+
+// Safely initialize only in browser with valid config
+if (isConfigValid) {
+  app = getApps().length === 0 
+    ? initializeApp(AppConfig.firebase) 
+    : getApps()[0];
+  auth = getAuth(app);
+  db = getFirestore(app);
+}
+```
+
+### Auth Context Provider (`app/auth/AuthContext.tsx`)
+
+The starter includes a complete auth context with:
+
+- `user` - Current user object or null
+- `loading` - Auth state loading status
+- `signIn(email, password)` - Email/password sign-in
+- `signUp(email, password)` - Create new account
+- `signInWithGoogle()` - Google OAuth sign-in
+- `logout()` - Sign out user
+
+### Using Auth in Components
+
+```typescript Example Component
+"use client";
+
+import { useAuth } from "@/app/auth/AuthContext";
+
+export default function ProfilePage() {
+  const { user, loading, logout } = useAuth();
+
+  if (loading) return <p>Loading...</p>;
+  
+  if (!user) {
+    return <p>Please sign in</p>;
+  }
+
+  return (
+    <div>
+      <p>Welcome, {user.email}!</p>
+      <p>Display Name: {user.displayName}</p>
+      <button onClick={logout}>Sign Out</button>
+    </div>
+  );
+}
+```
+
+---
+
+## Pre-Built Auth Pages
+
+The starter includes ready-to-use authentication pages:
+
+### Sign In Page (`/auth/signin`)
+
+Features:
+- Email/password form
+- Google sign-in button
+- Error handling
+- Link to sign-up page
+
+### Sign Up Page (`/auth/signup`)
+
+Features:
+- Email/password registration
+- Google sign-in option
+- Password validation
+- Link to sign-in page
+
+---
+
+## Protecting Routes
+
+### Client-Side Protection
+
+Add auth checks to your page components:
+
+```typescript app/dashboard/page.tsx
+"use client";
+
+import { useAuth } from "@/app/auth/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function DashboardPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/signin");
+    }
+  }, [user, loading, router]);
+
+  if (loading) return <p>Loading...</p>;
+  if (!user) return null;
+
+  return <div>Protected content</div>;
+}
+```
+
+### Server-Side Protection
+
+For server-side protection, you can enhance the middleware or use Firebase Admin SDK for server-side token verification.
+
+---
+
+## Integrating with ToughTongue AI
+
+### Pass User Info to Scenarios
+
+The starter automatically passes user information to ToughTongue AI iframes:
+
+```typescript Example from personality-test/page.tsx
+const getIframeUrl = () => {
+  if (!user) {
+    return `${SCENARIO_URLS.PERSONALITY_TEST}?bg=black&promptUserInfo=true`;
+  }
+
+  const userName = user.displayName || "";
+  const userEmail = user.email || "";
+
+  return `${SCENARIO_URLS.PERSONALITY_TEST}?bg=black&userName=${encodeURIComponent(
+    userName
+  )}&userEmail=${encodeURIComponent(userEmail)}`;
+};
+```
+
+### Store Sessions with User ID
+
+Associate ToughTongue AI sessions with authenticated users:
+
+```typescript
+const { user } = useAuth();
+
+// After session completes
+const saveSession = async (sessionId: string, analysisData: any) => {
+  // Save to localStorage with user context
+  const session = {
+    sessionId,
+    userId: user?.uid,
+    userEmail: user?.email,
+    analysisData,
+    completedAt: new Date().toISOString(),
+  };
+  
+  localStorage.setItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT, JSON.stringify(session));
+};
+```
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Password Requirements" icon="key">
+    Firebase enforces minimum 6-character passwords. Add client-side validation for stronger passwords:
+    
+    ```typescript
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError('Password must contain an uppercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError('Password must contain a number');
+      return;
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Error Handling" icon="triangle-exclamation">
+    Firebase auth errors have specific codes. Handle them gracefully:
+    
+    ```typescript
+    try {
+      await signIn(email, password);
+    } catch (err: any) {
+      switch (err.code) {
+        case 'auth/user-not-found':
+          setError('No account found with this email');
+          break;
+        case 'auth/wrong-password':
+          setError('Incorrect password');
+          break;
+        case 'auth/too-many-requests':
+          setError('Too many failed attempts. Try again later');
+          break;
+        case 'auth/invalid-email':
+          setError('Invalid email address');
+          break;
+        default:
+          setError('Failed to sign in');
+      }
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Email Verification (Optional)" icon="envelope">
+    Send verification emails after sign-up:
+    
+    ```typescript
+    import { sendEmailVerification } from 'firebase/auth';
+    
+    const signUp = async (email: string, password: string) => {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(credential.user);
+      alert('Verification email sent! Please check your inbox.');
+    };
+    ```
+  </Accordion>
+  
+  <Accordion title="Security Rules (If using Firestore)" icon="shield">
+    If you decide to use Firestore for data storage, configure security rules:
+    
+    ```javascript firestore.rules
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /users/{userId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+        match /sessions/{sessionId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Firebase: Error (auth/invalid-api-key)" icon="circle-exclamation">
+    **Solution:**
+    - Double-check all Firebase config values in `.env.local`
+    - Ensure all 6 Firebase variables are set correctly
+    - Restart dev server: `pnpm dev`
+  </Accordion>
+
+  <Accordion title="Google Sign-In not working" icon="google">
+    **Solution:**
+    - Verify you've enabled Google provider in Firebase Console
+    - Add your domain to authorized domains in Firebase Console → Authentication → Settings
+    - For localhost, `localhost` and `127.0.0.1` should be authorized by default
+  </Accordion>
+
+  <Accordion title="auth/operation-not-allowed" icon="ban">
+    **Solution:**
+    This means the authentication method hasn't been enabled in Firebase Console.
+    Go to Authentication → Sign-in method and enable the provider you're trying to use.
+  </Accordion>
+  
+  <Accordion title="Environment variables not loading" icon="file">
+    **Solution:**
+    - Ensure all variables are prefixed with `NEXT_PUBLIC_` for client-side access
+    - Restart your dev server after adding env vars
+    - Check for typos in variable names
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Add User Profiles" icon="user" href="https://firebase.google.com/docs/firestore/quickstart">
+    Store additional user data in Firestore
+  </Card>
+
+  <Card title="Password Reset" icon="key" href="https://firebase.google.com/docs/auth/web/manage-users#send_a_password_reset_email">
+    Implement password reset flow
+  </Card>
+
+  <Card title="Social Providers" icon="share-nodes" href="https://firebase.google.com/docs/auth/web/start#next_steps">
+    Add GitHub, Twitter, Facebook auth
+  </Card>
+  
+  <Card title="Admin SDK" icon="terminal" href="https://firebase.google.com/docs/auth/admin">
+    Server-side user management
+  </Card>
+</CardGroup>
+
+---
+
+<Card title="Need help?" icon="question">
+  Join our [Discord community](https://discord.com/invite/jfq2wVAP) or email **help@getarchieai.com**
+</Card>
