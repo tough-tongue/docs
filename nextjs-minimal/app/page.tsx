@@ -18,108 +18,107 @@ import { AppConfig } from "@/lib/config";
 export default function Home() {
   const [selectedType, setSelectedType] = useState<MBTIType | null>(null);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 md:py-32">
+      <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="mb-6 inline-flex items-center rounded-full bg-purple-100 px-4 py-1.5 text-sm font-medium text-purple-700">
+          <div className="mb-6 inline-flex items-center rounded-full bg-teal-500/20 px-4 py-1.5 text-sm font-medium text-teal-400">
             <span className="mr-2">🧠</span>
             MBTI Personality Assessment
           </div>
 
-          <h1 className="mb-6 text-5xl font-bold tracking-tight text-gray-900 md:text-7xl">
-            {AppConfig.app.name}
+          <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground md:text-6xl lg:text-7xl">
+            <span className="text-gradient">{AppConfig.app.name}</span>
           </h1>
 
-          <p className="mb-10 text-xl text-gray-600 md:text-2xl">
+          <p className="mb-10 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto">
             Discover your unique MBTI personality type through AI-powered conversations. Take the
-            comprehensive test and get personalized coaching to better understand yourself.
+            comprehensive test and get personalized coaching.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href={ROUTES.PERSONALITY_TEST}>
-              <Button size="lg" className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700">
+              <Button size="lg" className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white">
                 Take Personality Test
               </Button>
             </Link>
             <Link href={ROUTES.PERSONALITY_COACH}>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-border hover:bg-accent">
                 Talk to Your Coach
               </Button>
             </Link>
           </div>
 
-          <p className="mt-6 text-sm text-gray-500">
-            Takes approximately 10-15 minutes • Completely free
+          <p className="mt-6 text-sm text-muted-foreground">
+            Takes approximately 10-15 minutes
           </p>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">How It Works</h2>
-          <p className="text-lg text-gray-600">
-            A simple 3-step process to discover your personality type
-          </p>
-        </div>
+      <section className="container mx-auto px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center">
+            <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">How It Works</h2>
+            <p className="text-muted-foreground">
+              A simple 3-step process to discover your personality type
+            </p>
+          </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
-                <span className="text-2xl">1️⃣</span>
-              </div>
-              <CardTitle>Take the Test</CardTitle>
-              <CardDescription>
-                Have a natural conversation with our AI to assess your personality traits across all
-                MBTI dimensions.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-3">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/20">
+                  <span className="text-xl">1️⃣</span>
+                </div>
+                <CardTitle className="text-lg">Take the Test</CardTitle>
+                <CardDescription className="text-sm">
+                  Have a natural conversation with our AI to assess your personality traits.
+                </CardDescription>
+              </CardHeader>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100">
-                <span className="text-2xl">2️⃣</span>
-              </div>
-              <CardTitle>Get Your Results</CardTitle>
-              <CardDescription>
-                Receive a comprehensive analysis of your personality type with detailed insights and
-                characteristics.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-3">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/20">
+                  <span className="text-xl">2️⃣</span>
+                </div>
+                <CardTitle className="text-lg">Get Your Results</CardTitle>
+                <CardDescription className="text-sm">
+                  Receive a comprehensive analysis of your personality type with insights.
+                </CardDescription>
+              </CardHeader>
+            </Card>
 
-          <Card>
-            <CardHeader>
-              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-pink-100">
-                <span className="text-2xl">3️⃣</span>
-              </div>
-              <CardTitle>Talk to Your Coach</CardTitle>
-              <CardDescription>
-                Discuss your results with an AI coach who understands your personality type and can
-                provide personalized guidance.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-3">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/20">
+                  <span className="text-xl">3️⃣</span>
+                </div>
+                <CardTitle className="text-lg">Talk to Your Coach</CardTitle>
+                <CardDescription className="text-sm">
+                  Discuss your results with an AI coach for personalized guidance.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
         </div>
       </section>
 
       {/* MBTI Types Overview */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
+      <section className="container mx-auto px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center">
+            <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">
               16 Personality Types
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-muted-foreground">
               Based on the Myers-Briggs Type Indicator (MBTI) framework
             </p>
           </div>
 
           {/* Personality Types Image */}
-          <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+          <div className="mb-8 rounded-xl overflow-hidden shadow-lg shadow-teal-500/10 border border-border">
             <Image
               src="/images/personality-types-cover.png"
               alt="16 MBTI Personality Types"
@@ -130,22 +129,22 @@ export default function Home() {
             />
           </div>
 
-          <p className="text-center text-gray-600 mb-6">
+          <p className="text-center text-muted-foreground mb-6 text-sm">
             Click on any personality type to learn more about its characteristics
           </p>
 
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:gap-4">
             {MBTI_TYPES.map((type) => {
               const details = MBTI_TYPE_DETAILS[type];
               return (
                 <button
                   key={type}
                   onClick={() => setSelectedType(type)}
-                  className="group rounded-lg border-2 border-gray-200 bg-white p-4 text-center font-semibold text-gray-700 transition-all hover:border-purple-500 hover:shadow-md hover:scale-105 cursor-pointer"
+                  className="group rounded-lg border border-border bg-card p-3 text-center transition-all hover:border-teal-500/60 hover:bg-teal-500/10 hover:shadow-lg hover:shadow-teal-500/10 cursor-pointer"
                 >
-                  <div className="text-3xl mb-2">{details.character}</div>
-                  <div className="text-lg">{type}</div>
-                  <div className="text-xs text-gray-500 mt-1 group-hover:text-purple-600">
+                  <div className="text-2xl mb-1">{details.character}</div>
+                  <div className="text-base font-semibold text-foreground">{type}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5 group-hover:text-teal-400 transition-colors">
                     {details.nickname}
                   </div>
                 </button>
@@ -156,14 +155,14 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-r from-purple-600 to-indigo-600 p-12 text-center text-white">
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Ready to Discover Yourself?</h2>
-          <p className="mb-8 text-lg text-purple-100">
+      <section className="container mx-auto px-4 py-16">
+        <div className="mx-auto max-w-5xl rounded-2xl bg-gradient-to-r from-teal-600 to-cyan-600 p-10 text-center">
+          <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">Ready to Discover Yourself?</h2>
+          <p className="mb-6 text-teal-100/90">
             Start your journey to self-discovery with our AI-powered personality assessment
           </p>
           <Link href={ROUTES.PERSONALITY_TEST}>
-            <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+            <Button size="lg" variant="secondary" className="bg-white text-teal-700 hover:bg-gray-100">
               Get Started Now
             </Button>
           </Link>
@@ -171,25 +170,25 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12">
-        <div className="container mx-auto px-4 text-center text-gray-600">
-          <p className="mb-2">
+      <footer className="border-t border-border py-10">
+        <div className="container mx-auto px-4 text-center text-muted-foreground">
+          <p className="mb-2 text-sm">
             Built with{" "}
             <a
               href="https://www.toughtongueai.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-600 hover:underline"
+              className="text-teal-400 hover:text-teal-300 hover:underline"
             >
               ToughTongue AI
             </a>
           </p>
-          <p className="text-sm">
+          <p className="text-xs">
             <a
               href="https://docs.toughtongueai.com/developer/starters/nextjs"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-purple-600"
+              className="hover:text-teal-400"
             >
               Template Documentation
             </a>
@@ -199,22 +198,22 @@ export default function Home() {
 
       {/* Personality Type Details Dialog */}
       <Dialog open={selectedType !== null} onOpenChange={() => setSelectedType(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
           {selectedType && (
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-5xl">{MBTI_TYPE_DETAILS[selectedType].character}</span>
                   <div>
-                    <DialogTitle className="text-2xl">
+                    <DialogTitle className="text-2xl text-foreground">
                       {selectedType} - {MBTI_TYPE_DETAILS[selectedType].name}
                     </DialogTitle>
-                    <p className="text-purple-600 font-semibold">
+                    <p className="text-teal-400 font-semibold">
                       {MBTI_TYPE_DETAILS[selectedType].nickname}
                     </p>
                   </div>
                 </div>
-                <DialogDescription className="text-base text-gray-700 leading-relaxed">
+                <DialogDescription className="text-base text-muted-foreground leading-relaxed">
                   {MBTI_TYPE_DETAILS[selectedType].description}
                 </DialogDescription>
               </DialogHeader>
@@ -222,12 +221,12 @@ export default function Home() {
               <div className="space-y-4 mt-4">
                 {/* Key Traits */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Key Traits</h4>
+                  <h4 className="font-semibold text-foreground mb-2">Key Traits</h4>
                   <div className="flex flex-wrap gap-2">
                     {MBTI_TYPE_DETAILS[selectedType].traits.map((trait) => (
                       <span
                         key={trait}
-                        className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+                        className="px-3 py-1 bg-teal-500/20 text-teal-300 rounded-full text-sm"
                       >
                         {trait}
                       </span>
@@ -237,11 +236,11 @@ export default function Home() {
 
                 {/* Strengths */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Strengths</h4>
+                  <h4 className="font-semibold text-foreground mb-2">Strengths</h4>
                   <ul className="space-y-1">
                     {MBTI_TYPE_DETAILS[selectedType].strengths.map((strength) => (
-                      <li key={strength} className="flex items-center text-gray-700">
-                        <span className="mr-2 text-green-600">✓</span>
+                      <li key={strength} className="flex items-center text-muted-foreground">
+                        <span className="mr-2 text-green-400">✓</span>
                         {strength}
                       </li>
                     ))}
@@ -249,12 +248,12 @@ export default function Home() {
                 </div>
 
                 {/* Call to Action */}
-                <div className="pt-4 border-t">
-                  <p className="text-sm text-gray-600 mb-3">
+                <div className="pt-4 border-t border-border">
+                  <p className="text-sm text-muted-foreground mb-3">
                     Want to discover your personality type?
                   </p>
                   <Link href={ROUTES.PERSONALITY_TEST}>
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                    <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">
                       Take the Personality Test
                     </Button>
                   </Link>

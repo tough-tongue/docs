@@ -12,13 +12,15 @@ A production-ready **personality discovery application** built with Next.js 15, 
     Interactive AI-powered assessment to discover personality type
   </Card>
 
-  <Card title="AI Personality Coach" icon="comment">
-    Personalized coaching based on your personality type
-  </Card>
+{" "}
+<Card title="AI Personality Coach" icon="comment">
+  Personalized coaching based on your personality type
+</Card>
 
-  <Card title="Progress Dashboard" icon="chart-line">
-    Track test results and coaching session history
-  </Card>
+{" "}
+<Card title="Progress Dashboard" icon="chart-line">
+  Track test results and coaching session history
+</Card>
 
   <Card title="Admin Panel" icon="shield">
     Secure dashboard for data management
@@ -42,23 +44,25 @@ A production-ready **personality discovery application** built with Next.js 15, 
 <Steps>
   <Step title="Install Dependencies">```bash cd nextjs-minimal pnpm install ```</Step>
 
-  <Step title="Configure Environment">
-    Copy `.env.example` to `.env.local` and add your credentials: ```bash cp .env.example .env.local
-    ``` Required variables: ```env TOUGH_TONGUE_API_KEY=your_api_key_here
-    NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-    NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-    ADMIN_TOKEN=your_secure_admin_token ```
-  </Step>
+{" "}
+<Step title="Configure Environment">
+  Copy `.env.example` to `.env.local` and add your credentials: ```bash cp .env.example .env.local
+  ``` Required variables: ```env TOUGH_TONGUE_API_KEY=your_api_key_here
+  NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+  ADMIN_TOKEN=your_secure_admin_token ```
+</Step>
 
-  <Step title="Get Your Credentials">
-    **ToughTongue AI**: Get API key from [Developer
-    Portal](https://app.toughtongueai.com/developer?tab=api-keys) **Firebase**: Create project at
-    [Firebase Console](https://console.firebase.google.com/) See [Firebase Authentication
-    Setup](/starters/firebase-auth) for detailed instructions
-  </Step>
+{" "}
+<Step title="Get Your Credentials">
+  **ToughTongue AI**: Get API key from [Developer
+  Portal](https://app.toughtongueai.com/developer?tab=api-keys) **Firebase**: Create project at
+  [Firebase Console](https://console.firebase.google.com/) See [Firebase Authentication
+  Setup](/starters/firebase-auth) for detailed instructions
+</Step>
 
   <Step title="Run the App">
     ```bash pnpm dev ``` Visit [http://localhost:3000](http://localhost:3000)
@@ -76,21 +80,25 @@ A production-ready **personality discovery application** built with Next.js 15, 
     `/` - Personality discovery homepage with interactive MBTI type explorer
   </Card>
 
-  <Card title="Personality Test" icon="clipboard-check">
-    `/personality-test` - Complete MBTI assessment with ToughTongue AI
-  </Card>
+{" "}
+<Card title="Personality Test" icon="clipboard-check">
+  `/personality-test` - Complete MBTI assessment with ToughTongue AI
+</Card>
 
-  <Card title="Personality Coach" icon="user">
-    `/personality-coach` - AI coaching personalized to your type
-  </Card>
+{" "}
+<Card title="Personality Coach" icon="user">
+  `/personality-coach` - AI coaching personalized to your type
+</Card>
 
-  <Card title="Progress Dashboard" icon="chart-bar">
-    `/progress` - View test results and coaching history
-  </Card>
+{" "}
+<Card title="Progress Dashboard" icon="chart-bar">
+  `/progress` - View test results and coaching history
+</Card>
 
-  <Card title="Admin Panel" icon="lock">
-    `/admin` - Token-protected data management dashboard
-  </Card>
+{" "}
+<Card title="Admin Panel" icon="lock">
+  `/admin` - Token-protected data management dashboard
+</Card>
 
   <Card title="Authentication" icon="key">
     `/auth/signin` and `/auth/signup` - Firebase authentication pages
@@ -311,15 +319,17 @@ export const SCENARIOS = {
 <Steps>
   <Step title="Push to GitHub">Ensure your code is in a Git repository</Step>
 
-  <Step title="Import in Vercel">
-    - Go to [Vercel Dashboard](https://vercel.com/dashboard) - Click "New Project" - Import your
-    repository - Set root directory to `nextjs-minimal`
-  </Step>
+{" "}
+<Step title="Import in Vercel">
+  - Go to [Vercel Dashboard](https://vercel.com/dashboard) - Click "New Project" - Import your
+  repository - Set root directory to `nextjs-minimal`
+</Step>
 
-  <Step title="Add Environment Variables">
-    Add all variables from `.env.local` to Vercel project settings **⚠️ Important**: Set a secure
-    `ADMIN_TOKEN` for production!
-  </Step>
+{" "}
+<Step title="Add Environment Variables">
+  Add all variables from `.env.local` to Vercel project settings **⚠️ Important**: Set a secure
+  `ADMIN_TOKEN` for production!
+</Step>
 
   <Step title="Deploy">Click "Deploy" - Vercel will auto-deploy on future pushes</Step>
 </Steps>
@@ -334,23 +344,26 @@ export const SCENARIOS = {
     Email/Password and Google auth in Firebase Console - Restart dev server: `pnpm dev`
   </Accordion>
 
-  <Accordion title="ToughTongue AI session not starting">
-    **Possible causes:** - Invalid API key in `.env.local` - Scenario ID not configured in
-    `lib/constants.ts` - Browser blocking microphone permission **Solution:** - Verify
-    `TOUGH_TONGUE_API_KEY` in Developer Portal - Check scenario IDs in `lib/constants.ts` - Allow
-    microphone access when prompted
-  </Accordion>
+{" "}
+<Accordion title="ToughTongue AI session not starting">
+  **Possible causes:** - Invalid API key in `.env.local` - Scenario ID not configured in
+  `lib/constants.ts` - Browser blocking microphone permission **Solution:** - Verify
+  `TOUGH_TONGUE_API_KEY` in Developer Portal - Check scenario IDs in `lib/constants.ts` - Allow
+  microphone access when prompted
+</Accordion>
 
-  <Accordion title="Admin panel won't accept token">
-    **Solution:** - Check `ADMIN_TOKEN` in `.env.local` - Restart dev server after changing
-    environment variables - Default token is: `TTAI-STARTER-ADMIN-TOKEN`
-  </Accordion>
+{" "}
+<Accordion title="Admin panel won't accept token">
+  **Solution:** - Check `ADMIN_TOKEN` in `.env.local` - Restart dev server after changing
+  environment variables - Default token is: `TTAI-STARTER-ADMIN-TOKEN`
+</Accordion>
 
-  <Accordion title="Data not persisting">
-    **Explanation:** Data is stored in browser localStorage (per-browser, per-domain) **Note:** -
-    Clearing browser data will delete saved results - Data doesn't sync across browsers - For
-    production, consider adding database sync
-  </Accordion>
+{" "}
+<Accordion title="Data not persisting">
+  **Explanation:** Data is stored in browser localStorage (per-browser, per-domain) **Note:** -
+  Clearing browser data will delete saved results - Data doesn't sync across browsers - For
+  production, consider adding database sync
+</Accordion>
 
   <Accordion title="Build errors">
     **Solution:** ```bash rm -rf .next node_modules pnpm-lock.yaml pnpm install pnpm build ```
@@ -377,9 +390,10 @@ export const SCENARIOS = {
     Detailed Firebase authentication guide
   </Card>
 
-  <Card title="API Reference" icon="code" href="/api-reference/overview">
-    ToughTongue AI API documentation
-  </Card>
+{" "}
+<Card title="API Reference" icon="code" href="/api-reference/overview">
+  ToughTongue AI API documentation
+</Card>
 
   <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
     Common issues and solutions

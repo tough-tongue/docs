@@ -2,56 +2,52 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/auth/AuthContext";
+import { AuthGuard } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  SCENARIOS,
-  SCENARIO_URLS,
-  STORAGE_KEYS,
+  buildPersonalityTestUrl,
+  createIframeEventListener,
+  loadTestResult,
+  saveTestResult,
+  clearTestResult,
+  extractMBTIType,
   type PersonalityTestResult,
-} from "@/lib/constants";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+  type SessionAnalysis,
+} from "@/lib/toughtongue";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
-export default function PersonalityTestPage() {
-  const { user, loading: authLoading } = useAuth();
+function PersonalityTestContent() {
+  const { getUserName, getUserEmail } = useAuth();
   const [testResult, setTestResult] = useState<PersonalityTestResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
+  // Load existing test result on mount
   useEffect(() => {
-    // Load existing test result from localStorage
-    const stored = localStorage.getItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT);
-    if (stored) {
-      try {
-        setTestResult(JSON.parse(stored));
-      } catch (error) {
-        console.error("Error loading test result:", error);
-      }
+    const result = loadTestResult();
+    if (result) {
+      setTestResult(result);
     }
     setIsLoading(false);
+  }, []);
 
-    // Listen for messages from the iframe
-    const handleMessage = async (event: MessageEvent) => {
-      if (event.origin !== "https://app.toughtongueai.com") return;
+  // Set up iframe event listener
+  useEffect(() => {
+    const cleanup = createIframeEventListener({
+      onStart: (event) => {
+        console.log("Session started:", event.data.session_id);
+      },
+      onStop: async (event) => {
+        console.log("Session stopped:", event.data.session_id);
+        await analyzeSession(event.data.session_id);
+      },
+      onError: (error) => {
+        console.error("Iframe error:", error);
+      },
+    });
 
-      const { type, data } = event.data;
-
-      if (type === "onStart") {
-        console.log("Session started:", data);
-        setSessionId(data.session_id);
-      } else if (type === "onStop") {
-        console.log("Session stopped:", data);
-        const sessionId = data.session_id;
-        if (sessionId) {
-          setSessionId(sessionId);
-          await analyzeSession(sessionId);
-        }
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
+    return cleanup;
   }, []);
 
   const analyzeSession = async (sessionId: string) => {
@@ -67,20 +63,17 @@ export default function PersonalityTestPage() {
         throw new Error("Failed to analyze session");
       }
 
-      const analysisData = await response.json();
+      const analysisData: SessionAnalysis = await response.json();
 
-      // Save result to localStorage
+      // Create and save result
       const result: PersonalityTestResult = {
         sessionId,
         analysisData,
         completedAt: new Date().toISOString(),
-        personalityType: extractPersonalityType(analysisData),
+        personalityType: extractMBTIType(analysisData),
       };
 
-      localStorage.setItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT, JSON.stringify(result));
-      localStorage.setItem(STORAGE_KEYS.PERSONALITY_TEST_SESSION_ID, sessionId);
-      localStorage.setItem(STORAGE_KEYS.PERSONALITY_TEST_COMPLETED_AT, result.completedAt);
-
+      saveTestResult(result);
       setTestResult(result);
     } catch (error) {
       console.error("Error analyzing session:", error);
@@ -89,46 +82,25 @@ export default function PersonalityTestPage() {
     }
   };
 
-  const extractPersonalityType = (analysisData: any): PersonalityTestResult["personalityType"] => {
-    // Try to extract MBTI type from analysis data
-    // This is a placeholder - adjust based on actual API response structure
-    const text = JSON.stringify(analysisData).toUpperCase();
-    const mbtiPattern =
-      /\b(INTJ|INTP|ENTJ|ENTP|INFJ|INFP|ENFJ|ENFP|ISTJ|ISFJ|ESTJ|ESFJ|ISTP|ISFP|ESTP|ESFP)\b/;
-    const match = text.match(mbtiPattern);
-    return match ? (match[1] as PersonalityTestResult["personalityType"]) : undefined;
-  };
-
   const handleRetake = () => {
     if (
       confirm("Are you sure you want to retake the test? This will replace your current results.")
     ) {
-      localStorage.removeItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT);
-      localStorage.removeItem(STORAGE_KEYS.PERSONALITY_TEST_SESSION_ID);
-      localStorage.removeItem(STORAGE_KEYS.PERSONALITY_TEST_COMPLETED_AT);
+      clearTestResult();
       setTestResult(null);
-      setSessionId(null);
     }
   };
 
-  const getIframeUrl = () => {
-    if (!user) {
-      return `${SCENARIO_URLS.PERSONALITY_TEST}?bg=black&promptUserInfo=true`;
-    }
+  const iframeUrl = buildPersonalityTestUrl({
+    userName: getUserName(),
+    userEmail: getUserEmail(),
+  });
 
-    const userName = user.displayName || "";
-    const userEmail = user.email || "";
-
-    return `${SCENARIO_URLS.PERSONALITY_TEST}?bg=black&userName=${encodeURIComponent(
-      userName
-    )}&userEmail=${encodeURIComponent(userEmail)}`;
-  };
-
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
-        <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600" />
-        <p className="mt-4 text-gray-600">Loading...</p>
+        <Loader2 className="mx-auto h-8 w-8 animate-spin text-teal-500" />
+        <p className="mt-4 text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -136,25 +108,26 @@ export default function PersonalityTestPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">MBTI Personality Assessment</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold mb-2 text-foreground">MBTI Personality Assessment</h1>
+        <p className="text-muted-foreground">
           Take our comprehensive personality test to discover your MBTI type
         </p>
       </div>
 
+      {/* Test Completed Banner */}
       {testResult && (
-        <Card className="mb-8 border-green-200 bg-green-50">
+        <Card className="mb-8 border-green-500/30 bg-green-500/10">
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-                <CardTitle className="text-green-900">Test Completed!</CardTitle>
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                <CardTitle className="text-green-400">Test Completed!</CardTitle>
               </div>
               <Button variant="outline" size="sm" onClick={handleRetake}>
                 Retake Test
               </Button>
             </div>
-            <CardDescription className="text-green-700">
+            <CardDescription className="text-green-300/80">
               Completed on {new Date(testResult.completedAt).toLocaleDateString()}
               {testResult.personalityType && (
                 <span className="ml-2 font-semibold">
@@ -166,30 +139,16 @@ export default function PersonalityTestPage() {
         </Card>
       )}
 
+      {/* Analyzing Banner */}
       {isAnalyzing && (
-        <Card className="mb-8 border-blue-200 bg-blue-50">
+        <Card className="mb-8 border-blue-500/30 bg-blue-500/10">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-              <CardTitle className="text-blue-900">Analyzing Your Results...</CardTitle>
+              <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
+              <CardTitle className="text-blue-400">Analyzing Your Results...</CardTitle>
             </div>
-            <CardDescription className="text-blue-700">
+            <CardDescription className="text-blue-300/80">
               Please wait while we process your personality assessment
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      )}
-
-      {!user && (
-        <Card className="mb-8 border-yellow-200 bg-yellow-50">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-yellow-600" />
-              <CardTitle className="text-yellow-900">Not Signed In</CardTitle>
-            </div>
-            <CardDescription className="text-yellow-700">
-              You can take the test without signing in, but your results won't be saved to your
-              account. Sign in to save your progress.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -198,28 +157,40 @@ export default function PersonalityTestPage() {
       {/* ToughTongue AI Iframe */}
       <div className="mb-8">
         <iframe
-          src={getIframeUrl()}
+          src={iframeUrl}
           width="100%"
           height="700px"
           frameBorder="0"
           allow="microphone; camera; display-capture"
-          className="rounded-lg border shadow-lg"
+          className="rounded-lg border border-border shadow-lg shadow-teal-500/5"
         />
       </div>
 
+      {/* Results Card */}
       {testResult && (
-        <Card>
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle>Your Results</CardTitle>
             <CardDescription>Detailed analysis from your personality assessment</CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="overflow-x-auto rounded-lg bg-gray-100 p-4 text-sm">
+            <pre className="overflow-x-auto rounded-lg bg-background p-4 text-sm text-muted-foreground border border-border">
               {JSON.stringify(testResult.analysisData, null, 2)}
             </pre>
           </CardContent>
         </Card>
       )}
     </div>
+  );
+}
+
+export default function PersonalityTestPage() {
+  return (
+    <AuthGuard
+      title="Sign In to Take the Test"
+      description="Create an account to save your personality test results and track your progress"
+    >
+      <PersonalityTestContent />
+    </AuthGuard>
   );
 }

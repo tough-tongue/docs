@@ -6,7 +6,8 @@ description: "Add user authentication to the Next.js starter template with Fireb
 This guide shows you how Firebase Authentication works in the Next.js starter template, which comes with pre-built authentication pages and context providers.
 
 <Note>
-  The Next.js starter template **already includes** Firebase Authentication setup. This guide explains how it works and how to configure it.
+  The Next.js starter template **already includes** Firebase Authentication setup. This guide
+  explains how it works and how to configure it.
 </Note>
 
 ## Why Firebase Auth?
@@ -16,9 +17,11 @@ This guide shows you how Firebase Authentication works in the Next.js starter te
     Configure and run in under 10 minutes
   </Card>
 
-  <Card title="Multiple Providers" icon="users">
-    Email/password, Google, GitHub, and more
-  </Card>
+{" "}
+
+<Card title="Multiple Providers" icon="users">
+  Email/password, Google, GitHub, and more
+</Card>
 
   <Card title="Free Tier" icon="dollar-sign">
     10K monthly active users free
@@ -58,12 +61,11 @@ This guide shows you how Firebase Authentication works in the Next.js starter te
     In Firebase Console sidebar, click **Authentication** → **Get Started**
   </Step>
 
-  <Step title="Enable Email/Password">
-    - Go to "Sign-in method" tab
-    - Click on "Email/Password"
-    - Toggle **Enable**
-    - Save
-  </Step>
+{" "}
+
+<Step title="Enable Email/Password">
+  - Go to "Sign-in method" tab - Click on "Email/Password" - Toggle **Enable** - Save
+</Step>
 
   <Step title="Enable Google Sign-In (Recommended)">
     - Click on "Google"
@@ -94,8 +96,8 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
 ```
 
 <Warning>
-  All Firebase config variables must be prefixed with `NEXT_PUBLIC_` to be accessible in the browser.
-  Never commit `.env.local` to version control!
+  All Firebase config variables must be prefixed with `NEXT_PUBLIC_` to be accessible in the
+  browser. Never commit `.env.local` to version control!
 </Warning>
 
 ---
@@ -111,9 +113,7 @@ import { AppConfig } from "./config";
 
 // Safely initialize only in browser with valid config
 if (isConfigValid) {
-  app = getApps().length === 0 
-    ? initializeApp(AppConfig.firebase) 
-    : getApps()[0];
+  app = getApps().length === 0 ? initializeApp(AppConfig.firebase) : getApps()[0];
   auth = getAuth(app);
   db = getFirestore(app);
 }
@@ -141,7 +141,7 @@ export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
 
   if (loading) return <p>Loading...</p>;
-  
+
   if (!user) {
     return <p>Please sign in</p>;
   }
@@ -165,6 +165,7 @@ The starter includes ready-to-use authentication pages:
 ### Sign In Page (`/auth/signin`)
 
 Features:
+
 - Email/password form
 - Google sign-in button
 - Error handling
@@ -173,6 +174,7 @@ Features:
 ### Sign Up Page (`/auth/signup`)
 
 Features:
+
 - Email/password registration
 - Google sign-in option
 - Password validation
@@ -254,7 +256,7 @@ const saveSession = async (sessionId: string, analysisData: any) => {
     analysisData,
     completedAt: new Date().toISOString(),
   };
-  
+
   localStorage.setItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT, JSON.stringify(session));
 };
 ```
@@ -356,12 +358,13 @@ const saveSession = async (sessionId: string, analysisData: any) => {
     - Restart dev server: `pnpm dev`
   </Accordion>
 
-  <Accordion title="Google Sign-In not working" icon="google">
-    **Solution:**
-    - Verify you've enabled Google provider in Firebase Console
-    - Add your domain to authorized domains in Firebase Console → Authentication → Settings
-    - For localhost, `localhost` and `127.0.0.1` should be authorized by default
-  </Accordion>
+{" "}
+
+<Accordion title="Google Sign-In not working" icon="google">
+  **Solution:** - Verify you've enabled Google provider in Firebase Console - Add your domain to
+  authorized domains in Firebase Console → Authentication → Settings - For localhost, `localhost`
+  and `127.0.0.1` should be authorized by default
+</Accordion>
 
   <Accordion title="auth/operation-not-allowed" icon="ban">
     **Solution:**
@@ -386,9 +389,15 @@ const saveSession = async (sessionId: string, analysisData: any) => {
     Store additional user data in Firestore
   </Card>
 
-  <Card title="Password Reset" icon="key" href="https://firebase.google.com/docs/auth/web/manage-users#send_a_password_reset_email">
-    Implement password reset flow
-  </Card>
+{" "}
+
+<Card
+  title="Password Reset"
+  icon="key"
+  href="https://firebase.google.com/docs/auth/web/manage-users#send_a_password_reset_email"
+>
+  Implement password reset flow
+</Card>
 
   <Card title="Social Providers" icon="share-nodes" href="https://firebase.google.com/docs/auth/web/start#next_steps">
     Add GitHub, Twitter, Facebook auth
@@ -402,5 +411,6 @@ const saveSession = async (sessionId: string, analysisData: any) => {
 ---
 
 <Card title="Need help?" icon="question">
-  Join our [Discord community](https://discord.com/invite/jfq2wVAP) or email **help@getarchieai.com**
+  Join our [Discord community](https://discord.com/invite/jfq2wVAP) or email
+  **help@getarchieai.com**
 </Card>

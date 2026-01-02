@@ -17,12 +17,6 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.1.2
         version: 1.2.4(@types/react@19.2.7)(react@19.2.3)
-      '@supabase/ssr':
-        specifier: ^0.8.0
-        version: 0.8.0(@supabase/supabase-js@2.89.0)
-      '@supabase/supabase-js':
-        specifier: ^2.47.10
-        version: 2.89.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -50,9 +44,6 @@ importers:
       tw-animate-css:
         specifier: ^1.2.5
         version: 1.4.0
-      zustand:
-        specifier: ^5.0.3
-        version: 5.0.9(@types/react@19.2.7)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4.1.4
@@ -743,35 +734,6 @@ packages:
       '@types/react':
         optional: true
 
-  '@supabase/auth-js@2.89.0':
-    resolution: {integrity: sha512-wiWZdz8WMad8LQdJMWYDZ2SJtZP5MwMqzQq3ehtW2ngiI3UTgbKiFrvMUUS3KADiVlk4LiGfODB2mrYx7w2f8w==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/functions-js@2.89.0':
-    resolution: {integrity: sha512-XEueaC5gMe5NufNYfBh9kPwJlP5M2f+Ogr8rvhmRDAZNHgY6mI35RCkYDijd92pMcNM7g8pUUJov93UGUnqfyw==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/postgrest-js@2.89.0':
-    resolution: {integrity: sha512-/b0fKrxV9i7RNOEXMno/I1862RsYhuUo+Q6m6z3ar1f4ulTMXnDfv0y4YYxK2POcgrOXQOgKYQx1eArybyNvtg==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/realtime-js@2.89.0':
-    resolution: {integrity: sha512-aMOvfDb2a52u6PX6jrrjvACHXGV3zsOlWRzZsTIOAJa0hOVvRp01AwC1+nLTGUzxzezejrYeCX+KnnM1xHdl+w==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/ssr@0.8.0':
-    resolution: {integrity: sha512-/PKk8kNFSs8QvvJ2vOww1mF5/c5W8y42duYtXvkOSe+yZKRgTTZywYG2l41pjhNomqESZCpZtXuWmYjFRMV+dw==}
-    peerDependencies:
-      '@supabase/supabase-js': ^2.76.1
-
-  '@supabase/storage-js@2.89.0':
-    resolution: {integrity: sha512-6zKcXofk/M/4Eato7iqpRh+B+vnxeiTumCIP+Tz26xEqIiywzD9JxHq+udRrDuv6hXE+pmetvJd8n5wcf4MFRQ==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/supabase-js@2.89.0':
-    resolution: {integrity: sha512-KlaRwSfFA0fD73PYVMHj5/iXFtQGCcX7PSx0FdQwYEEw9b2wqM7GxadY+5YwcmuEhalmjFB/YvqaoNVF+sWUlg==}
-    engines: {node: '>=20.0.0'}
-
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
@@ -866,9 +828,6 @@ packages:
   '@types/node@25.0.3':
     resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
 
-  '@types/phoenix@1.6.7':
-    resolution: {integrity: sha512-oN9ive//QSBkf19rfDv45M7eZPi0eEXylht2OLEXicu5b4KoQ1OzXIw+xDSGWxSxe1JmepRR/ZH283vsu518/Q==}
-
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
@@ -876,9 +835,6 @@ packages:
 
   '@types/react@19.2.7':
     resolution: {integrity: sha512-MWtvHrGZLFttgeEj28VXHxpmwYbor/ATPYbBfSFZEIRK0ecCFLl2Qo55z52Hss+UV9CRN7trSeq1zbgx7YDWWg==}
-
-  '@types/ws@8.18.1':
-    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -932,10 +888,6 @@ packages:
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
-  cookie@1.0.2:
-    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
-    engines: {node: '>=18'}
-
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
@@ -983,10 +935,6 @@ packages:
 
   http-parser-js@0.5.10:
     resolution: {integrity: sha512-Pysuw9XpUq5dVc/2SMHpuTY01RFl8fttgcyunjL7eEMhGM3cI4eOmiCycJDVCo/7O7ClfQD3SaI6ftDzqOXYMA==}
-
-  iceberg-js@0.8.1:
-    resolution: {integrity: sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA==}
-    engines: {node: '>=20.0.0'}
 
   idb@7.1.1:
     resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
@@ -1263,11 +1211,6 @@ packages:
       '@types/react':
         optional: true
 
-  use-sync-external-store@1.6.0:
-    resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
   web-vitals@4.2.4:
     resolution: {integrity: sha512-r4DIlprAGwJ7YM11VZp4R884m0Vmgr6EAKe3P+kO0PPj3Unqyvv59rczf6UiGcb9Z8QxZVcqKNwv/g0WNdWwsw==}
 
@@ -1283,18 +1226,6 @@ packages:
     resolution: {integrity: sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==}
     engines: {node: '>=10'}
 
-  ws@8.18.3:
-    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
@@ -1306,24 +1237,6 @@ packages:
   yargs@17.7.2:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
-
-  zustand@5.0.9:
-    resolution: {integrity: sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      immer: '>=9.0.6'
-      react: '>=18.0.0'
-      use-sync-external-store: '>=1.2.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
-      use-sync-external-store:
-        optional: true
 
 snapshots:
 
@@ -2004,49 +1917,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.7
 
-  '@supabase/auth-js@2.89.0':
-    dependencies:
-      tslib: 2.8.1
-
-  '@supabase/functions-js@2.89.0':
-    dependencies:
-      tslib: 2.8.1
-
-  '@supabase/postgrest-js@2.89.0':
-    dependencies:
-      tslib: 2.8.1
-
-  '@supabase/realtime-js@2.89.0':
-    dependencies:
-      '@types/phoenix': 1.6.7
-      '@types/ws': 8.18.1
-      tslib: 2.8.1
-      ws: 8.18.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
-  '@supabase/ssr@0.8.0(@supabase/supabase-js@2.89.0)':
-    dependencies:
-      '@supabase/supabase-js': 2.89.0
-      cookie: 1.0.2
-
-  '@supabase/storage-js@2.89.0':
-    dependencies:
-      iceberg-js: 0.8.1
-      tslib: 2.8.1
-
-  '@supabase/supabase-js@2.89.0':
-    dependencies:
-      '@supabase/auth-js': 2.89.0
-      '@supabase/functions-js': 2.89.0
-      '@supabase/postgrest-js': 2.89.0
-      '@supabase/realtime-js': 2.89.0
-      '@supabase/storage-js': 2.89.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
@@ -2124,8 +1994,6 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
-  '@types/phoenix@1.6.7': {}
-
   '@types/react-dom@19.2.3(@types/react@19.2.7)':
     dependencies:
       '@types/react': 19.2.7
@@ -2133,10 +2001,6 @@ snapshots:
   '@types/react@19.2.7':
     dependencies:
       csstype: 3.2.3
-
-  '@types/ws@8.18.1':
-    dependencies:
-      '@types/node': 25.0.3
 
   ansi-regex@5.0.1: {}
 
@@ -2188,8 +2052,6 @@ snapshots:
       color-name: 1.1.4
 
   color-name@1.1.4: {}
-
-  cookie@1.0.2: {}
 
   csstype@3.2.3: {}
 
@@ -2254,8 +2116,6 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   http-parser-js@0.5.10: {}
-
-  iceberg-js@0.8.1: {}
 
   idb@7.1.1: {}
 
@@ -2510,11 +2370,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.7
 
-  use-sync-external-store@1.6.0(react@19.2.3):
-    dependencies:
-      react: 19.2.3
-    optional: true
-
   web-vitals@4.2.4: {}
 
   websocket-driver@0.7.4:
@@ -2531,8 +2386,6 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
 
-  ws@8.18.3: {}
-
   y18n@5.0.8: {}
 
   yargs-parser@21.1.1: {}
@@ -2546,9 +2399,3 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
-
-  zustand@5.0.9(@types/react@19.2.7)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3)):
-    optionalDependencies:
-      '@types/react': 19.2.7
-      react: 19.2.3
-      use-sync-external-store: 1.6.0(react@19.2.3)

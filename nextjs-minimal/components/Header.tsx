@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/app/auth/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -9,65 +10,100 @@ import { ROUTES } from "@/lib/constants";
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { currentUser, logout, getUserName } = useAuth();
+
+  const isActive = (route: string) => pathname === route;
 
   return (
-    <header className="border-b bg-white">
-      <div className="container mx-auto px-4 py-4">
-        <div className="grid grid-cols-3 items-center">
-          <div className="flex items-center">
-            <Link href={ROUTES.HOME} className="text-xl font-bold">
-              {AppConfig.app.name}
-            </Link>
-          </div>
-          <nav className="flex items-center justify-center space-x-6">
-            <Link
-              href={ROUTES.HOME}
-              className={`hover:text-gray-600 ${pathname === ROUTES.HOME ? "font-semibold" : ""}`}
-            >
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          {/* Logo & App Name */}
+          <Link href={ROUTES.HOME} className="flex items-center gap-3 group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg overflow-hidden">
+              <Image
+                src="/icons/logo.svg"
+                alt="Logo"
+                width={36}
+                height={36}
+                className="transition-transform group-hover:scale-110"
+              />
+            </div>
+            <span className="text-lg font-semibold text-foreground hidden sm:block">
+              {AppConfig.app.shortName}
+            </span>
+          </Link>
+
+          {/* Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
+            <NavLink href={ROUTES.HOME} active={isActive(ROUTES.HOME)}>
               Home
-            </Link>
-            <Link
-              href={ROUTES.PERSONALITY_TEST}
-              className={`hover:text-gray-600 ${
-                pathname === ROUTES.PERSONALITY_TEST ? "font-semibold" : ""
-              }`}
-            >
-              Take Test
-            </Link>
-            <Link
-              href={ROUTES.PERSONALITY_COACH}
-              className={`hover:text-gray-600 ${
-                pathname === ROUTES.PERSONALITY_COACH ? "font-semibold" : ""
-              }`}
-            >
+            </NavLink>
+            <NavLink href={ROUTES.PERSONALITY_TEST} active={isActive(ROUTES.PERSONALITY_TEST)}>
+              Test
+            </NavLink>
+            <NavLink href={ROUTES.PERSONALITY_COACH} active={isActive(ROUTES.PERSONALITY_COACH)}>
               Coach
-            </Link>
-            <Link
-              href={ROUTES.PROGRESS}
-              className={`hover:text-gray-600 ${
-                pathname === ROUTES.PROGRESS ? "font-semibold" : ""
-              }`}
-            >
+            </NavLink>
+            <NavLink href={ROUTES.PROGRESS} active={isActive(ROUTES.PROGRESS)}>
               Progress
-            </Link>
+            </NavLink>
           </nav>
-          <div className="flex items-center justify-end gap-2">
-            {user ? (
+
+          {/* User Section */}
+          <div className="flex items-center gap-3">
+            {currentUser ? (
               <>
-                <span className="text-sm text-gray-600">{user.email}</span>
-                <Button variant="outline" size="sm" onClick={logout}>
+                <div className="hidden sm:flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-teal-500/20 flex items-center justify-center">
+                    <span className="text-sm font-medium text-teal-400">
+                      {getUserName().charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{getUserName()}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={logout}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   Sign Out
                 </Button>
               </>
             ) : (
-              <Link href="/auth/signin">
-                <Button size="sm">Sign In</Button>
+              <Link href={ROUTES.SIGNIN}>
+                <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
+                  Sign In
+                </Button>
               </Link>
             )}
           </div>
         </div>
       </div>
     </header>
+  );
+}
+
+function NavLink({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+        active
+          ? "text-teal-400 bg-teal-500/10"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+      }`}
+    >
+      {children}
+    </Link>
   );
 }

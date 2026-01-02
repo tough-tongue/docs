@@ -1,48 +1,31 @@
 import { NextResponse } from "next/server";
-import { AppConfig } from "@/lib/config";
+import { analyzeSession, ToughTongueError, type AnalyzeSessionRequest } from "@/lib/toughtongue";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const apiKey = AppConfig.toughTongue.apiKey;
-
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Tough Tongue API key is not configured" },
-        { status: 500 }
-      );
-    }
 
     // Validate request body
     if (!body.session_id) {
-      return NextResponse.json({ error: "session_id is required" }, { status: 400 });
-    }
-
-    // Call Tough Tongue API to analyze the session
-    const response = await fetch("https://api.toughtongueai.com/api/public/sessions/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        session_id: body.session_id,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
       return NextResponse.json(
-        { error: "Failed to analyze session", details: data },
-        { status: response.status }
+        { error: "session_id is required" },
+        { status: 400 }
       );
     }
 
+    const request: AnalyzeSessionRequest = {
+      session_id: body.session_id,
+    };
+
+    const data = await analyzeSession(request);
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error analyzing Tough Tongue session:", error);
+    console.error("Error analyzing session:", error);
+
+    if (error instanceof ToughTongueError) {
+      return NextResponse.json(error.toApiError(), { status: error.status || 500 });
+    }
+
     return NextResponse.json(
       { error: "An error occurred while analyzing the session" },
       { status: 500 }

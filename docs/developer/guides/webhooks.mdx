@@ -16,48 +16,40 @@ Webhooks allow you to receive real-time notifications when events occur in your 
 ## Setting Up Webhooks
 
 <Steps>
-  <Step title="Configure Endpoint">
-    Set up an endpoint to receive webhook notifications
-  </Step>
-  
-  <Step title="Register Webhook">
-    Register your endpoint URL in the developer portal
-  </Step>
-  
-  <Step title="Verify Signatures">
-    Validate webhook signatures for security
-  </Step>
+  <Step title="Configure Endpoint">Set up an endpoint to receive webhook notifications</Step>
+
+  <Step title="Register Webhook">Register your endpoint URL in the developer portal</Step>
+
+  <Step title="Verify Signatures">Validate webhook signatures for security</Step>
 </Steps>
 
 ## Example Webhook Handler
 
 ```javascript
-app.post('/webhooks/toughtongue', (req, res) => {
-  const signature = req.headers['x-toughtongue-signature'];
-  
+app.post("/webhooks/toughtongue", (req, res) => {
+  const signature = req.headers["x-toughtongue-signature"];
+
   // Verify signature
   if (!verifySignature(req.body, signature)) {
-    return res.status(401).send('Invalid signature');
+    return res.status(401).send("Invalid signature");
   }
-  
+
   const { event, data } = req.body;
-  
+
   switch (event) {
-    case 'session.completed':
+    case "session.completed":
       // Handle session completion
       handleSessionComplete(data.session_id);
       break;
-      
-    case 'session.analyzed':
+
+    case "session.analyzed":
       // Handle analysis ready
       handleAnalysisReady(data.session_id, data.analysis);
       break;
   }
-  
-  res.status(200).send('OK');
+
+  res.status(200).send("OK");
 });
 ```
 
-<Note>
-  Webhook functionality is currently in beta. Contact support for access.
-</Note>
+<Note>Webhook functionality is currently in beta. Contact support for access.</Note>
