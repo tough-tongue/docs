@@ -1,0 +1,72 @@
+---
+title: "Scenario Studio"
+sidebarTitle: "Scenario Studio"
+description: "Create custom voice AI agents with natural language"
+---
+
+Build voice agents by describing what you want. No coding required.
+
+<Tip>
+  **Scenario Studio** is also called "Advanced Scenario Creator" in the app.
+</Tip>
+
+## Creating a Scenario
+
+1. Go to [Scenario Studio](https://app.toughtongueai.com/advanced-scenario-create)
+2. Describe your agent in natural language
+3. Configure settings and deploy
+
+## What Your Prompt Controls
+
+Your scenario input determines three things:
+
+| Element | What it does |
+|---------|--------------|
+| **Role** | AI's persona and tone (positive, skeptical, humorous) |
+| **Agenda** | Questions to ask and how to probe |
+| **Evaluation** | Scoring criteria for analysis |
+
+## Writing Effective Prompts
+
+**Name format:** `[Coach Name]: [Situation]`
+
+Examples:
+- "PM Interviewer: Analytics Question"
+- "Sales Coach: Cold Call Practice"
+- "HR Manager: Performance Review"
+
+**Set the role:** Use "You are [Role]" with a tone.
+
+```
+You are a skeptical VP of Engineering evaluating a technical pitch.
+Be direct, ask tough questions, and push back on vague claims.
+```
+
+**Add context:** Attach materials to make scenarios more realistic:
+- PDF documents (pitch decks, playbooks)
+- Blog post links
+- YouTube videos
+- Google Slides
+
+## Conversation Strategies
+
+| Mode | Best for |
+|------|----------|
+| **Talkative** | AI leads, continues even if user is silent. Good for interviews. |
+| **Quiz** | Jumps straight to analysis after session. No avatar display. |
+| **Conductor** | Timed actions at specific moments. Control session length. |
+
+## Controlling Session Duration
+
+**Per-link control:** Add `?maxDuration=600` to URL (600 = 10 minutes)
+
+**Scenario-level control:** Use Conductor Mode with timed messages:
+- At 540s: "You have one minute left"
+- At 600s: "End the call and say thank you"
+
+## Sharing Options
+
+- **Public link:** Anyone can access
+- **Single-use links:** One-time access with optional user info collection
+- **Embed via iframe:** White-label in your app
+- **Organization-only:** Restrict to team members

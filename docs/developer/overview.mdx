@@ -1,0 +1,86 @@
+---
+title: "Developer Overview"
+sidebarTitle: "Overview"
+description: "Integrate voice AI agents into your application"
+---
+
+<Note>
+  **Beta:** This documentation is under active development. [Join
+  Discord](https://discord.com/invite/NfTPT3HsSj) for updates.
+</Note>
+
+Two ways to integrate ToughTongue AI:
+
+<CardGroup cols={2}>
+  <Card title="Iframe Embedding" icon="window" href="/developer/iframe">
+    Drop-in widget. Fastest integration—under 5 minutes.
+  </Card>
+  <Card title="REST API" icon="code" href="/developer/api">
+    Full programmatic control. Build custom workflows.
+  </Card>
+</CardGroup>
+
+---
+
+## Quick Comparison
+
+| Feature        | Iframe            | API              |
+| -------------- | ----------------- | ---------------- |
+| Setup time     | 5 min             | 30+ min          |
+| Custom UI      | Limited           | Full control     |
+| Event handling | postMessage       | Webhooks         |
+| Best for       | Embedded practice | Custom platforms |
+
+---
+
+## Get Started
+
+### 1. Get API Key
+
+1. Sign up at [app.toughtongueai.com](https://app.toughtongueai.com)
+2. Go to [Developer Portal → API Keys](https://app.toughtongueai.com/developer?tab=api-keys)
+3. Create and save your token
+
+<Warning>Never expose API tokens in client-side code. Proxy through your backend.</Warning>
+
+### 2. Create a Scenario
+
+Use [Scenario Studio](https://app.toughtongueai.com/advanced-scenario-create)
+or the API:
+
+```bash
+curl -X POST https://api.toughtongueai.com/api/public/scenarios \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Sales Coach", "ai_instructions": "You are a skeptical VP..."}'
+```
+
+### 3. Choose Integration
+
+**Iframe** — Embed directly:
+
+```html
+<iframe src="https://app.toughtongueai.com/embed/SCENARIO_ID" allow="microphone"></iframe>
+```
+
+**API** — Build custom:
+
+```javascript
+// Create session
+const session = await fetch("/api/tough-tongue/sessions", {
+  method: "POST",
+  body: JSON.stringify({ scenario_id: "SCENARIO_ID" }),
+}).then((r) => r.json());
+
+// Redirect to session
+window.location = session.embed_url;
+```
+
+---
+
+## Resources
+
+- [API Reference](/api-reference/overview) — Full endpoint docs
+- [Starter Templates](/starters/overview) — Working code examples
+
+**Help:** help@getarchieai.com

@@ -1,0 +1,205 @@
+---
+title: "API Integration"
+sidebarTitle: "REST API"
+description: "Full programmatic control with the REST API"
+---
+
+Base URL: `https://api.toughtongueai.com/api/public`
+
+All requests require Bearer token authentication.
+
+---
+
+## Authentication
+
+```bash
+curl https://api.toughtongueai.com/api/public/scenarios \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+Get your token from
+[Developer Portal → API Keys](https://app.toughtongueai.com/developer?tab=api-keys).
+
+<Warning>Proxy API calls through your backend. Never expose tokens client-side.</Warning>
+
+---
+
+## Core Workflows
+
+### 1. Create Scenario
+
+```bash
+curl -X POST https://api.toughtongueai.com/api/public/scenarios \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sales Cold Call",
+    "ai_instructions": "You are a skeptical VP of Engineering...",
+    "is_public": true
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "id": "scenario_abc123",
+  "name": "Sales Cold Call",
+  "is_public": true
+}
+```
+
+### 2. Create Session
+
+```bash
+curl -X POST https://api.toughtongueai.com/api/public/v2/sessions \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scenario_id": "scenario_abc123",
+    "user_email": "trainee@company.com",
+    "metadata": {"team": "sales"}
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "session_id": "session_xyz789",
+  "embed_url": "https://app.toughtongueai.com/embed/session/session_xyz789"
+}
+```
+
+### 3. Analyze Session
+
+```bash
+curl -X POST https://api.toughtongueai.com/api/public/sessions/analyze \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"session_id": "session_xyz789"}'
+```
+
+**Response:**
+
+```json
+{
+  "overall_score": 85,
+  "strengths": ["Strong opening", "Good questions"],
+  "improvements": ["Handle objections more confidently"]
+}
+```
+
+---
+
+## Backend Proxy Example
+
+<Tabs>
+  <Tab title="Node.js">
+```javascript
+import express from 'express';
+
+const app = express();
+const TTAI_TOKEN = process.env.TTAI_TOKEN;
+
+app.post('/api/analyze', async (req, res) => {
+const response = await fetch(
+'https://api.toughtongueai.com/api/public/sessions/analyze',
+{
+method: 'POST',
+headers: {
+'Authorization': `Bearer ${TTAI_TOKEN}`,
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({ session_id: req.body.session_id })
+}
+);
+res.json(await response.json());
+});
+
+````
+  </Tab>
+  <Tab title="Python">
+```python
+from flask import Flask, request, jsonify
+import requests
+import os
+
+app = Flask(__name__)
+TTAI_TOKEN = os.environ.get('TTAI_TOKEN')
+
+@app.route('/api/analyze', methods=['POST'])
+def analyze():
+    response = requests.post(
+        'https://api.toughtongueai.com/api/public/sessions/analyze',
+        headers={'Authorization': f'Bearer {TTAI_TOKEN}'},
+        json={'session_id': request.json['session_id']}
+    )
+    return jsonify(response.json())
+````
+
+  </Tab>
+</Tabs>
+
+---
+
+## Endpoint Reference
+
+### Scenarios
+
+| Method | Endpoint          | Description     |
+| ------ | ----------------- | --------------- |
+| GET    | `/scenarios`      | List scenarios  |
+| POST   | `/scenarios`      | Create scenario |
+| GET    | `/scenarios/{id}` | Get scenario    |
+| PATCH  | `/scenarios/{id}` | Update scenario |
+| DELETE | `/scenarios/{id}` | Delete scenario |
+
+### Sessions
+
+| Method | Endpoint            | Description     |
+| ------ | ------------------- | --------------- |
+| GET    | `/sessions`         | List sessions   |
+| GET    | `/sessions/{id}`    | Get session     |
+| POST   | `/sessions/analyze` | Analyze session |
+| POST   | `/v2/sessions`      | Create session  |
+
+### Utilities
+
+| Method | Endpoint   | Description   |
+| ------ | ---------- | ------------- |
+| POST   | `/test`    | Test token    |
+| GET    | `/balance` | Check balance |
+
+---
+
+## Error Codes
+
+| Code | Meaning                  |
+| ---- | ------------------------ |
+| 400  | Invalid parameters       |
+| 401  | Invalid token            |
+| 403  | Insufficient permissions |
+| 404  | Resource not found       |
+| 429  | Rate limited             |
+| 500  | Server error             |
+
+**Error format:**
+
+```json
+{
+  "error": "Message",
+  "details": {}
+}
+```
+
+---
+
+## Best Practices
+
+1. **Cache scenarios** — they rarely change
+2. **Use webhooks** — don't poll for session completion
+3. **Retry with backoff** — handle transient failures
+4. **Log errors** — monitor API health
+
+**Next:** [API Reference →](/api-reference/overview)

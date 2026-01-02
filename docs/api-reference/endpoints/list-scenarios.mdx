@@ -1,0 +1,23 @@
+---
+title: "List Scenarios"
+api: "GET /scenarios"
+description: "List all scenarios for your account"
+---
+
+Returns scenarios you've created or have access to.
+
+<ResponseExample>
+```json 200
+{
+  "scenarios": [
+    {
+      "id": "scenario_abc123",
+      "name": "Sales Cold Call",
+      "description": "Practice pitching to VPs",
+      "is_public": true,
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>

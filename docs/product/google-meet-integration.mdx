@@ -1,282 +1,59 @@
 ---
-title: "Google Meet Agent Integration"
-description: "Deploy voice AI agents that join Google Meet calls for training, screening, and customer data collection"
+title: "Google Meet Agent"
+sidebarTitle: "Google Meet"
+description: "AI agents that join your video calls"
 ---
 
-# Google Meet Agent Integration
-
-**Voice AI agents that join your Google Meet calls.** Perfect for teams that are understaffed, need help with screening calls, or want to conduct training sessions at scale.
+Your AI agents can join Google Meet calls—perfect for screening, training,
+or when you're overbooked.
 
 <iframe
-  src="https://www.loom.com/embed/1598e6b656bb493cbfd3dd0fa14d87f3?sid=13e925ae-a82b-4b27-b1c8-7f8f40d8dc02"
+  src="https://www.loom.com/embed/1598e6b656bb493cbfd3dd0fa14d87f3?sid=13e925ae-a82b-4b27-b1c8-7f8f40d8dc02&hideEmbedTopBar=true"
+  width="100%"
+  height="400"
   frameBorder="0"
   allowFullScreen
-  style={{width: '100%', height: '400px'}}
+  style={{ borderRadius: "8px" }}
 />
 
----
+## Setup
 
-## How to Get Started
+1. [Create a scenario in Scenario Studio](https://app.toughtongueai.com/advanced-scenario-create/?isPublic=false)
+   describing what the agent should do
+2. Go to **Library → Scenario → Meeting Bot**
+3. Choose your mode
 
-<Steps>
-  <Step title="Create Your Scenario">
-    Navigate to your [scenario library](https://app.toughtongueai.com/library/) and [create a new scenario](https://app.toughtongueai.com/advanced-scenario-create/?isPublic=false) describing what you want the AI agent to accomplish in the meeting.
-  </Step>
-  
-  <Step title="Access the Meeting Bot">
-    Go to: **Library → Scenario → Meeting Bot**
-  </Step>
-  
-  <Step title="Choose Your Mode">
-    Select either Custom Meeting or Calendar Integration mode
-  </Step>
-</Steps>
+## Modes
 
----
+| Mode | How it works |
+|------|--------------|
+| **Custom Meeting** | Provide meeting URL + join time. Best for one-off meetings. |
+| **Calendar Integration** | Auto-join based on keyword filter (e.g., "interview 101") |
 
-## Two Ways to Use Meeting Bot
+## What Happens
 
-<Tabs>
-  <Tab title="Custom Meeting Mode">
-    **Best for:** One-off meetings, dual meetings, or ad-hoc meetings
-    
-    <Steps>
-      <Step>Provide the meeting URL or Google Meet link</Step>
-      <Step>Specify when you want the bot to join</Step>
-      <Step>Done! The bot will join at the specified time</Step>
-    </Steps>
-    
-    Perfect for meetings that just appeared on your calendar or when you need precise control.
-  </Tab>
-  
-  <Tab title="Calendar Integration Mode">
-    **Best for:** Recurring meetings or automated joining
-    
-    <Steps>
-      <Step>Grant access to your calendar</Step>
-      <Step>Optionally specify a keyword filter (e.g., "interview 101")</Step>
-      <Step>The bot automatically joins matching meetings</Step>
-    </Steps>
-    
-    The keyword filter prevents the agent from joining meetings where you don't want it present.
-  </Tab>
-</Tabs>
+- Bot joins meeting and introduces itself based on scenario
+- Records transcript automatically
+- Generates analysis based on scenario criteria
+- Session available on your dashboard
 
-**Demo:** 🎥 [Watch the Video Demo](https://www.youtube.com/watch?v=XeNuZ-f3wPM)
+## Removing the Bot
 
----
+The Google Meet admin (person who sent the invite) can remove the bot.
+Analysis still processes normally after removal.
 
-## Use Cases
+## Pricing
 
-<CardGroup cols={2}>
-  <Card title="Candidate Screening" icon="user-check">
-    Automate initial interviews. AI agent conducts structured interviews, records responses, and provides analysis.
-  </Card>
-  
-  <Card title="Training Sessions" icon="chalkboard-teacher">
-    AI joins as a participant or facilitator, providing consistent training delivery at scale.
-  </Card>
-  
-  <Card title="Customer Discovery" icon="comments">
-    AI conducts user research calls, collects feedback, and identifies patterns across conversations.
-  </Card>
-  
-  <Card title="Team Overload Support" icon="users">
-    When your calendar is overbooked, AI handles meetings you can't attend and provides transcripts + summaries.
-  </Card>
-</CardGroup>
+**Through August 2025:** Free—uses your existing minutes.
 
----
+**After August 2025:**
+- Premium subscribers ($20/month or $200/year)
+- Business plan ($99+)
 
-## FAQs
+## Limitations
 
-<AccordionGroup>
-  <Accordion title="Is this feature available to everyone?">
-    Currently, we're allowing selected users to test this feature. To get access:
-    
-    1. Click the meeting bot icon in your dashboard
-    2. Send us a message through the platform
-    
-    Or email the ID you use on ToughTongue AI to **help@getarchieai.com**
-  </Accordion>
-  
-  <Accordion title="How do I remove the bot from a Google Meet call?">
-    The Google Meet admin (person who sent the invite) can remove the bot from the meeting. This is currently the only way to end the bot's participation.
-  </Accordion>
-  
-  <Accordion title="What happens to the analysis after the bot is removed?">
-    The session will be recorded and processed normally for analysis. The user name recorded for analysis is Google Meet's meeting title.
-  </Accordion>
-  
-  <Accordion title="Can I connect multiple calendars?">
-    Yes, you can connect and manage multiple calendars through the integration.
-  </Accordion>
-  
-  <Accordion title="What does this feature cost?">
-    **Through August 2025:** Free for all users—you only consume your existing minutes available on the ToughTongue AI platform.
-    
-    **After August 2025:** Available for:
-    - Premium subscribers ($20/month or $200/year plans only—not available in Free or Standard $12/month plans)
-    - Business plan users ($99 and above)
-    
-    For business deals and custom pricing, email **help@getarchieai.com**
-  </Accordion>
-  
-  <Accordion title="How do I grant calendar access?">
-    We're currently getting our calendar access reviewed by Google. You may see a warning that says the app is "unsafe," but you can proceed by granting the necessary permissions to use this feature.
-    
-    **Alternative:** If you prefer not to grant calendar access, you can use the Custom Meeting mode instead—simply provide the meeting URL directly without needing any calendar integration.
-  </Accordion>
-  
-  <Accordion title="Which meeting platforms are supported?">
-    Currently, we support **Google Meet** with **Zoom** and **Microsoft Teams** coming soon.
-    
-    Feel free to reach out with a request at **help@getarchieai.com**
-  </Accordion>
-  
-  <Accordion title="How does the bot introduce itself when joining?">
-    The bot will introduce itself based on your scenario settings. You can customize the introduction in your scenario configuration.
-  </Accordion>
-  
-  <Accordion title="Does the bot record meetings and perform analysis?">
-    Yes! The bot automatically:
-    - Generates transcripts
-    - Performs analysis (based on settings in your scenario: rubric, auto analysis option, etc.)
-    - Stores session data for review
-  </Accordion>
-  
-  <Accordion title="What are the current limitations?">
-    1. **Background noise sensitivity:** Works best in quiet environments
-    2. **Multiple speakers:** While multiple people can be in the meeting, the agent performs best when one person speaks at a time. If multiple people speak simultaneously, the agent can get confused about who to respond to
-    3. **Platform support:** Currently limited to Google Meet (more platforms coming soon)
-  </Accordion>
-</AccordionGroup>
+- Background noise sensitivity—works best in quiet environments
+- Multiple speakers—performs best with one person speaking at a time
+- Currently Google Meet only (Zoom, Teams coming soon)
 
----
-
-## Best Practices
-
-<CardGroup cols={2}>
-  <Card title="Clear Scenario Instructions" icon="list-check">
-    Define exactly what the AI should accomplish:
-    - Questions to ask
-    - Topics to cover
-    - How to respond to common situations
-  </Card>
-  
-  <Card title="Test Before Production" icon="flask">
-    Run a few test meetings to ensure:
-    - Bot joins successfully
-    - Audio quality is good
-    - AI behaves as expected
-    - Analysis provides useful insights
-  </Card>
-  
-  <Card title="Inform Participants" icon="info-circle">
-    Let meeting participants know:
-    - An AI agent will be present
-    - The purpose of the AI
-    - What happens to the recording
-  </Card>
-  
-  <Card title="Review Transcripts" icon="file-alt">
-    Check transcripts after meetings to:
-    - Verify accuracy
-    - Extract insights
-    - Improve future scenarios
-  </Card>
-</CardGroup>
-
----
-
-## Example Scenarios
-
-### Candidate Screening
-
-```markdown
-You are an AI recruiter conducting initial screening interviews for a Software Engineer position.
-
-**Your goals:**
-1. Assess technical background and experience
-2. Understand candidate's motivation and career goals
-3. Evaluate communication skills
-
-**Questions to ask:**
-- Tell me about your recent projects
-- What technologies are you most comfortable with?
-- Why are you interested in this position?
-- What are your salary expectations?
-
-**Evaluation criteria:**
-- Technical depth
-- Communication clarity
-- Cultural fit indicators
-- Red flags to note
-```
-
-### Customer Discovery
-
-```markdown
-You are a product researcher conducting user interviews to understand pain points with our project management tool.
-
-**Your goals:**
-1. Understand current workflows
-2. Identify friction points
-3. Gather feature requests
-
-**Questions to ask:**
-- Walk me through how you currently manage projects
-- What frustrates you most about your current tools?
-- If you could wave a magic wand, what would you change?
-
-**Note:** Be empathetic, ask follow-up questions, and dig deeper into interesting responses.
-```
-
----
-
-## Technical Details
-
-<Tabs>
-  <Tab title="How It Works">
-    1. **Meeting Detection:** Based on calendar or custom URL
-    2. **Bot Joins:** At specified time, AI agent enters the meeting
-    3. **Audio Processing:** Real-time transcription and understanding
-    4. **AI Response:** Natural conversation with sub-second latency
-    5. **Recording & Analysis:** Transcript and insights saved to your dashboard
-  </Tab>
-  
-  <Tab title="Privacy & Security">
-    - All recordings are encrypted at rest and in transit
-    - Only you and authorized org members can access transcripts
-    - Compliant with GDPR, SOC 2, and enterprise security standards
-    - Participants should be informed of recording (your responsibility)
-  </Tab>
-  
-  <Tab title="Audio Quality">
-    **Requirements:**
-    - Stable internet connection (10+ Mbps recommended)
-    - Quiet environment preferred
-    - One primary speaker at a time
-    
-    **Supported:**
-    - Multiple participants (AI responds to active speaker)
-    - Background noise filtering (best-effort)
-    - International accents
-  </Tab>
-</Tabs>
-
----
-
-## Get Help
-
-Need help setting up or have questions?
-
-- 📧 **Email:** [help@getarchieai.com](mailto:help@getarchieai.com)
-- 📅 **Book Time:** [Schedule a call](https://meetings-na2.hubspot.com/ajitesh-abhishek/team-calendar)
-- 💬 **Community:** [Join Discord](https://discord.com/invite/NfTPT3HsSj)
-
----
-
-<Card title="Ready to deploy meeting bots?" icon="video">
-  **[Request Access →](mailto:help@getarchieai.com)** or **[Watch Demo →](https://www.youtube.com/watch?v=XeNuZ-f3wPM)**
-</Card>
+**Access:** Request at help@getarchieai.com with your account email.

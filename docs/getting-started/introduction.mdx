@@ -1,0 +1,113 @@
+---
+title: "Welcome to Tough Tongue AI"
+sidebarTitle: "Welcome"
+description: "Voice AI agents for high-stakes conversations"
+---
+
+<Note>
+  **Beta:** This documentation is under active development.
+  [Join Discord](https://discord.com/invite/NfTPT3HsSj) for updates.
+</Note>
+
+export const faqs = [
+  {
+    q: "Can AI join my Google Meet calls?",
+    a: `Yes! Agents join calls for screening, training, or when you're overbooked.
+       [Google Meet guide →](/product/google-meet-integration)`,
+  },
+  {
+    q: "How do I embed this in my app?",
+    a: `A few lines of code. Supports iframes, APIs, white-label pages.
+       [Embedding guide →](/developer/iframe)`,
+  },
+  {
+    q: "How long are sessions?",
+    a: `12 minutes guaranteed. Heavy usage (video, PDFs, whiteboard) may hit
+       limits sooner. Restore from [sessions](https://app.toughtongueai.com/sessions).`,
+  },
+  {
+    q: "Audio not working?",
+    a: `Check microphone permissions. Chrome: lock icon in address bar.
+       Safari: Preferences → Websites → Microphone.`,
+  },
+];
+
+Build voice AI agents for practice and training—or integrate them into your app.
+
+<CardGroup cols={2}>
+  <Card title="Product Docs" icon="wand-magic-sparkles" href="/product/scenario-studio">
+    Build agents with natural language. No coding.
+  </Card>
+  <Card title="Developer Docs" icon="code" href="/getting-started/quickstart#for-developers">
+    API & iframe integration.
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Ready-to-use:** Browse [Scenario Library](https://app.toughtongueai.com/library)
+  with 100+ pre-built agents.
+</Tip>
+
+---
+
+## Product Walkthrough
+
+<iframe
+  src="https://www.loom.com/embed/1fe309fc1e8a449aa00913cc15810dc5?sid=76204da1-d06c-489f-b2ae-8859cfb98834&hideEmbedTopBar=true"
+  width="100%"
+  height="400"
+  frameBorder="0"
+  allowFullScreen
+  style={{ borderRadius: "8px" }}
+/>
+
+---
+
+## What's Different
+
+| Feature | What it means |
+|---------|---------------|
+| **Agentic** | Agents use tools—images, slides, whiteboard—like a human coach |
+| **Multimodal** | Reads tone, expressions, body language—not just words |
+| **Complete** | Prepare → Practice → Get actionable feedback |
+
+---
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Sales & Negotiation">
+    Practice pitches and objection handling with AI buyers using your materials.
+  </Accordion>
+  <Accordion title="Leadership Development">
+    Rehearse feedback conversations, difficult discussions, team meetings.
+  </Accordion>
+  <Accordion title="Interview Prep">
+    Coding interviews with editor, system design with whiteboard, case studies.
+  </Accordion>
+  <Accordion title="Custom">
+    Customer service, compliance, product knowledge, public speaking.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  {faqs.map((faq) => (
+    <Accordion key={faq.q} title={faq.q}>
+      {faq.a}
+    </Accordion>
+  ))}
+</AccordionGroup>
+
+---
+
+## Resources
+
+- [Scenario Library](https://app.toughtongueai.com/library) — 100+ scenarios
+- [Developer Portal](https://app.toughtongueai.com/developer) — API keys
+- [Discord](https://discord.com/invite/jfq2wVAP) — Community help
+
+**Questions?** help@getarchieai.com

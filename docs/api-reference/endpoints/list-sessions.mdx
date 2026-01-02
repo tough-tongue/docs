@@ -1,0 +1,30 @@
+---
+title: "List Sessions"
+api: "GET /sessions"
+description: "List all sessions for your account"
+---
+
+<ParamField query="scenario_id" type="string">
+  Filter by scenario
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Max results to return
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "sessions": [
+    {
+      "id": "session_abc123",
+      "scenario_id": "scenario_xyz",
+      "user_email": "user@example.com",
+      "duration_seconds": 180,
+      "status": "completed",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>

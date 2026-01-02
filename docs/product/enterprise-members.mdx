@@ -1,0 +1,53 @@
+---
+title: "Member Management"
+sidebarTitle: "Members & Roles"
+description: "Manage team access and quotas"
+---
+
+Control who's in your organization, what they can do, and how much they can use.
+
+## Roles
+
+| Role | Can manage members | Can view analytics | Content access |
+|------|-------------------|-------------------|----------------|
+| **Member** | ❌ | ❌ | Only what's shared with them |
+| **Admin** | ✅ | ✅ | Only what's shared with them |
+| **Owner** | ✅ | ✅ | Only what's shared with them |
+
+**Important:** Admins/Owners have org privileges but don't automatically access
+scenario content. Creators always control their content.
+
+## Adding Members
+
+**Individual:** Account Settings → Members → Add Member
+- Email (required)
+- Name, Role, Quota (optional)
+- Non-existing accounts created automatically
+
+**Bulk CSV:**
+```csv
+email,name,role,quota_minutes
+john@example.com,John Doe,view,25.0
+jane@example.com,Jane Smith,edit,100.0
+```
+
+Valid roles: `view`, `read`, `edit`, `owner`
+
+## Quotas
+
+- Assign per-member usage limits (minutes)
+- No quota = default organizational quota
+- Members see remaining quota on billing page
+
+## Scenario Access Control
+
+When creating scenarios, set org-wide permissions:
+
+| Level | Who sees what |
+|-------|--------------|
+| **Interact + view own** | Practice, see only personal history |
+| **Interact + view all** | Practice, see everyone's sessions |
+| **Interact + edit + view all** | Full collaborative access |
+| **Private** | Only people you explicitly add |
+
+Use **Manage Access** to grant individual users specific permissions.

@@ -1,112 +1,223 @@
-# ToughTongue AI Starter Templates
+# ToughTongue AI Documentation & Starter Templates
 
-This repository contains production-ready starter templates for building applications with [ToughTongue AI](https://www.toughtongueai.com/). Choose the template that best fits your tech stack and start building interactive voice-based learning applications.
+**The Lovable for Voice AI Agents** - Build production-ready voice AI agents without low-level pipeline maintenance.
 
-## 🚀 Quick Start
+This repository contains:
 
-1. **Fork this repository** to create your own copy
-2. **Choose a starter template** from the options below
-3. **Get your API token** from the [ToughTongue AI Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys)
-4. **Follow the template-specific setup guide**
-5. **Start building** your application
+1. 📚 **Comprehensive Documentation** - Product and Developer docs for ToughTongue AI
+2. 🚀 **Production-Ready Starter Templates** - Flask and Next.js templates with Firebase auth
 
-## 📦 Available Templates
+---
+
+## 🎯 About ToughTongue AI
+
+ToughTongue AI is a voice AI agent platform that enables you to build training and coaching applications without dealing with the complexity of WebSocket connections, STT/TTS pipelines, audio streaming, or inference infrastructure.
+
+**What Makes It Different:**
+
+- **Voice AI Agents, Not Chatbots** - Multimodal understanding (voice, facial expressions, body language)
+- **Agentic with Real Tools** - Generate images, navigate slides, sketch diagrams
+- **Complete Workflow** - Prepare → Practice → Debrief with AI feedback
+- **No Infrastructure Maintenance** - Focus on your product, not the pipeline
+
+---
+
+## 📚 Documentation
+
+This repository powers the complete documentation site for ToughTongue AI, organized into **Product** and **Developer** sections.
+
+### Documentation Structure
+
+```
+docs/
+├── introduction.mdx          # Main landing page with "Lovable for Voice AI" positioning
+├── quickstart.mdx           # Getting started guide
+├── use-cases/              # Product documentation (SaaS users, no code)
+│   ├── sales-coaching.mdx
+│   ├── enterprise-account.mdx
+│   └── ...
+├── product/                # Product integrations
+│   ├── google-meet-integration.mdx
+│   └── phone-integration.mdx
+├── guides/                 # Developer guides
+│   ├── embedding.mdx
+│   ├── api-integration.mdx
+│   ├── firebase-auth.mdx
+│   └── webhooks.mdx
+├── starters/              # Starter template documentation
+│   ├── overview.mdx
+│   ├── flask.mdx
+│   └── nextjs.mdx
+├── api-reference/         # API documentation
+│   ├── overview.mdx
+│   ├── scenarios.mdx
+│   ├── sessions.mdx
+│   └── analytics.mdx
+├── concepts/              # Core concepts
+│   ├── scenarios.mdx
+│   ├── sessions.mdx
+│   └── authentication.mdx
+└── mint.json             # Mintlify configuration
+```
+
+### View the Documentation
+
+The documentation is built with [Mintlify](https://mintlify.com) and organized into:
+
+1. **Product Documentation** - For SaaS users (no coding required)
+   - Use cases (sales coaching, enterprise, interview prep)
+   - Product integrations (Google Meet, Phone)
+2. **Developer Documentation** - For API/SDK integration
+   - Core concepts (scenarios, sessions, authentication)
+   - Integration guides (embedding, webhooks, API)
+   - Starter templates (Flask, Next.js)
+   - Complete API reference
+
+**To run docs locally:**
+
+```bash
+cd docs
+pnpm install
+pnpm dev
+```
+
+---
+
+## 🚀 Starter Templates
+
+Production-ready templates to jumpstart your ToughTongue AI integration.
 
 ### Flask Minimal (`flask-minimal/`)
-
-A lightweight Flask-based application perfect for Python developers.
 
 **Tech Stack:**
 
 - Python 3.9+
-- Flask 2.0+
+- Flask 3.1.0+
 - Preact (no build tools)
 - Vercel-ready
 
-**Best for:**
+**Features:**
 
-- Python developers
-- Simple integrations
-- Quick prototypes
-- Server-side API proxying
+- ✅ Beautiful landing page
+- ✅ Iframe embedding example
+- ✅ Session management
+- ✅ Server-side API proxy
+- ✅ Session analysis
 
 **Quick Start:**
 
 ```bash
 cd flask-minimal
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-# Create .env file with TTAI_TOKEN
+# Create .env with TTAI_TOKEN=your_api_token
 python app.py
 ```
 
-📖 [Full Flask Minimal Guide](flask-minimal/README.md) | [Documentation](docs/starters/flask.mdx)
+📖 **[Full Flask Guide](flask-minimal/README.md)** | **[Documentation](docs/starters/flask.mdx)**
 
 ---
 
 ### Next.js Minimal (`nextjs-minimal/`)
 
-A modern, production-ready Next.js application with TypeScript.
-
 **Tech Stack:**
 
-- Next.js 15+ (App Router)
+- Next.js 16.1.1 (App Router)
 - TypeScript
 - React 19
 - Tailwind CSS
+- Firebase Authentication
 - Zustand (state management)
-- Clerk (authentication, optional)
 
-**Best for:**
+**Features:**
 
-- Modern web applications
-- Production-ready projects
-- TypeScript developers
-- Full-featured applications
+- ✅ Modern landing page with hero & features
+- ✅ Firebase authentication (sign-in/sign-up/Google)
+- ✅ Protected routes with auth middleware
+- ✅ Iframe embedding with event handling
+- ✅ Session analysis with API integration
+- ✅ Responsive, production-ready UI
 
 **Quick Start:**
 
 ```bash
 cd nextjs-minimal
 pnpm install
-# Create .env.local with TOUGH_TONGUE_API_KEY
+# Create .env.local with:
+# TOUGH_TONGUE_API_KEY=your_api_token
+# NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_key
+# ... (see .env.example)
 pnpm dev
 ```
 
-📖 [Full Next.js Minimal Guide](nextjs-minimal/README.md) | [Documentation](docs/starters/nextjs.mdx)
+📖 **[Full Next.js Guide](nextjs-minimal/README.md)** | **[Documentation](docs/starters/nextjs.mdx)**
 
 ---
 
-## 📚 Documentation
-
-Comprehensive documentation is available in the [`docs/`](/docs) folder:
-
-- **[Introduction](docs/introduction.mdx)** - Overview of ToughTongue AI and starter templates
-- **[Getting Started](docs/quickstart.mdx)** - Quick start guide for all templates
-- **[Flask Minimal](docs/starters/flask.mdx)** - Complete Flask starter guide
-- **[Next.js Minimal](docs/starters/nextjs.mdx)** - Complete Next.js starter guide
-- **[API Integration](docs/api-reference/overview.mdx)** - Complete API reference and integration patterns
-- **[Deployment](docs/integration/deployment.mdx)** - Deployment guides for various platforms
-- **[Best Practices](docs/integration/best-practices.mdx)** - Development best practices and patterns
-
 ## 🔑 Getting Your API Token
 
-1. Sign in to [ToughTongue AI](https://www.toughtongueai.com/)
+1. Sign up at [ToughTongue AI](https://app.toughtongueai.com)
 2. Navigate to the [Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys)
 3. Create a new API key
 4. Copy and securely store your token
 
-## 🎯 What is ToughTongue AI?
+---
 
-ToughTongue AI is a conversational AI platform that enables you to practice and improve communication skills through interactive voice-based conversations. Perfect for:
+## 🎯 What Can You Build?
 
-- 📞 Interview preparation
-- 💼 Sales training
-- 🎧 Customer service role play
-- 👔 Leadership development
-- 📊 Performance review practice
-- 🤝 Conflict resolution training
+ToughTongue AI powers voice AI agents across industries:
+
+- **Sales & GTM** - Cold call simulators, objection handling, discovery call coaching
+- **Leadership Development** - Performance reviews, difficult conversations, feedback delivery
+- **Job Interview Prep** - Technical interviews, behavioral practice, case studies
+- **Customer Service** - De-escalation training, complaint handling, empathy coaching
+- **Education** - Teacher training, student communication, classroom management
+- **Healthcare** - Patient communication, bedside manner, delivering difficult news
+
+---
+
+## 📦 Repository Structure
+
+```
+/
+├── docs/                      # Mintlify documentation site
+│   ├── introduction.mdx       # "Lovable for Voice AI Agents" landing
+│   ├── quickstart.mdx         # Getting started
+│   ├── use-cases/            # Product documentation
+│   ├── product/              # Product integrations
+│   ├── guides/               # Developer guides (including firebase-auth.mdx)
+│   ├── starters/             # Starter template docs
+│   ├── api-reference/        # Complete API reference
+│   ├── concepts/             # Core concepts
+│   └── mint.json             # Mintlify config
+│
+├── flask-minimal/            # Flask starter template
+│   ├── app.py                # Flask server
+│   ├── api/                  # API routes
+│   ├── templates/            # Landing page HTML
+│   ├── www/                  # Frontend assets (Preact)
+│   └── requirements.txt      # Python dependencies
+│
+├── nextjs-minimal/           # Next.js starter template
+│   ├── app/
+│   │   ├── auth/            # Firebase auth (AuthContext, signin, signup)
+│   │   ├── analysis/        # Session analysis page
+│   │   ├── course/          # Course example
+│   │   ├── page.tsx         # Landing page
+│   │   └── api/             # API routes
+│   ├── components/           # React components
+│   ├── lib/
+│   │   └── firebase.ts      # Firebase config
+│   └── package.json          # Dependencies (Next.js 16.1.1, Firebase 12.7.0)
+│
+└── 0ven/                     # Project tracking (gitignored)
+    ├── tt-ai/                # Original repo reference
+    ├── specs/spec.md         # Project specification
+    └── ai-docs/agent-updates.md  # Progress tracking
+```
+
+---
 
 ## 🏗️ Integration Overview
 
@@ -116,157 +227,174 @@ Both starters demonstrate complete integration patterns:
 2. **Event Handling** - Listen for session start/stop events
 3. **Session Management** - Track and store session data
 4. **API Integration** - Analyze sessions and retrieve insights
-5. **Secure Backend** - Server-side API proxying for security
+5. **Authentication** - Firebase auth with sign-in/sign-up/Google
+6. **Secure Backend** - Server-side API proxying for security
+
+---
 
 ## 📋 Template Comparison
 
-| Feature          | Flask Minimal | Next.js Minimal    |
-| ---------------- | ------------- | ------------------ |
-| Language         | Python        | TypeScript         |
-| Framework        | Flask         | Next.js 15         |
-| Frontend         | Preact        | React 19           |
-| Build Tools      | None          | Next.js            |
-| Type Safety      | No            | Yes                |
-| Authentication   | No            | Clerk (optional)   |
-| State Management | Preact Hooks  | Zustand            |
-| Styling          | CSS           | Tailwind CSS       |
-| Deployment       | Vercel/Any    | Vercel (optimized) |
-| Best For         | Simple apps   | Production apps    |
+| Feature          | Flask Minimal | Next.js Minimal         |
+| ---------------- | ------------- | ----------------------- |
+| Language         | Python        | TypeScript              |
+| Framework        | Flask 3.1     | Next.js 16.1            |
+| Frontend         | Preact        | React 19                |
+| Build Tools      | None          | Next.js                 |
+| Type Safety      | No            | Yes                     |
+| Authentication   | None          | Firebase (email+Google) |
+| State Management | Preact Hooks  | Zustand                 |
+| Styling          | CSS           | Tailwind CSS            |
+| Deployment       | Vercel/Any    | Vercel (optimized)      |
+| Best For         | Simple apps   | Production apps         |
+
+---
 
 ## 🚢 Deployment
 
 Both templates are ready for deployment:
 
-- **Vercel** (Recommended) - Pre-configured for both templates
-- **Other Platforms** - See [Deployment Guide](/docs/deployment.md)
+- **Vercel** (Recommended) - Pre-configured `vercel.json` for both
+- **Other Platforms** - See [Deployment Guide](docs/guides/deployment.md)
 
-## 🔧 Common Tasks
+**Environment Variables:**
 
-### Creating a Scenario
+- Flask: `TTAI_TOKEN`
+- Next.js: `TOUGH_TONGUE_API_KEY`, Firebase config vars
 
-Scenarios define conversation context and AI behavior. Create them via:
+---
 
-- **Web UI**: [Scenario Builder](https://app.toughtongueai.com/scenarios)
-- **API**: See [API Integration Guide](/docs/api-integration.md)
+## 📖 Quick Links
 
-### Embedding in Your App
+### For Product Users
 
-Both templates include iframe embedding examples:
+- **[App](https://app.toughtongueai.com)** - Start using the platform (no code)
+- **[Scenario Library](https://app.toughtongueai.com/library)** - 100+ pre-built agents
+- **[Use Cases](docs/use-cases/)** - Product documentation
 
-```html
-<iframe
-  src="https://app.toughtongueai.com/embed/SCENARIO_ID"
-  width="100%"
-  height="600px"
-  frameborder="0"
-  allow="microphone"
-></iframe>
-```
+### For Developers
 
-### Listening for Events
+- **[API Playground](https://app.toughtongueai.com/api-playground)** - Test endpoints
+- **[Developer Portal](https://app.toughtongueai.com/developer)** - Manage API keys
+- **[API Reference](docs/api-reference/overview.mdx)** - Complete API docs
+- **[Integration Guides](docs/guides/)** - Embedding, webhooks, Firebase auth
+- **[Starter Templates](docs/starters/)** - Flask & Next.js documentation
 
-Handle session events:
+### Community
 
-```javascript
-window.addEventListener("message", (event) => {
-  if (event.data.event === "onStop") {
-    const sessionId = event.data.sessionId;
-    // Analyze session, redirect, etc.
-  }
-});
-```
+- **[Discord](https://discord.com/invite/jfq2wVAP)** - Get help from other builders
+- **[GitHub](https://github.com/tough-tongue/tt-starter)** - This repository
+
+---
 
 ## 🛠️ Development
 
 ### Prerequisites
 
-- **Flask Minimal**: Python 3.9+, pip
-- **Next.js Minimal**: Node.js 18+, npm/yarn
+- **Flask Starter**: Python 3.9+, pip
+- **Next.js Starter**: Node.js 18+, pnpm
+- **Documentation**: Node.js 18+, pnpm, Mintlify CLI
 
-### Project Structure
+### Local Development
 
-```
-tt-starter/
-├── flask-minimal/          # Flask starter template
-│   ├── app.py             # Main Flask app
-│   ├── api/               # API routes
-│   └── www/               # Frontend assets
-├── nextjs-minimal/        # Next.js starter template
-│   ├── app/               # Next.js App Router
-│   ├── components/        # React components
-│   └── package.json       # Dependencies
-└── docs/                  # Documentation
+**Run documentation site:**
+
+```bash
+cd docs
+pnpm install
+pnpm dev
+# Opens at http://localhost:3000
 ```
 
-## 📖 Learn More
+**Run Flask starter:**
 
-- **[API Integration Guide](/docs/api-integration.md)** - Complete API reference
-- **[Deployment Guide](/docs/deployment.md)** - Deploy to various platforms
-- **[Best Practices](/docs/best-practices.md)** - Development best practices
-
-## 🆘 Support
-
-- **Documentation**: See [`docs/`](/docs) folder
-- **API Playground**: [https://app.toughtongueai.com/api-playground](https://app.toughtongueai.com/api-playground)
-- **Developer Portal**: [https://app.toughtongueai.com/developer](https://app.toughtongueai.com/developer)
-- **Community**: [Discord](https://discord.com/invite/jfq2wVAP)
-- **Support Email**: [help@getarchieai.com](mailto:help@getarchieai.com)
-
-## 📄 License
-
-MIT
-
-## 📁 Repository Structure
-
+```bash
+cd flask-minimal
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+# Opens at http://localhost:5001
 ```
-tt-starter/
-├── flask-minimal/          # Python Flask starter
-│   ├── app.py             # Flask server
-│   ├── api/               # API routes
-│   ├── www/               # Frontend assets
-│   ├── templates/         # HTML templates (NEW)
-│   └── requirements.txt   # Python dependencies
-│
-├── nextjs-minimal/        # Next.js TypeScript starter
-│   ├── app/               # Next.js App Router
-│   │   ├── auth/         # Auth pages & context (NEW)
-│   │   ├── analysis/     # Session analysis
-│   │   ├── course/       # Course example
-│   │   └── api/          # API routes
-│   ├── components/        # React components
-│   ├── lib/              # Utilities & Firebase (NEW)
-│   └── package.json       # Dependencies
-│
-├── docs/                  # Mintlify documentation
-│   ├── introduction.mdx   # Main landing (NEW)
-│   ├── quickstart.mdx     # Getting started (NEW)
-│   ├── use-cases/        # Product docs (NEW)
-│   ├── product/          # Integrations (NEW)
-│   ├── guides/           # Developer guides
-│   ├── starters/         # Template docs
-│   ├── api-reference/    # API documentation
-│   └── mint.json         # Mintlify config (UPDATED)
-│
-└── 0ven/                 # Project tracking & references
-    ├── agent-updates.md  # Progress tracking
-    └── COMPLETION_SUMMARY.md  # Detailed summary
+
+**Run Next.js starter:**
+
+```bash
+cd nextjs-minimal
+pnpm install
+pnpm dev
+# Opens at http://localhost:3000
 ```
+
+---
+
+## ✅ Project Status
+
+**Documentation:** ✅ Complete
+
+- Product documentation imported and enhanced
+- Developer documentation comprehensive
+- "Lovable for Voice AI Agents" branding applied throughout
+- Mintlify configuration complete
+
+**Starter Templates:** ✅ Complete
+
+- Flask: Landing page + API integration
+- Next.js: Landing page + Firebase auth + Protected routes
+- Both: Production-ready with modern UI
+
+**Security:** ✅ Up-to-date
+
+- Next.js: 16.1.1 (CVE-2025-66478 fixed)
+- Firebase: 12.7.0
+- Flask: 3.1.0
+
+See [`0ven/ai-docs/agent-updates.md`](0ven/ai-docs/agent-updates.md) for detailed progress tracking.
+
+---
+
+## 🎓 What is "Lovable for Voice AI Agents"?
+
+Just like [Lovable](https://lovable.dev) makes full-stack development accessible, ToughTongue AI makes voice AI agent development accessible.
+
+**Build without low-level pipeline maintenance:**
+
+- ❌ No managing WebSocket connections
+- ❌ No configuring STT/TTS pipelines
+- ❌ No handling audio streaming logic
+- ❌ No managing inference infrastructure
+
+✅ **Just describe what you want your agent to do, and we handle the rest.**
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to:
 
-## ⭐ Show Your Support
-
-If you find these starter templates helpful, please consider:
-
-- ⭐ Starring this repository
-- 🐛 Reporting bugs
-- 💡 Suggesting new features
-- 📝 Improving documentation
+- 🐛 Report bugs via GitHub Issues
+- 💡 Suggest new features
+- 📝 Improve documentation
+- 🔧 Submit Pull Requests
 
 ---
 
-**Ready to build?** Choose a template above and follow its setup guide!
+## 📄 License
+
+MIT - See individual starter template directories for details
+
+---
+
+## 🆘 Support
+
+- **Documentation**: Browse the [`docs/`](docs/) directory
+- **API Issues**: [Developer Portal](https://app.toughtongueai.com/developer)
+- **Community Help**: [Discord](https://discord.com/invite/jfq2wVAP)
+- **Email Support**: [help@getarchieai.com](mailto:help@getarchieai.com)
+
+---
+
+**Ready to build?**
+
+🚀 **For Product Users:** [Start with the App →](https://app.toughtongueai.com)
+
+💻 **For Developers:** [Read the Quickstart →](docs/quickstart.mdx) or [Choose a Starter Template ↑](#-starter-templates)

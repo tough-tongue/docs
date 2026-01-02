@@ -1,0 +1,127 @@
+---
+description: Contributing guide for the Next.js starter template
+globs: nextjs-minimal/**
+alwaysApply: false
+---
+
+# Next.js Starter Template - Contributor Guide
+
+## Overview
+
+This is a production-ready Next.js starter for ToughTongue AI integration.
+
+**Stack:** Next.js 15 (App Router), TypeScript, React 19, Tailwind CSS, shadcn/ui, Zustand, Firebase Auth
+
+## Directory Structure
+
+```
+nextjs-minimal/
+├── app/
+│   ├── page.tsx              # Home page
+│   ├── layout.tsx            # Root layout
+│   ├── analysis/             # Session analysis feature
+│   │   ├── page.tsx
+│   │   ├── components/       # Feature-specific components
+│   │   └── hooks/            # Feature-specific hooks
+│   ├── course/               # Course/lesson feature
+│   ├── auth/                 # Auth pages & context
+│   ├── api/tough-tongue/     # API routes (server-side)
+│   └── store/                # Zustand stores
+├── components/               # Shared components
+│   ├── ui/                   # shadcn/ui primitives
+│   └── *.tsx                 # App-level components
+├── lib/
+│   ├── firebase.ts           # Firebase client
+│   └── utils.ts              # Utilities
+└── middleware.ts             # Auth middleware
+```
+
+## Key Patterns
+
+### API Routes
+
+All ToughTongue API calls go through server-side routes to protect the API key:
+
+```typescript
+// app/api/tough-tongue/sessions/analyze/route.ts
+export async function POST(req: Request) {
+  const { session_id } = await req.json();
+  const res = await fetch(`${API_BASE}/sessions/analyze`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.TOUGH_TONGUE_API_KEY}` },
+    body: JSON.stringify({ session_id }),
+  });
+  return NextResponse.json(await res.json());
+}
+```
+
+### Iframe Events
+
+Handle ToughTongue iframe events via `postMessage`:
+
+```typescript
+// Listen for session events
+window.addEventListener("message", (event) => {
+  if (event.origin !== "https://app.toughtongueai.com") return;
+  if (event.data.event === "onStop") {
+    // Session completed - event.data.sessionId available
+  }
+});
+```
+
+### State Management
+
+- **Zustand** for client state (session data, UI state)
+- **React Server Components** for server-fetched data
+
+## Contributing
+
+### Adding a New Feature
+
+1. Create feature directory: `app/feature-name/`
+2. Add page: `app/feature-name/page.tsx`
+3. Add components: `app/feature-name/components/`
+4. Add hooks if needed: `app/feature-name/hooks/`
+
+### Adding an API Route
+
+Create route handler: `app/api/tough-tongue/endpoint/route.ts`
+
+### Adding a Shared Component
+
+1. UI primitives → `components/ui/` (use shadcn/ui patterns)
+2. App components → `components/`
+
+### Environment Variables
+
+Required in `.env.local`:
+
+```
+TOUGH_TONGUE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+```
+
+## Rules
+
+- ✅ API keys only in server-side code (`app/api/`)
+- ✅ Use TypeScript strictly
+- ✅ Follow existing component patterns
+- ✅ Keep components in feature directories when feature-specific
+- ❌ No API keys in client components
+- ❌ No `any` types without justification
+
+## Commands
+
+```bash
+pnpm dev        # Start dev server
+pnpm build      # Production build
+pnpm lint       # Run linter
+```
+
+## Resources
+
+- [ToughTongue Docs](/docs)
+- [Developer Portal](https://app.toughtongueai.com/developer)
+- [Discord](https://discord.com/invite/NfTPT3HsSj)

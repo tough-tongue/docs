@@ -1,0 +1,35 @@
+---
+title: "Analyze Session"
+api: "POST /sessions/analyze"
+description: "Trigger AI analysis for a completed session"
+---
+
+<ParamField body="session_id" type="string" required>
+  Session ID to analyze
+</ParamField>
+
+<RequestExample>
+```json
+{
+  "session_id": "session_abc123"
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "session_id": "session_abc123",
+  "analysis": {
+    "overall_score": 85,
+    "strengths": [
+      "Strong opening statement",
+      "Good active listening"
+    ],
+    "improvements": [
+      "Could handle objections more confidently"
+    ]
+  }
+}
+```
+</ResponseExample>

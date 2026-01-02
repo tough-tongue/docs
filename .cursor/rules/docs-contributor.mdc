@@ -1,0 +1,224 @@
+---
+description: Contributing guide for ToughTongue AI documentation (Mintlify)
+globs: docs/**
+alwaysApply: false
+---
+
+# Documentation Contributor Guide
+
+## Overview
+
+Documentation site built with **Mintlify**. Lives in `docs/` directory.
+
+## Directory Structure
+
+```
+docs/
+├── mint.json                 # Mintlify config (nav, tabs, API settings)
+├── getting-started/          # Intro & quickstart
+├── product/                  # Product documentation
+├── developer/                # Developer guides
+├── api-reference/
+│   ├── overview.mdx          # API overview with test endpoint
+│   ├── endpoints/            # Individual API endpoint pages
+│   └── openapi.json          # OpenAPI spec
+├── guides/                   # How-to guides
+├── starters/                 # Starter template docs
+├── use-cases/                # Use case examples
+└── public/                   # Static assets (logos, favicon)
+```
+
+## MDX Guidelines
+
+### Formatting Rules
+
+- **Line length**: Keep under ~100 characters
+- **No JSX artifacts**: Never use `{" "}` - causes rendering issues
+- **Inline exports only**: Mintlify doesn't support importing from `.ts` files
+
+```mdx
+<!-- ✅ Correct: inline export -->
+
+export const items = [{ title: "Item 1" }];
+
+<!-- ❌ Wrong: external import -->
+
+import { items } from "./data.ts";
+
+;
+```
+
+### Frontmatter
+
+```yaml
+---
+title: "Page Title" # Main heading
+sidebarTitle: "Sidebar Name" # Optional: different name in sidebar
+description: "Brief description"
+---
+```
+
+### Mintlify Components
+
+````mdx
+<Note>Informational callout</Note>
+<Tip>Helpful suggestion</Tip>
+<Warning>Important caution</Warning>
+
+<Card title="Title" icon="icon-name" href="/path">
+  Card description
+</Card>
+
+<CardGroup cols={2}>
+  <Card>...</Card>
+  <Card>...</Card>
+</CardGroup>
+
+<Accordion title="Expandable section">Content here</Accordion>
+
+<CodeGroup>
+```bash Tab 1
+code here
+````
+
+```python Tab 2
+code here
+```
+
+</CodeGroup>
+```
+
+## API Reference Pages
+
+### Endpoint Page Structure
+
+Use `api` frontmatter for interactive playground:
+
+```yaml
+---
+title: "Create Scenario"
+api: "POST /scenarios" # Relative to baseUrl in mint.json
+description: "Create a new scenario"
+---
+```
+
+### Parameters & Examples
+
+````mdx
+<ParamField body="name" type="string" required>
+  Description here
+</ParamField>
+
+<ParamField body="is_public" type="boolean" default="false">
+  Optional with default
+</ParamField>
+
+<RequestExample>
+```json
+{ "name": "Example" }
+````
+
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{ "id": "scenario_123" }
+```
+</ResponseExample>
+```
+
+## mint.json Key Settings
+
+### Tabs
+
+```json
+"tabs": [
+  { "name": "API Reference", "url": "api-reference" }
+]
+```
+
+First tab (Documentation) is implicit/default.
+
+### API Configuration
+
+```json
+"api": {
+  "baseUrl": "https://api.toughtongueai.com/api/public",
+  "auth": { "method": "bearer" },
+  "playground": { "mode": "show" }
+}
+```
+
+### Navigation
+
+Pages must be listed in `navigation` to appear in sidebar.
+
+## Content Guidelines
+
+### Do's
+
+- ✅ Be concise - no filler content
+- ✅ Use action-oriented titles ("Create Scenario" not "Scenario Creation")
+- ✅ Add `<Note>` for beta features: "Beta: This feature is under development"
+- ✅ Link to related pages
+- ✅ Use code examples sparingly
+
+### Don'ts
+
+- ❌ Don't hallucinate features (e.g., made-up rate limits)
+- ❌ Don't add unnecessary sections
+- ❌ Don't exceed ~100 char line length
+- ❌ Don't use `{" "}` in MDX
+- ❌ Don't import from external TypeScript files
+
+## Terminology
+
+| Correct         | Also Known As                          |
+| --------------- | -------------------------------------- |
+| Scenario Studio | Advanced Scenario Creator              |
+| ToughTongue AI  | Tough Tongue AI (with space in titles) |
+
+## Common Tasks
+
+### Add a New Page
+
+1. Create `.mdx` file in appropriate directory
+2. Add to `mint.json` navigation
+3. Add frontmatter with title/description
+
+### Add API Endpoint
+
+1. Create `api-reference/endpoints/endpoint-name.mdx`
+2. Use `api` frontmatter with relative path
+3. Add `<ParamField>`, `<RequestExample>`, `<ResponseExample>`
+4. Add to `mint.json` navigation under API Reference
+
+### Update Navigation
+
+Edit `mint.json` → `navigation` array. Structure:
+
+```json
+{
+  "group": "Group Name",
+  "pages": ["path/to/page", "path/to/other"]
+}
+```
+
+## Testing Changes
+
+```bash
+cd docs
+pnpm dev   # Runs on localhost:3000
+```
+
+Check:
+
+- Page renders without disappearing content
+- Navigation works correctly
+- Code blocks display properly
+- API playground functions (for API pages)
+
+## Resources
+
+- [Mintlify Docs](https://mintlify.com/docs)
+- [Component Reference](https://mintlify.com/docs/content/components)

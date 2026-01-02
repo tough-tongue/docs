@@ -1,0 +1,26 @@
+---
+title: "Test API Token"
+api: "POST /test"
+description: "Verify your API token is working correctly"
+---
+
+<ParamField body="input" type="string">
+  Test input (e.g., "check")
+</ParamField>
+
+<RequestExample>
+```json
+{
+  "input": "check"
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "success": true,
+  "message": "API token is valid"
+}
+```
+</ResponseExample>

@@ -1,101 +1,176 @@
-# Next.js Minimal Starter
+# Next.js ToughTongue AI Starter Template
 
-A modern, production-ready Next.js application built with TypeScript, React 19, and Tailwind CSS. This starter demonstrates advanced integration patterns with ToughTongue AI, including authentication, state management, and a full course/lesson system.
+A production-ready Next.js application showcasing how to integrate ToughTongue AI for voice-based training scenarios. Built with TypeScript, React 19, Next.js 15, Firebase Authentication, Supabase middleware, and Tailwind CSS.
 
-## Features
+## ✨ What This Template Includes
 
-- **TypeScript**: Full type safety throughout the application
-- **Next.js 15 App Router**: Modern React Server Components architecture
-- **Clerk Authentication**: Built-in user authentication (optional)
-- **Zustand State Management**: Lightweight, performant state management
-- **API Routes**: Server-side API integration with ToughTongue AI
-- **Tailwind CSS**: Utility-first styling with dark mode support
-- **Course System**: Full-featured course/lesson management
-- **Session Analysis**: Complete session tracking and analysis
+- **🎤 ToughTongue AI Integration**: Complete iframe embedding with session management and analysis
+- **🔐 Firebase Authentication**: Email/password + Google OAuth sign-in
+- **⚡ Next.js 15 App Router**: Modern React Server Components
+- **🎨 Tailwind CSS + shadcn/ui**: Beautiful, customizable UI components
+- **📊 Zustand State Management**: Lightweight state management for sessions and analysis
+- **🛡️ Supabase Middleware**: Session handling and server-side utilities
+- **🔒 Secure API Routes**: Server-side proxying to keep your API keys safe
+- **📱 Responsive Design**: Works perfectly on mobile, tablet, and desktop
 
-## Quick Start
+## 🚀 Quick Start (5 minutes)
 
-### 1. Prerequisites
+### Prerequisites
 
-- Node.js 18 or higher
-- npm or yarn
-- A [ToughTongue AI account](https://www.toughtongueai.com/)
-- An API token from the [Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys)
+- **Node.js 18+** ([Download](https://nodejs.org/))
+- **pnpm** (Install: `npm install -g pnpm`)
+- **ToughTongue AI Account** ([Sign up](https://www.toughtongueai.com/))
 
-### 2. Installation
+### Step 1: Install Dependencies
 
 ```bash
-# Install dependencies
+cd nextjs-minimal
 pnpm install
 ```
 
-### 3. Configuration
+### Step 2: Configure Environment Variables
 
-Create a `.env.local` file in the `nextjs-minimal/` directory:
+Copy the example environment file:
 
-```env
-# ToughTongue AI (Required)
-TOUGH_TONGUE_API_KEY=your_api_token_here
-
-# Clerk Authentication (Optional - remove if not using)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
+```bash
+cp .env.example .env.local
 ```
 
-**To get your ToughTongue AI API token:**
+Open `.env.local` and add your credentials:
+
+```env
+# Required: ToughTongue AI API Configuration
+TOUGH_TONGUE_API_KEY=your_api_key_here
+
+# Required: Firebase Configuration (for authentication)
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+
+# Optional: Supabase Configuration (for future database features)
+# NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+**Where to get your credentials:**
+
+#### 🎤 ToughTongue AI API Key
 
 1. Go to [ToughTongue AI Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys)
-2. Create a new API key
-3. Copy and paste it into `.env.local`
+2. Click "Create New API Key"
+3. Copy the API key and paste into `.env.local` as `TOUGH_TONGUE_API_KEY`
 
-**To set up Clerk (optional):**
+#### 🔥 Firebase Configuration
 
-1. Create an account at [Clerk](https://clerk.com/)
-2. Create a new application
-3. Copy your publishable key and secret key
-4. Add them to `.env.local`
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project (or use existing)
+3. Enable **Authentication** → **Email/Password** and **Google** providers
+4. Go to Project Settings → General → Your apps → Web app
+5. Copy the config values into your `.env.local`
 
-Authentication is powered by Firebase. Sign-in and sign-up pages are located at `/auth/signin` and `/auth/signup`.
+#### 📦 Supabase (Optional - for future database features)
 
-### 4. Update Scenario IDs
+1. Go to [Supabase Dashboard](https://app.supabase.com/)
+2. Create a new project
+3. Go to Settings → API to get your URL and anon key
 
-Update scenario IDs in your components. For example, in `app/analysis/components/ToughTongueIframe.tsx`:
+### Step 3: Update Scenario IDs
+
+The template includes placeholder scenario IDs. Replace them with your own:
+
+**In `app/analysis/components/ToughTongueIframe.tsx`** (around line 15):
 
 ```typescript
-const scenarioId = "YOUR_SCENARIO_ID_HERE"; // Replace with your scenario ID
+const scenarioId = "YOUR_SCENARIO_ID_HERE"; // ← Replace this
 ```
 
 **To get a scenario ID:**
 
-1. Go to [ToughTongue AI](https://www.toughtongueai.com/)
-2. Create a scenario or use an existing one
+1. Go to [ToughTongue AI Dashboard](https://app.toughtongueai.com/)
+2. Create a new scenario or open an existing one
 3. Copy the scenario ID from the URL or scenario settings
 
-### 5. Run the Application
+### Step 4: Run the Development Server
 
 ```bash
 pnpm dev
 ```
 
-The application will start at `http://localhost:3000`.
+Visit [http://localhost:3000](http://localhost:3000) 🎉
 
-## Integration Guide
+## 📁 Project Structure
 
-### How It Works
+```
+nextjs-minimal/
+├── app/
+│   ├── page.tsx                         # Landing page
+│   ├── layout.tsx                       # Root layout with AuthContext
+│   ├── globals.css                      # Global styles
+│   │
+│   ├── auth/                            # Authentication pages
+│   │   ├── AuthContext.tsx              # Firebase auth context provider
+│   │   ├── signin/page.tsx              # Sign-in page
+│   │   └── signup/page.tsx              # Sign-up page
+│   │
+│   ├── analysis/                        # Session analysis demo
+│   │   ├── page.tsx                     # Analysis page
+│   │   ├── hooks/
+│   │   │   └── useSessionManagement.ts  # Custom hook for session lifecycle
+│   │   └── components/
+│   │       ├── ToughTongueIframe.tsx    # Iframe embed component
+│   │       ├── SessionInformation.tsx   # Display session info
+│   │       ├── DataDisplay.tsx          # Display analysis results
+│   │       └── ErrorDisplay.tsx         # Error handling component
+│   │
+│   ├── course/                          # Course example page
+│   │   ├── page.tsx                     # Course layout
+│   │   └── CourseClient.tsx             # Course client component
+│   │
+│   ├── api/tough-tongue/                # API routes (secure server-side)
+│   │   ├── scenarios/route.ts           # Create scenarios
+│   │   └── sessions/
+│   │       ├── [sessionId]/route.ts     # Get session details
+│   │       └── analyze/route.ts         # Analyze completed session
+│   │
+│   └── store/
+│       └── sessionStore.ts              # Zustand state management
+│
+├── components/
+│   ├── ui/                              # shadcn/ui components
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   └── scroll-area.tsx
+│   ├── course/
+│   │   └── CourseSidebar.tsx            # Course navigation sidebar
+│   ├── FeatureCard.tsx
+│   ├── Header.tsx
+│   └── MediaEmbed.tsx                   # Embed YouTube, Loom, ToughTongue
+│
+├── lib/
+│   ├── firebase.ts                      # Firebase initialization
+│   ├── firebase/
+│   │   └── firestore.ts                 # Firestore utilities
+│   ├── supabase/                        # Supabase utilities
+│   │   ├── client.ts                    # Browser client
+│   │   ├── server.ts                    # Server client
+│   │   ├── middleware.ts                # Session middleware
+│   │   └── types.ts                     # TypeScript types
+│   └── utils.ts                         # Utility functions
+│
+├── middleware.ts                        # Next.js middleware (Supabase)
+├── .env.example                         # Environment variable template
+├── .env.local                           # Your local config (git-ignored)
+└── package.json
+```
 
-This starter demonstrates a complete integration pattern:
+## 🎯 How It Works
 
-1. **Frontend Components** embed ToughTongue AI iframes
-2. **API Routes** (`app/api/tough-tongue/`) proxy API requests securely
-3. **Custom Hooks** (`app/analysis/hooks/`) manage session state and events
-4. **State Management** (Zustand) stores session data across components
-5. **Session Analysis** uses API routes to analyze completed sessions
+### 1. **Embedding ToughTongue AI Scenarios**
 
-### Key Integration Points
-
-#### 1. Embedding the Iframe
-
-Use the `ToughTongueIframe` component or create your own:
+The `ToughTongueIframe` component embeds scenarios into your app:
 
 ```typescript
 import ToughTongueIframe from "./components/ToughTongueIframe";
@@ -103,19 +178,18 @@ import ToughTongueIframe from "./components/ToughTongueIframe";
 <ToughTongueIframe />;
 ```
 
-Or embed directly:
+Or embed directly with an iframe:
 
 ```typescript
 <iframe
   src={`https://app.toughtongueai.com/embed/${scenarioId}?bg=black`}
   width="100%"
   height="600px"
-  frameBorder="0"
   allow="microphone"
 />
 ```
 
-#### 2. Listening for Events
+### 2. **Listening to Session Events**
 
 The `useSessionManagement` hook automatically listens for iframe events:
 
@@ -123,26 +197,31 @@ The `useSessionManagement` hook automatically listens for iframe events:
 import useSessionManagement from "./hooks/useSessionManagement";
 
 const { sessionId, sessionData, analyzeSession } = useSessionManagement();
+
+// Hook automatically handles:
+// - onStart events (session started)
+// - onStop events (session completed, stores session ID)
 ```
 
-The hook handles:
+### 3. **Analyzing Sessions**
 
-- `onStart` events - Session started
-- `onStop` events - Session completed, stores session ID
-
-#### 3. Analyzing Sessions
-
-After a session completes, analyze it:
+After a session completes, fetch detailed analysis:
 
 ```typescript
-const { analyzeSession, sessionAnalysis } = useSessionManagement();
+const { analyzeSession, sessionAnalysis, loading, error } = useSessionManagement();
 
-// After session completes
+// Call this after session completes
 await analyzeSession();
-// Results available in sessionAnalysis
+
+// Access results
+console.log(sessionAnalysis);
 ```
 
-The API route (`app/api/tough-tongue/sessions/analyze/route.ts`) securely handles the request:
+### 4. **API Routes (Secure Server-Side Proxying)**
+
+API routes keep your API keys secure by handling requests server-side:
+
+**Example: `app/api/tough-tongue/sessions/analyze/route.ts`**
 
 ```typescript
 export async function POST(req: Request) {
@@ -162,120 +241,109 @@ export async function POST(req: Request) {
 }
 ```
 
-### Customization
+Your frontend calls `/api/tough-tongue/sessions/analyze` instead of the ToughTongue API directly.
 
-#### Changing Scenarios
+### 5. **State Management with Zustand**
 
-Update scenario IDs in your components:
+The `sessionStore` manages session state across components:
 
 ```typescript
-// In ToughTongueIframe.tsx or your component
-const scenarioId = "YOUR_NEW_SCENARIO_ID";
+import { useSessionStore } from "@/app/store/sessionStore";
+
+const { sessionId, sessionData, sessionAnalysis, setSessionId } = useSessionStore();
 ```
 
-#### Styling
+## 🔐 Authentication Flow
 
-The project uses Tailwind CSS. Customize in:
+The template uses **Firebase Authentication** with email/password and Google OAuth:
 
-- `tailwind.config.ts` - Tailwind configuration
-- `app/globals.css` - Global styles
-- Component files - Inline Tailwind classes
+### Sign Up / Sign In
 
-#### Adding New Pages
+- **Sign Up**: `/auth/signup`
+- **Sign In**: `/auth/signin`
 
-1. Create a new directory in `app/`
-2. Add `page.tsx` file
-3. Export default component
-4. Add navigation links as needed
-
-#### Adding New API Routes
-
-1. Create route file in `app/api/`
-2. Export HTTP method handlers (`GET`, `POST`, etc.)
-3. Use `NextResponse` for responses
-
-Example:
+### Using Auth in Components
 
 ```typescript
-// app/api/your-endpoint/route.ts
-import { NextResponse } from "next/server";
+"use client";
+import { useAuth } from "@/app/auth/AuthContext";
 
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
+function MyComponent() {
+  const { user, signOut } = useAuth();
+
+  if (!user) {
+    return <p>Please sign in</p>;
+  }
+
+  return (
+    <div>
+      <p>Welcome, {user.email}</p>
+      <button onClick={signOut}>Sign Out</button>
+    </div>
+  );
 }
 ```
 
-## Project Structure
+### Protecting Routes
 
-```
-nextjs-minimal/
-├── app/
-│   ├── page.tsx                    # Home page
-│   ├── layout.tsx                  # Root layout
-│   ├── analysis/
-│   │   ├── page.tsx                # Analysis page
-│   │   ├── hooks/
-│   │   │   └── useSessionManagement.ts  # Session management hook
-│   │   └── components/
-│   │       ├── ToughTongueIframe.tsx
-│   │       ├── SessionInformation.tsx
-│   │       ├── DataDisplay.tsx
-│   │       └── ErrorDisplay.tsx
-│   ├── course/
-│   │   ├── page.tsx                # Course page
-│   │   └── CourseClient.tsx        # Course client component
-│   ├── api/
-│   │   └── tough-tongue/
-│   │       ├── scenarios/
-│   │       │   └── route.ts        # Create scenarios
-│   │       └── sessions/
-│   │           ├── [sessionId]/
-│   │           │   └── route.ts    # Get session details
-│   │           └── analyze/
-│   │               └── route.ts    # Analyze session
-│   ├── store/
-│   │   └── sessionStore.ts         # Zustand state management
-│   └── sign-in/                    # Clerk authentication
-├── components/
-│   ├── ui/                         # shadcn/ui components
-│   ├── FeatureCard.tsx
-│   ├── Header.tsx
-│   └── MediaEmbed.tsx
-├── middleware.ts                   # Clerk middleware
-└── package.json
+Add authentication checks in your page components:
+
+```typescript
+"use client";
+import { useAuth } from "@/app/auth/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function ProtectedPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/signin");
+    }
+  }, [user, loading, router]);
+
+  if (loading) return <p>Loading...</p>;
+  if (!user) return null;
+
+  return <div>Protected content</div>;
+}
 ```
 
-## API Routes
+## 📡 API Routes Reference
 
-### POST `/api/tough-tongue/scenarios`
+### `POST /api/tough-tongue/scenarios`
 
-Create a new scenario:
+Create a new ToughTongue AI scenario:
 
 ```typescript
 const response = await fetch("/api/tough-tongue/scenarios", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: "Scenario Name",
-    description: "Description",
-    ai_instructions: "AI instructions...",
-    user_friendly_description: "User-facing description",
+    name: "Customer Support Training",
+    description: "Practice handling customer complaints",
+    ai_instructions: "You are a frustrated customer...",
+    user_friendly_description: "Practice de-escalation techniques",
   }),
 });
+
+const { scenario_id } = await response.json();
 ```
 
-### GET `/api/tough-tongue/sessions/[sessionId]`
+### `GET /api/tough-tongue/sessions/[sessionId]`
 
-Get session details:
+Get detailed session information:
 
 ```typescript
 const response = await fetch(`/api/tough-tongue/sessions/${sessionId}`);
-const data = await response.json();
+const sessionData = await response.json();
 ```
 
-### POST `/api/tough-tongue/sessions/analyze`
+### `POST /api/tough-tongue/sessions/analyze`
 
-Analyze a session:
+Analyze a completed session:
 
 ```typescript
 const response = await fetch("/api/tough-tongue/sessions/analyze", {
@@ -283,164 +351,173 @@ const response = await fetch("/api/tough-tongue/sessions/analyze", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ session_id: sessionId }),
 });
-const data = await response.json();
+
+const analysis = await response.json();
 ```
 
-## Pages
+## 🎨 Customization
 
-### Home Page (`app/page.tsx`)
+### Changing Scenarios
 
-Landing page with:
-
-- Feature cards
-- Course modules overview
-- Call-to-action buttons
-
-### Analysis Page (`app/analysis/page.tsx`)
-
-Complete session analysis interface:
-
-- Embedded ToughTongue AI iframe
-- Session information display
-- Analysis results
-- Error handling
-
-### Course Page (`app/course/page.tsx`)
-
-Full course/lesson system:
-
-- Lesson sidebar navigation
-- Media embedding (YouTube, Loom, ToughTongue AI)
-- Lesson progression
-- Responsive design
-
-## State Management
-
-The application uses Zustand for state management (`app/store/sessionStore.ts`):
+Update scenario IDs in your components:
 
 ```typescript
-import { useSessionStore } from "@/app/store/sessionStore";
-
-const { sessionId, sessionData, setSessionId } = useSessionStore();
+// In ToughTongueIframe.tsx or any component
+const scenarioId = "your-new-scenario-id";
 ```
 
-Available state:
+### Styling with Tailwind
 
-- `sessionId`: Current session ID
-- `sessionData`: Session event data
-- `sessionDetails`: Detailed session information
-- `sessionAnalysis`: Analysis results
+The project uses Tailwind CSS. Customize:
 
-## Deployment
+- **`tailwind.config.ts`**: Theme configuration
+- **`app/globals.css`**: Global styles
+- **Component files**: Use Tailwind classes directly
 
-### Vercel (Recommended)
+### Adding New Pages
 
-Next.js is optimized for Vercel deployment:
+1. Create a directory in `app/`
+2. Add `page.tsx`
+3. Export a default component
 
-1. Push code to GitHub
+```typescript
+// app/dashboard/page.tsx
+export default function Dashboard() {
+  return <div>My Dashboard</div>;
+}
+```
 
-2. Import project in Vercel:
+### Adding New API Routes
+
+1. Create route file in `app/api/`
+2. Export HTTP method handlers
+
+```typescript
+// app/api/my-endpoint/route.ts
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  return NextResponse.json({ message: "Hello!" });
+}
+
+export async function POST(req: Request) {
+  const body = await req.json();
+  return NextResponse.json({ received: body });
+}
+```
+
+## 🚢 Deployment
+
+### Deploy to Vercel (Recommended)
+
+Next.js is optimized for Vercel:
+
+1. **Push to GitHub**
+
+2. **Import in Vercel:**
 
    - Go to [Vercel Dashboard](https://vercel.com/dashboard)
    - Click "New Project"
    - Import your repository
-   - Select `nextjs-minimal` as root directory
+   - **Important**: Set root directory to `nextjs-minimal`
 
-3. Configure environment variables:
+3. **Add Environment Variables:**
 
-   - `TOUGH_TONGUE_API_KEY` - Your ToughTongue AI API token
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key (if using)
-   - `CLERK_SECRET_KEY` - Clerk secret key (if using)
+   - Go to Project Settings → Environment Variables
+   - Add all variables from your `.env.local`
 
-4. Deploy:
-   - Vercel will automatically deploy on push
-   - Or click "Deploy" in dashboard
+4. **Deploy:**
+   - Click "Deploy"
+   - Vercel will auto-deploy on future git pushes
 
-### Other Platforms
+### Deploy to Other Platforms
 
-For other platforms (Netlify, Railway, etc.):
+For Netlify, Railway, Render, etc.:
 
-1. Build: `pnpm build`
-2. Start: `npm start`
-3. Set environment variables
-4. Configure Node.js version (18+)
+1. Build command: `pnpm build`
+2. Start command: `pnpm start`
+3. Node version: 18+
+4. Root directory: `nextjs-minimal`
+5. Add environment variables in platform settings
 
-## Environment Variables
+## 🛠️ Troubleshooting
 
-| Variable                            | Required | Description                            |
-| ----------------------------------- | -------- | -------------------------------------- |
-| `TOUGH_TONGUE_API_KEY`              | Yes      | Your ToughTongue AI API token          |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | No       | Clerk publishable key (if using Clerk) |
-| `CLERK_SECRET_KEY`                  | No       | Clerk secret key (if using Clerk)      |
+### ❌ `ERR_PNPM_NO_MATCHING_VERSION`
 
-## Authentication
+**Solution**: The dependency versions have been updated. Run:
 
-The starter includes Clerk authentication. To disable:
+```bash
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+```
 
-1. Remove Clerk from `package.json` dependencies
-2. Remove or modify `middleware.ts` to remove Clerk logic
-3. Authentication pages are at `app/auth/signin/` and `app/auth/signup/`
-4. Remove authentication checks from pages
+### ❌ Firebase Configuration Errors
 
-## Troubleshooting
+**Error**: `Firebase: Error (auth/invalid-api-key)`
 
-### Build Errors
+**Solution**:
 
-- Ensure Node.js 18+ is installed
-- Clear `.next` directory: `rm -rf .next`
-- Reinstall dependencies: `rm -rf node_modules && pnpm install`
+1. Double-check all Firebase config values in `.env.local`
+2. Ensure you've enabled Email/Password and Google authentication in Firebase Console
+3. Restart dev server: `pnpm dev`
 
-### API Errors
+### ❌ ToughTongue AI Session Not Starting
 
-- Verify `TOUGH_TONGUE_API_KEY` is set in `.env.local`
-- Check API token hasn't expired
-- Review API route error handling
+**Possible causes:**
 
-### Authentication Issues
+1. Invalid API key in `.env.local`
+2. Scenario ID not configured (still says `YOUR_SCENARIO_ID_HERE`)
+3. Browser blocking microphone permission
 
-- Verify Clerk keys are correct
-- Check middleware configuration
-- Review Clerk dashboard settings
+**Solution**:
 
-### TypeScript Errors
+1. Verify API keys in [Developer Portal](https://app.toughtongueai.com/developer)
+2. Update scenario ID in `app/analysis/components/ToughTongueIframe.tsx`
+3. Allow microphone access when prompted
 
-- Run `pnpm build` to see all type errors
-- Ensure all types are properly imported
-- Check `tsconfig.json` configuration
+### ❌ TypeScript Errors
 
-## Dependencies
+Run type checking:
 
-### Core
+```bash
+pnpm build
+```
 
-- **Next.js 15+**: React framework
-- **React 19**: UI library
-- **TypeScript**: Type safety
+Common fixes:
 
-### UI & Styling
+- Ensure all imports are correct
+- Check `tsconfig.json` paths
+- Restart TypeScript server in your IDE
 
-- **Tailwind CSS**: Utility-first CSS
-- **shadcn/ui**: Component library
-- **lucide-react**: Icons
+### ❌ Module Not Found Errors
 
-### State & Data
+Clear Next.js cache:
 
-- **Zustand**: State management
-- **Clerk**: Authentication (optional)
+```bash
+rm -rf .next
+pnpm dev
+```
 
-## Next Steps
+## 📚 Learn More
 
-- Explore the [full documentation](/docs/nextjs-minimal)
-- Learn about [API integration](/docs/api-integration)
-- Check out [deployment options](/docs/deployment)
-- Review [best practices](/docs/best-practices)
+- **[ToughTongue AI Documentation](https://docs.toughtongueai.com)**
+- **[API Reference](https://docs.toughtongueai.com/api)**
+- **[Next.js Documentation](https://nextjs.org/docs)**
+- **[Firebase Documentation](https://firebase.google.com/docs)**
+- **[Tailwind CSS](https://tailwindcss.com/docs)**
+- **[shadcn/ui](https://ui.shadcn.com)**
 
-## Support
+## 💬 Support & Community
 
-- [API Playground](https://app.toughtongueai.com/api-playground)
-- [Developer Portal](https://app.toughtongueai.com/developer)
-- [Developer Community](https://discord.com/invite/jfq2wVAP)
-- [Support Email](mailto:help@getarchieai.com)
+- **[Developer Community Discord](https://discord.com/invite/jfq2wVAP)**
+- **[API Playground](https://app.toughtongueai.com/api-playground)**
+- **[Email Support](mailto:help@getarchieai.com)**
+- **[GitHub Issues](https://github.com/tough-tongue/tt-starter/issues)**
 
-## License
+## 📝 License
 
-MIT
+MIT License - feel free to use this template for any project!
+
+---
+
+Built with ❤️ by the ToughTongue AI team

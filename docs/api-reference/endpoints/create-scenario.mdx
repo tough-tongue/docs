@@ -1,0 +1,48 @@
+---
+title: "Create Scenario"
+api: "POST /scenarios"
+description: "Create a new conversation scenario"
+---
+
+<ParamField body="name" type="string" required>
+  Scenario name
+</ParamField>
+
+<ParamField body="ai_instructions" type="string" required>
+  Instructions for the AI agent behavior
+</ParamField>
+
+<ParamField body="description" type="string">
+  Internal description (for your team)
+</ParamField>
+
+<ParamField body="is_public" type="boolean" default="false">
+  Allow access without authentication
+</ParamField>
+
+<ParamField body="is_recording" type="boolean" default="true">
+  Record audio for analysis
+</ParamField>
+
+<RequestExample>
+```json
+{
+  "name": "Customer Support Training",
+  "ai_instructions": "You are a frustrated customer who received a defective product...",
+  "is_public": true
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "id": "scenario_xyz789",
+  "name": "Customer Support Training",
+  "ai_instructions": "You are a frustrated customer...",
+  "is_public": true,
+  "is_recording": true,
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+</ResponseExample>
