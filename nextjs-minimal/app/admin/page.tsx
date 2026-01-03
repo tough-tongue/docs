@@ -197,6 +197,9 @@ export default function AdminPage() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Scenario selector
+  const [selectedScenario, setSelectedScenario] = useState<string>(SCENARIOS.PERSONALITY_TEST);
+
   // Store editor state
   const [storeJson, setStoreJson] = useState("");
   const [storeError, setStoreError] = useState<string | null>(null);
@@ -204,12 +207,30 @@ export default function AdminPage() {
 
   const isAuthenticated = !!adminToken;
 
-  // Initialize store JSON when authenticated
+  // Initialize store JSON when authenticated (exclude sessionDetails - too noisy)
   useEffect(() => {
     if (isAuthenticated) {
-      const { user, assessmentSessions, coachSessions, sessionDetails } = appStore;
+      const {
+        user,
+        userPersonalityType,
+        userPersonalityAssessment,
+        userPersonalitySessionId,
+        assessmentSessions,
+        coachSessions,
+      } = appStore;
       setStoreJson(
-        JSON.stringify({ user, assessmentSessions, coachSessions, sessionDetails }, null, 2)
+        JSON.stringify(
+          {
+            user,
+            userPersonalityType,
+            userPersonalityAssessment,
+            userPersonalitySessionId,
+            assessmentSessions,
+            coachSessions,
+          },
+          null,
+          2
+        )
       );
     }
   }, [isAuthenticated, appStore]);
@@ -239,7 +260,7 @@ export default function AdminPage() {
     setStats((prev) => ({ ...prev, isLoadingBalance: true, error: null }));
     try {
       const response = await fetch("/api/balance", {
-        headers: { Authorization: `Bearer ${adminToken}` },
+        headers: { "x-admin-token": adminToken },
       });
       if (!response.ok)
         throw new Error(response.status === 401 ? "Invalid token" : "Failed to fetch");
@@ -261,10 +282,9 @@ export default function AdminPage() {
     if (!adminToken) return;
     setStats((prev) => ({ ...prev, isLoadingSessions: true, error: null }));
     try {
-      const response = await fetch(
-        `/api/sessions?scenario_id=${SCENARIOS.PERSONALITY_TEST}&limit=100`,
-        { headers: { Authorization: `Bearer ${adminToken}` } }
-      );
+      const response = await fetch(`/api/sessions?scenario_id=${selectedScenario}&limit=100`, {
+        headers: { "x-admin-token": adminToken },
+      });
       if (!response.ok)
         throw new Error(response.status === 401 ? "Invalid token" : "Failed to fetch");
       const data = await response.json();
@@ -279,7 +299,7 @@ export default function AdminPage() {
         error: err instanceof Error ? err.message : "Failed to load sessions",
       }));
     }
-  }, [adminToken]);
+  }, [adminToken, selectedScenario]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -408,19 +428,29 @@ export default function AdminPage() {
       {/* Sessions Table */}
       <Card className="mb-6 bg-card border-border">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <CardTitle>Sessions (Last 30 Days)</CardTitle>
-              <CardDescription>Scenario: {SCENARIOS.PERSONALITY_TEST}</CardDescription>
+              <CardDescription>View sessions for a specific scenario</CardDescription>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={fetchSessions}
-              disabled={stats.isLoadingSessions}
-            >
-              <RefreshCw className={`h-4 w-4 ${stats.isLoadingSessions ? "animate-spin" : ""}`} />
-            </Button>
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedScenario}
+                onChange={(e) => setSelectedScenario(e.target.value)}
+                className="h-9 px-3 rounded-md border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+              >
+                <option value={SCENARIOS.PERSONALITY_TEST}>Personality Test</option>
+                <option value={SCENARIOS.PERSONALITY_COACH}>Personality Coach</option>
+              </select>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={fetchSessions}
+                disabled={stats.isLoadingSessions}
+              >
+                <RefreshCw className={`h-4 w-4 ${stats.isLoadingSessions ? "animate-spin" : ""}`} />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -598,10 +628,24 @@ export default function AdminPage() {
               variant="ghost"
               size="sm"
               onClick={() => {
-                const { user, assessmentSessions, coachSessions, sessionDetails } = appStore;
+                const {
+                  user,
+                  userPersonalityType,
+                  userPersonalityAssessment,
+                  userPersonalitySessionId,
+                  assessmentSessions,
+                  coachSessions,
+                } = appStore;
                 setStoreJson(
                   JSON.stringify(
-                    { user, assessmentSessions, coachSessions, sessionDetails },
+                    {
+                      user,
+                      userPersonalityType,
+                      userPersonalityAssessment,
+                      userPersonalitySessionId,
+                      assessmentSessions,
+                      coachSessions,
+                    },
                     null,
                     2
                   )

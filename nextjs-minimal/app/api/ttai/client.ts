@@ -23,21 +23,6 @@ export interface ApiError {
   status: number;
 }
 
-// Scenario types
-export interface CreateScenarioRequest {
-  name: string;
-  description: string;
-  ai_instructions: string;
-  user_friendly_description?: string;
-}
-
-export interface CreateScenarioResponse {
-  id: string;
-  name: string;
-  description: string;
-  embed_url: string;
-}
-
 // Session types
 export interface Session {
   id: string;
@@ -127,7 +112,7 @@ export class ToughTongueError extends Error {
 // =============================================================================
 
 interface RequestOptions {
-  method: "GET" | "POST" | "PUT" | "DELETE";
+  method: "GET" | "POST";
   body?: unknown;
 }
 
@@ -193,23 +178,6 @@ export async function analyzeSession(request: AnalyzeSessionRequest): Promise<Se
   return apiRequest<SessionAnalysis>("/sessions/analyze", {
     method: "POST",
     body: { session_id: request.session_id },
-  });
-}
-
-/** Create a scenario */
-export async function createScenario(
-  request: CreateScenarioRequest
-): Promise<CreateScenarioResponse> {
-  return apiRequest<CreateScenarioResponse>("/scenarios", {
-    method: "POST",
-    body: {
-      name: request.name,
-      description: request.description,
-      ai_instructions: request.ai_instructions,
-      user_friendly_description: request.user_friendly_description || undefined,
-      is_public: true,
-      is_recording: false,
-    },
   });
 }
 

@@ -46,8 +46,6 @@ function TestContent() {
           duration: event.data.duration_seconds,
           status: "completed",
         });
-        setShowTest(false);
-        setTestCompleted(true);
         setLastSessionId(event.data.session_id);
       },
       onTerminated: (event) => {
@@ -57,9 +55,14 @@ function TestContent() {
           duration: event.data.duration_seconds,
           status: "terminated",
         });
+        setLastSessionId(event.data.session_id);
         setShowTest(false);
         setTestCompleted(true);
-        setLastSessionId(event.data.session_id);
+      },
+      onSubmit: (event) => {
+        console.log("Session data submitted:", event.data.session_id);
+        setShowTest(false);
+        setTestCompleted(true);
       },
       onError: (error) => {
         console.error("Iframe error:", error);
@@ -77,8 +80,8 @@ function TestContent() {
   // Test completed - show success and link to results
   if (testCompleted) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-lg mx-auto bg-card border-green-500/30">
+      <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[60vh]">
+        <Card className="max-w-lg w-full bg-card border-green-500/30">
           <CardHeader className="text-center">
             <CheckCircle2 className="mx-auto h-16 w-16 text-green-400 mb-4" />
             <CardTitle className="text-2xl text-green-400">Test Completed!</CardTitle>
@@ -111,25 +114,31 @@ function TestContent() {
   // Show the test iframe
   if (showTest) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
+      <div className="flex flex-col h-[calc(100vh-4rem)]">
+        {/* Header */}
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2 text-foreground">MBTI Personality Assessment</h1>
-            <p className="text-muted-foreground">Complete the assessment to discover your type</p>
+            <h1 className="text-2xl font-bold text-foreground">MBTI Personality Assessment</h1>
+            <p className="text-muted-foreground text-sm">
+              Complete the assessment to discover your type
+            </p>
           </div>
-          <Button variant="outline" onClick={() => setShowTest(false)}>
+          <Button variant="outline" size="sm" onClick={() => setShowTest(false)}>
             Cancel
           </Button>
         </div>
 
-        <iframe
-          src={iframeUrl}
-          width="100%"
-          height="700px"
-          frameBorder="0"
-          allow="microphone; camera; display-capture"
-          className="rounded-lg border border-border shadow-lg shadow-teal-500/5"
-        />
+        {/* Iframe - full remaining height */}
+        <div className="flex-1 container mx-auto px-4 pb-4">
+          <iframe
+            src={iframeUrl}
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            allow="microphone; camera; display-capture"
+            className="rounded-lg border border-border shadow-lg shadow-teal-500/5"
+          />
+        </div>
       </div>
     );
   }

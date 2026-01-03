@@ -6,12 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { AppConfig } from "./config";
 
 /**
- * Verifies admin token from Authorization header
+ * Verifies admin token from x-admin-token header
  */
 export function verifyAdminToken(request: NextRequest): boolean {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) return false;
-  return authHeader.slice(7) === AppConfig.admin.token;
+  const token = request.headers.get("x-admin-token");
+  return token === AppConfig.admin.token;
 }
 
 /**

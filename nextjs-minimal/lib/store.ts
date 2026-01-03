@@ -67,6 +67,11 @@ export interface AppState {
   // Admin token for sensitive API requests
   adminToken: string | null;
 
+  // User's finalized personality assessment (from a selected session)
+  userPersonalityType: string | null; // e.g., "INTP"
+  userPersonalityAssessment: string | null; // Full text description
+  userPersonalitySessionId: string | null;
+
   // Session IDs (references)
   assessmentSessions: string[];
   coachSessions: string[];
@@ -81,6 +86,13 @@ export interface AppActions {
 
   // Admin token actions
   setAdminToken: (token: string | null) => void;
+
+  // Personality assessment actions
+  setUserPersonalityAssessment: (
+    type: string | null,
+    assessment: string | null,
+    sessionId: string | null
+  ) => void;
 
   // Assessment session actions
   addAssessmentSession: (sessionId: string, details?: Partial<SessionDetails>) => void;
@@ -108,6 +120,9 @@ export type AppStore = AppState & AppActions;
 const initialState: AppState = {
   user: null,
   adminToken: null,
+  userPersonalityType: null,
+  userPersonalityAssessment: null,
+  userPersonalitySessionId: null,
   assessmentSessions: [],
   coachSessions: [],
   sessionDetails: {},
@@ -127,6 +142,14 @@ export const useAppStore = create<AppStore>()(
 
       // Admin token actions
       setAdminToken: (token) => set({ adminToken: token }),
+
+      // Personality assessment actions
+      setUserPersonalityAssessment: (type, assessment, sessionId) =>
+        set({
+          userPersonalityType: type,
+          userPersonalityAssessment: assessment,
+          userPersonalitySessionId: sessionId,
+        }),
 
       // Assessment session actions
       addAssessmentSession: (sessionId, details) =>

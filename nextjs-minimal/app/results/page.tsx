@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AuthGuard } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppStore, type SessionDetails, type ReportCardItem } from "@/lib/store";
+import { useAppStore, type ReportCardItem } from "@/lib/store";
 import { ROUTES } from "@/lib/constants";
 import {
   FileText,
@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Copy,
   User,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -45,6 +46,26 @@ const DIMENSION_LABELS: Record<string, { label: string; description: string }> =
   },
 };
 
+/** Build assessment summary from evaluation results */
+function buildAssessmentSummary(reportCard: ReportCardItem[]): string {
+  const typeItem = reportCard.find((item) => item.topic === "personality_assessment");
+  const dimensions = reportCard.filter((item) => item.topic !== "personality_assessment");
+
+  if (!typeItem) return "";
+
+  const type = typeItem.score_str;
+  const dimensionSummary = dimensions
+    .map((d) => {
+      const label = DIMENSION_LABELS[d.topic]?.label || d.topic;
+      return `${label}: ${d.score_str}`;
+    })
+    .join(". ");
+
+  return `The user's MBTI personality has been assessed as ${type}. ${dimensionSummary}. ${
+    typeItem.note?.split("\n")[0] || ""
+  }`;
+}
+
 function ResultsContent() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -57,6 +78,8 @@ function ResultsContent() {
   const assessmentSessions = useAppStore((s) => s.assessmentSessions);
   const sessionDetails = useAppStore((s) => s.sessionDetails);
   const updateSessionDetails = useAppStore((s) => s.updateSessionDetails);
+  const userPersonalitySessionId = useAppStore((s) => s.userPersonalitySessionId);
+  const setUserPersonalityAssessment = useAppStore((s) => s.setUserPersonalityAssessment);
 
   const selectedSession = selectedSessionId ? sessionDetails[selectedSessionId] : null;
 
@@ -124,6 +147,20 @@ function ResultsContent() {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const markAsFinalAssessment = (sessionId: string) => {
+    const session = sessionDetails[sessionId];
+    if (!session?.evaluation_results?.report_card) return;
+
+    // Extract the MBTI type from report_card
+    const typeItem = session.evaluation_results.report_card.find(
+      (item) => item.topic === "personality_assessment"
+    );
+    const mbtiType = typeItem?.score_str || null;
+
+    const summary = buildAssessmentSummary(session.evaluation_results.report_card);
+    setUserPersonalityAssessment(mbtiType, summary, sessionId);
   };
 
   const formatDuration = (seconds?: number) => {
@@ -207,9 +244,7 @@ function ResultsContent() {
                   <th className="text-left py-2 px-2 text-muted-foreground font-medium">
                     Duration
                   </th>
-                  <th className="text-left py-2 px-2 text-muted-foreground font-medium">
-                    Analyzed
-                  </th>
+                  <th className="text-left py-2 px-2 text-muted-foreground font-medium">Status</th>
                   <th className="text-left py-2 px-2 text-muted-foreground font-medium">Action</th>
                 </tr>
               </thead>
@@ -218,6 +253,7 @@ function ResultsContent() {
                   const details = sessionDetails[id];
                   const isSelected = selectedSessionId === id;
                   const isAnalyzed = !!details?.evaluation_results;
+                  const isFinal = userPersonalitySessionId === id;
                   return (
                     <tr
                       key={id}
@@ -228,6 +264,9 @@ function ResultsContent() {
                     >
                       <td className="py-2 px-2">
                         <div className="flex items-center gap-2">
+                          {isFinal ? (
+                            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                          ) : null}
                           <code className="text-xs font-mono break-all">{id}</code>
                           <Button
                             size="sm"
@@ -253,13 +292,18 @@ function ResultsContent() {
                         {formatDuration(details?.duration)}
                       </td>
                       <td className="py-2 px-2">
-                        {isAnalyzed ? (
+                        {isFinal ? (
+                          <span className="flex items-center gap-1 text-yellow-400">
+                            <Star className="h-3 w-3 fill-yellow-400" />
+                            Final
+                          </span>
+                        ) : isAnalyzed ? (
                           <span className="flex items-center gap-1 text-green-400">
                             <CheckCircle className="h-4 w-4" />
-                            Yes
+                            Analyzed
                           </span>
                         ) : (
-                          <span className="text-muted-foreground">No</span>
+                          <span className="text-muted-foreground">Pending</span>
                         )}
                       </td>
                       <td className="py-2 px-2">
@@ -317,32 +361,54 @@ function ResultsContent() {
           {/* Session Info */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                   <CardTitle>Session Details</CardTitle>
                   <CardDescription className="font-mono text-xs mt-1">
                     {selectedSessionId}
                   </CardDescription>
                 </div>
-                {!selectedSession.evaluation_results ? (
-                  <Button
-                    onClick={() => analyzeSession(selectedSessionId)}
-                    disabled={isAnalyzing}
-                    className="bg-teal-600 hover:bg-teal-700"
-                  >
-                    {isAnalyzing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Analyze Session
-                      </>
-                    )}
-                  </Button>
-                ) : null}
+                <div className="flex gap-2">
+                  {selectedSession.evaluation_results?.report_card ? (
+                    <Button
+                      onClick={() => markAsFinalAssessment(selectedSessionId)}
+                      variant={
+                        userPersonalitySessionId === selectedSessionId ? "secondary" : "outline"
+                      }
+                      disabled={userPersonalitySessionId === selectedSessionId}
+                    >
+                      <Star
+                        className={`h-4 w-4 mr-2 ${
+                          userPersonalitySessionId === selectedSessionId
+                            ? "fill-yellow-400 text-yellow-400"
+                            : ""
+                        }`}
+                      />
+                      {userPersonalitySessionId === selectedSessionId
+                        ? "Final Assessment"
+                        : "Mark as Final"}
+                    </Button>
+                  ) : null}
+                  {!selectedSession.evaluation_results ? (
+                    <Button
+                      onClick={() => analyzeSession(selectedSessionId)}
+                      disabled={isAnalyzing}
+                      className="bg-teal-600 hover:bg-teal-700"
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Analyzing...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Analyze Session
+                        </>
+                      )}
+                    </Button>
+                  ) : null}
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -535,7 +601,6 @@ function ResultsContent() {
                       const isUser = line.includes("] User:");
                       if (!isAI && !isUser) return null;
 
-                      // Extract timestamp and content
                       const match = line.match(/\[(.*?)\] (AI|User): (.*)/);
                       if (!match) return null;
 

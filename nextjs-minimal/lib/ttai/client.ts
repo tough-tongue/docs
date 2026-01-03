@@ -70,15 +70,15 @@ export function buildPersonalityTestUrl(options: {
 export function buildCoachUrl(options: {
   userName?: string;
   userEmail?: string;
-  personalityType?: string;
+  userPersonalityAssessment?: string;
 }): string {
   return buildEmbedUrl({
     scenarioId: SCENARIOS.PERSONALITY_COACH,
     background: "black",
     userName: options.userName,
     userEmail: options.userEmail,
-    dynamicVariables: options.personalityType
-      ? { personalityType: options.personalityType }
+    dynamicVariables: options.userPersonalityAssessment
+      ? { t_user_personality_assessment: options.userPersonalityAssessment }
       : undefined,
   });
 }
