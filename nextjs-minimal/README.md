@@ -139,11 +139,13 @@ nextjs-minimal/
 ## 🎯 How the App Works
 
 ### 1. **Landing Page** (`/`)
+
 - Welcomes users to the personality discovery journey
 - Explains the MBTI assessment
 - Call-to-action buttons to take test or talk to coach
 
 ### 2. **Personality Test** (`/personality-test`)
+
 - Embeds ToughTongue AI personality assessment scenario
 - Listens for session completion events
 - Automatically analyzes results via API
@@ -152,12 +154,14 @@ nextjs-minimal/
 - Allows retaking the test
 
 ### 3. **Personality Coach** (`/personality-coach`)
+
 - Embeds ToughTongue AI coaching scenario
 - Personalizes conversation with user's MBTI type (if test taken)
 - Tracks all coaching sessions in localStorage
 - Shows session history
 
 ### 4. **Progress Dashboard** (`/progress`)
+
 - Displays personality test results (with MBTI type)
 - Lists all coaching sessions with timestamps
 - Shows statistics (tests completed, sessions, etc.)
@@ -165,6 +169,7 @@ nextjs-minimal/
 - Quick actions to retake test or start new session
 
 ### 5. **Admin Panel** (`/admin`)
+
 - Protected by ADMIN_TOKEN
 - Shows app statistics
 - Allows exporting all data as JSON
@@ -172,6 +177,7 @@ nextjs-minimal/
 - Security warnings if using default token
 
 ### 6. **Admin Token Banner**
+
 - Appears on all pages if using default admin token
 - Reminds admins to set custom ADMIN_TOKEN
 - Dismissible but reappears on page refresh
@@ -203,36 +209,41 @@ function MyComponent() {
 
 ## 💾 Data Storage
 
-The app uses **browser localStorage** for data persistence:
-
-- **Personality Test Results**: Stored with full analysis data
-- **Coach Sessions**: Array of all coaching session metadata
-- **Session IDs**: For potential future sync/retrieval
-
-### Storage Keys (in `lib/constants.ts`)
+The app uses **Zustand** with localStorage persistence (`lib/store.ts`):
 
 ```typescript
-export const STORAGE_KEYS = {
-  PERSONALITY_TEST_RESULT: "personality_test_result",
-  PERSONALITY_TEST_SESSION_ID: "personality_test_session_id",
-  PERSONALITY_TEST_COMPLETED_AT: "personality_test_completed_at",
-  COACH_SESSIONS: "coach_sessions",
-} as const;
+interface AppState {
+  user: User | null; // Current user (local or Firebase)
+  assessmentSessions: string[]; // Assessment session IDs
+  coachSessions: string[]; // Coach session IDs
+  sessionDetails: Record<string, SessionDetails>; // Session data keyed by ID
+}
 ```
 
-### Accessing Stored Data
+### Using the Store
 
 ```typescript
-import { STORAGE_KEYS } from "@/lib/constants";
+import { useAppStore, selectLatestAssessment, selectPersonalityType } from "@/lib/store";
 
-// Get personality test result
-const result = localStorage.getItem(STORAGE_KEYS.PERSONALITY_TEST_RESULT);
-const testData = result ? JSON.parse(result) : null;
+// In a component
+function MyComponent() {
+  // Get latest assessment
+  const latestAssessment = useAppStore(selectLatestAssessment);
+  const personalityType = useAppStore(selectPersonalityType);
 
-// Get coach sessions
-const sessions = localStorage.getItem(STORAGE_KEYS.COACH_SESSIONS);
-const coachHistory = sessions ? JSON.parse(sessions) : [];
+  // Get all sessions
+  const assessmentSessions = useAppStore((s) => s.assessmentSessions);
+  const sessionDetails = useAppStore((s) => s.sessionDetails);
+
+  // Actions
+  const addAssessmentSession = useAppStore((s) => s.addAssessmentSession);
+  const updateSessionDetails = useAppStore((s) => s.updateSessionDetails);
+}
 ```
+
+### Storage Key
+
+All data is persisted under the localStorage key: `ttai-app-store`
 
 ## 🎨 Customization
 
@@ -362,12 +373,14 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 1. **Push to GitHub**
 
 2. **Import in Vercel:**
+
    - Go to [Vercel Dashboard](https://vercel.com/dashboard)
    - Click "New Project"
    - Import your repository
    - **Important**: Set root directory to `nextjs-minimal`
 
 3. **Add Environment Variables:**
+
    - Go to Project Settings → Environment Variables
    - Add all variables from your `.env.local`
    - **⚠️ Set a secure `ADMIN_TOKEN` for production!**
@@ -383,6 +396,7 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 **Error**: `Firebase: Error (auth/invalid-api-key)`
 
 **Solution**:
+
 1. Double-check all Firebase config values in `.env.local`
 2. Ensure you've enabled Email/Password and Google authentication in Firebase Console
 3. Restart dev server: `pnpm dev`
@@ -390,11 +404,13 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 ### ❌ ToughTongue AI Session Not Starting
 
 **Possible causes:**
+
 1. Invalid API key in `.env.local`
 2. Scenario ID not configured
 3. Browser blocking microphone permission
 
 **Solution**:
+
 1. Verify `TOUGH_TONGUE_API_KEY` in [Developer Portal](https://app.toughtongueai.com/developer)
 2. Check scenario IDs in `lib/constants.ts`
 3. Allow microphone access when prompted
@@ -402,6 +418,7 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 ### ❌ Admin Panel Won't Accept Token
 
 **Solution**:
+
 1. Check `ADMIN_TOKEN` in `.env.local`
 2. Restart dev server after changing environment variables
 3. If using default token, ensure you're entering: `TTAI-STARTER-ADMIN-TOKEN`
@@ -411,6 +428,7 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 **Cause**: localStorage is browser-specific
 
 **Solution**:
+
 - Data is stored per-browser
 - Clearing browser data will delete saved results
 - For production, consider adding database sync (Firebase/Supabase)

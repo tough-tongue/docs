@@ -39,14 +39,14 @@ export default function Header() {
             <NavLink href={ROUTES.HOME} active={isActive(ROUTES.HOME)}>
               Home
             </NavLink>
-            <NavLink href={ROUTES.PERSONALITY_TEST} active={isActive(ROUTES.PERSONALITY_TEST)}>
+            <NavLink href={ROUTES.TEST} active={isActive(ROUTES.TEST)}>
               Test
             </NavLink>
-            <NavLink href={ROUTES.PERSONALITY_COACH} active={isActive(ROUTES.PERSONALITY_COACH)}>
-              Coach
+            <NavLink href={ROUTES.RESULTS} active={isActive(ROUTES.RESULTS)}>
+              Results
             </NavLink>
-            <NavLink href={ROUTES.PROGRESS} active={isActive(ROUTES.PROGRESS)}>
-              Progress
+            <NavLink href={ROUTES.COACH} active={isActive(ROUTES.COACH)}>
+              Coach
             </NavLink>
           </nav>
 

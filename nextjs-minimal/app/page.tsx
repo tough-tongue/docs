@@ -37,21 +37,26 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href={ROUTES.PERSONALITY_TEST}>
-              <Button size="lg" className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white">
+            <Link href={ROUTES.TEST}>
+              <Button
+                size="lg"
+                className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
+              >
                 Take Personality Test
               </Button>
             </Link>
-            <Link href={ROUTES.PERSONALITY_COACH}>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-border hover:bg-accent">
+            <Link href={ROUTES.COACH}>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto border-border hover:bg-accent"
+              >
                 Talk to Your Coach
               </Button>
             </Link>
           </div>
 
-          <p className="mt-6 text-sm text-muted-foreground">
-            Takes approximately 10-15 minutes
-          </p>
+          <p className="mt-6 text-sm text-muted-foreground">Takes approximately 10-15 minutes</p>
         </div>
       </section>
 
@@ -157,12 +162,18 @@ export default function Home() {
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-5xl rounded-2xl bg-gradient-to-r from-teal-600 to-cyan-600 p-10 text-center">
-          <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">Ready to Discover Yourself?</h2>
+          <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
+            Ready to Discover Yourself?
+          </h2>
           <p className="mb-6 text-teal-100/90">
             Start your journey to self-discovery with our AI-powered personality assessment
           </p>
-          <Link href={ROUTES.PERSONALITY_TEST}>
-            <Button size="lg" variant="secondary" className="bg-white text-teal-700 hover:bg-gray-100">
+          <Link href={ROUTES.TEST}>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-teal-700 hover:bg-gray-100"
+            >
               Get Started Now
             </Button>
           </Link>
@@ -252,7 +263,7 @@ export default function Home() {
                   <p className="text-sm text-muted-foreground mb-3">
                     Want to discover your personality type?
                   </p>
-                  <Link href={ROUTES.PERSONALITY_TEST}>
+                  <Link href={ROUTES.TEST}>
                     <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">
                       Take the Personality Test
                     </Button>
