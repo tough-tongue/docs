@@ -1,0 +1,71 @@
+---
+title: "List Sessions (Enriched)"
+api: "GET /v2/sessions"
+description: "List sessions with enriched evaluation data"
+---
+
+List sessions with additional evaluation and analytics data.
+Returns the same structure as CSV exports with evaluation scores and report cards.
+
+<ParamField query="scenario_id" type="string">
+  Filter by scenario ID
+</ParamField>
+
+<ParamField query="user_email" type="string">
+  Filter by user email (comma-separated for multiple)
+</ParamField>
+
+<ParamField query="from_date" type="string">
+  Filter from date (ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ)
+</ParamField>
+
+<ParamField query="to_date" type="string">
+  Filter to date (ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ)
+</ParamField>
+
+<ParamField query="is_org" type="boolean" default="false">
+  Use admin access for org-wide data (requires org context)
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Page number (starts at 1)
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Items per page (max 500)
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "sessions": [
+    {
+      "id": "session_abc123",
+      "scenario_id": "scenario_xyz",
+      "scenario_name": "Sales Cold Call",
+      "user_email": "user@example.com",
+      "duration_seconds": 180,
+      "duration_minutes": 3.0,
+      "status": "completed",
+      "evaluation_score": 85,
+      "evaluation_note": "Strong performance overall",
+      "report_card": {
+        "topics": [
+          {
+            "name": "Opening",
+            "score": 90,
+            "note": "Clear and confident introduction"
+          }
+        ]
+      },
+      "report_card_topics": "Opening;Objection Handling;Closing",
+      "analytics_url": "https://app.toughtongueai.com/analysis/session_abc123",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 50
+}
+```
+</ResponseExample>

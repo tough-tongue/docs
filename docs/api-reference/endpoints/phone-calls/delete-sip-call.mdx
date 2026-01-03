@@ -1,0 +1,20 @@
+---
+title: "Delete Phone Call"
+api: "DELETE /v2/sip/calls/{call_id}"
+description: "Cancel a scheduled phone call"
+---
+
+Delete a scheduled SIP call before it is initiated.
+Only calls with `pending` or `scheduled` status can be deleted.
+
+<ParamField path="call_id" type="string" required>
+  The unique identifier of the call to delete
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "deleted": true
+}
+```
+</ResponseExample>

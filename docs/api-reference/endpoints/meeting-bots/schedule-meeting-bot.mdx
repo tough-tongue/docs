@@ -1,0 +1,49 @@
+---
+title: "Schedule Meeting Bot"
+api: "POST /v2/meeting-bots"
+description: "Schedule a bot to join and analyze a meeting"
+---
+
+Schedule a meeting bot to join a video call and provide real-time analysis.
+Supports multiple URLs (newline-separated) for batch scheduling.
+
+<Note>
+  Requires `access_meet_bot` enabled for your account.
+</Note>
+
+<ParamField body="scenario_id" type="string" required>
+  The scenario to use for analysis
+</ParamField>
+
+<ParamField body="meeting_url" type="string" required>
+  The meeting URL(s) to join. Multiple URLs can be separated by newlines.
+</ParamField>
+
+<ParamField body="bot_name" type="string" default="ToughTongue AI">
+  Display name for the bot in the meeting
+</ParamField>
+
+<RequestExample>
+```json
+{
+  "scenario_id": "scenario_abc123",
+  "meeting_url": "https://meet.google.com/abc-defg-hij",
+  "bot_name": "Sales Coach"
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "bots": [
+    {
+      "id": "bot_abc123",
+      "meeting_url": "https://meet.google.com/abc-defg-hij",
+      "status": "scheduled",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>

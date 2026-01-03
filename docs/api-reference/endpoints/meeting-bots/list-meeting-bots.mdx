@@ -1,0 +1,50 @@
+---
+title: "List Meeting Bots"
+api: "GET /v2/meeting-bots"
+description: "List scheduled and active meeting bots"
+---
+
+List meeting bot records with filtering and pagination.
+
+<ParamField query="status" type="string">
+  Filter by status: `pending`, `scheduled`, `in_call_recording`, `call_ended`, `failed`
+</ParamField>
+
+<ParamField query="scenario_id" type="string">
+  Filter by scenario ID
+</ParamField>
+
+<ParamField query="from_date" type="string">
+  Filter from date (ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ)
+</ParamField>
+
+<ParamField query="to_date" type="string">
+  Filter to date (ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ)
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Page number (starts at 1)
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Items per page (max 500)
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "bots": [
+    {
+      "id": "bot_abc123",
+      "scenario_id": "scenario_xyz",
+      "meeting_url": "https://meet.google.com/abc-defg-hij",
+      "status": "scheduled",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 50
+}
+```
+</ResponseExample>

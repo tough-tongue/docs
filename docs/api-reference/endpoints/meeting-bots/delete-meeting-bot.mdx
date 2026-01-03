@@ -1,0 +1,20 @@
+---
+title: "Delete Meeting Bot"
+api: "DELETE /v2/meeting-bots/{bot_id}"
+description: "Cancel a scheduled meeting bot"
+---
+
+Delete a scheduled meeting bot before it joins the call.
+Only bots with `pending` or `scheduled` status can be deleted.
+
+<ParamField path="bot_id" type="string" required>
+  The unique identifier of the bot to delete
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "deleted": true
+}
+```
+</ResponseExample>

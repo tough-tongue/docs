@@ -1,0 +1,24 @@
+---
+title: "List Featured Scenarios"
+api: "GET /featured-scenarios"
+description: "List all public and featured scenarios"
+---
+
+Returns globally featured scenarios. This endpoint returns public scenarios that
+have been marked as featured and cannot be used with org context.
+
+<ResponseExample>
+```json 200
+{
+  "scenarios": [
+    {
+      "id": "scenario_abc123",
+      "name": "Customer Objection Handling",
+      "description": "Practice handling common customer objections",
+      "is_public": true,
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>

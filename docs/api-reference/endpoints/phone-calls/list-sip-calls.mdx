@@ -1,0 +1,55 @@
+---
+title: "List Phone Calls"
+api: "GET /v2/sip/calls"
+description: "List SIP phone call records"
+---
+
+List SIP call records with filtering and pagination.
+
+<ParamField query="status" type="string">
+  Filter by status: `pending`, `scheduled`, `in_call_recording`, `call_ended`, `failed`
+</ParamField>
+
+<ParamField query="scenario_id" type="string">
+  Filter by scenario ID
+</ParamField>
+
+<ParamField query="batch_id" type="string">
+  Filter by batch ID
+</ParamField>
+
+<ParamField query="from_date" type="string">
+  Filter from date (ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ)
+</ParamField>
+
+<ParamField query="to_date" type="string">
+  Filter to date (ISO format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ)
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Page number (starts at 1)
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Items per page (max 500)
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "calls": [
+    {
+      "id": "call_abc123",
+      "scenario_id": "scenario_xyz",
+      "phone_number": "+14155551234",
+      "status": "call_ended",
+      "duration_seconds": 180,
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "limit": 50
+}
+```
+</ResponseExample>

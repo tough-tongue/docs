@@ -99,20 +99,64 @@
               {
                 "group": "Scenarios",
                 "pages": [
-                  "api-reference/endpoints/list-scenarios",
-                  "api-reference/endpoints/create-scenario"
+                  "api-reference/endpoints/scenarios/list-scenarios",
+                  "api-reference/endpoints/scenarios/get-scenario",
+                  "api-reference/endpoints/scenarios/create-scenario",
+                  "api-reference/endpoints/scenarios/list-featured-scenarios"
                 ]
               },
               {
                 "group": "Sessions",
                 "pages": [
-                  "api-reference/endpoints/list-sessions",
-                  "api-reference/endpoints/analyze-session"
+                  "api-reference/endpoints/sessions/list-sessions",
+                  "api-reference/endpoints/sessions/get-session",
+                  "api-reference/endpoints/sessions/analyze-session",
+                  "api-reference/endpoints/sessions/list-sessions-v2"
                 ]
               },
               {
+                "group": "Collections",
+                "pages": [
+                  "api-reference/endpoints/collections/list-collections",
+                  "api-reference/endpoints/collections/get-collection"
+                ]
+              },
+              {
+                "group": "Meeting Bots",
+                "pages": [
+                  "api-reference/endpoints/meeting-bots/schedule-meeting-bot",
+                  "api-reference/endpoints/meeting-bots/list-meeting-bots",
+                  "api-reference/endpoints/meeting-bots/delete-meeting-bot"
+                ]
+              },
+              {
+                "group": "Phone Calls",
+                "pages": [
+                  "api-reference/endpoints/phone-calls/initiate-sip-call",
+                  "api-reference/endpoints/phone-calls/create-sip-batch",
+                  "api-reference/endpoints/phone-calls/list-sip-calls",
+                  "api-reference/endpoints/phone-calls/delete-sip-call"
+                ]
+              },
+              {
+                "group": "Billing",
+                "pages": [
+                  "api-reference/endpoints/billing/get-balance",
+                  "api-reference/endpoints/billing/list-purchases",
+                  "api-reference/endpoints/billing/list-subscriptions",
+                  "api-reference/endpoints/billing/create-checkout-session"
+                ]
+              },
+              {
+                "group": "Analytics",
+                "pages": ["api-reference/endpoints/analytics/get-analytics"]
+              },
+              {
                 "group": "Utilities",
-                "pages": ["api-reference/endpoints/test-token"]
+                "pages": [
+                  "api-reference/endpoints/utilities/test-token",
+                  "api-reference/endpoints/utilities/create-access-token"
+                ]
               }
             ]
           }

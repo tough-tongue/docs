@@ -1,0 +1,31 @@
+---
+title: "List Subscriptions"
+api: "GET /subscriptions"
+description: "List all subscriptions for your scenarios and collections"
+---
+
+Returns all active subscriptions for scenarios and collections you've created.
+
+<ParamField query="user_email" type="string">
+  Filter subscriptions by subscriber email
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "subscriptions": [
+    {
+      "id": "sub_abc123",
+      "scenario_id": "scenario_xyz",
+      "user_email": "subscriber@example.com",
+      "plan": "monthly",
+      "amount": 9.99,
+      "currency": "USD",
+      "status": "active",
+      "current_period_end": "2024-02-15T10:30:00Z",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>

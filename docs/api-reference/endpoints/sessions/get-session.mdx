@@ -1,0 +1,41 @@
+---
+title: "Get Session"
+api: "GET /sessions/{session_id}"
+description: "Get detailed session information including transcript and evaluation"
+---
+
+Retrieve detailed information about a specific session, including transcript
+and evaluation data.
+
+<ParamField path="session_id" type="string" required>
+  The unique identifier of the session
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "id": "session_abc123",
+  "scenario_id": "scenario_xyz",
+  "user_email": "user@example.com",
+  "duration_seconds": 180,
+  "status": "completed",
+  "created_at": "2024-01-15T10:30:00Z",
+  "transcript": [
+    {
+      "role": "ai",
+      "content": "Hello, how can I help you today?",
+      "timestamp": 0
+    },
+    {
+      "role": "user",
+      "content": "I'd like to discuss our product.",
+      "timestamp": 3
+    }
+  ],
+  "evaluation": {
+    "overall_score": 85,
+    "feedback": "Strong performance with room for improvement"
+  }
+}
+```
+</ResponseExample>

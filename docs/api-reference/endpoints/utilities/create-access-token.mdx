@@ -1,0 +1,39 @@
+---
+title: "Create Access Token"
+api: "POST /scenario-access-token"
+description: "Create a short-lived access token for embedding scenarios"
+---
+
+Create a Scenario Access Token (SAT) for embedding private scenarios in iframes.
+Tokens are valid for 1-24 hours.
+
+<ParamField body="scenario_id" type="string" required>
+  The scenario ID to create an access token for
+</ParamField>
+
+<ParamField body="duration_hours" type="integer" default="1">
+  Token validity duration (1-24 hours)
+</ParamField>
+
+<ParamField body="email" type="string">
+  Optional user email. For org context, must be format `*@ORG-ID.toughtongueai.com`
+</ParamField>
+
+<RequestExample>
+```json
+{
+  "scenario_id": "scenario_abc123",
+  "duration_hours": 4
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "access_token": "sat_xxxxxx",
+  "expires_at": "2024-01-15T14:30:00Z",
+  "scenario_id": "scenario_abc123"
+}
+```
+</ResponseExample>

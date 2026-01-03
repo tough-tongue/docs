@@ -1,0 +1,25 @@
+---
+title: "Get Scenario"
+api: "GET /scenarios/{scenario_id}"
+description: "Get detailed information about a specific scenario"
+---
+
+Retrieve details for a scenario you own or have access to.
+
+<ParamField path="scenario_id" type="string" required>
+  The unique identifier of the scenario
+</ParamField>
+
+<ResponseExample>
+```json 200
+{
+  "id": "scenario_abc123",
+  "name": "Sales Cold Call",
+  "description": "Practice pitching to VPs",
+  "ai_instructions": "You are a VP of Engineering who is skeptical...",
+  "is_public": true,
+  "is_recording": true,
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+</ResponseExample>

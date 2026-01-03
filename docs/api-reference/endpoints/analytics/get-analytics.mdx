@@ -1,0 +1,66 @@
+---
+title: "Get Analytics"
+api: "GET /v2/analytics"
+description: "Get unified analytics data"
+---
+
+Get comprehensive analytics data in a single API call.
+Supports both personal and organization-wide views.
+
+<ParamField query="is_org_wide" type="boolean" default="false">
+  Toggle between personal and org-wide view. Org view requires EDIT or OWNER role.
+</ParamField>
+
+<ParamField query="start_date" type="string">
+  Filter analytics from this date (default: 90 days ago)
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Filter analytics until this date (default: today)
+</ParamField>
+
+**Personal view** returns:
+- Scenario statistics (usage, scores)
+
+**Org view** additionally returns:
+- Organization dashboard (time series, usage summary)
+- Wallet balance
+- Member usage breakdown
+
+<ResponseExample>
+```json 200
+{
+  "scenario_stats": [
+    {
+      "scenario_id": "scenario_abc123",
+      "scenario_name": "Sales Training",
+      "session_count": 45,
+      "avg_score": 78.5,
+      "total_duration_minutes": 120
+    }
+  ],
+  "org_dashboard": {
+    "time_series": [
+      {
+        "date": "2024-01-15",
+        "session_count": 5,
+        "unique_users": 3
+      }
+    ],
+    "usage_summary": {
+      "total_sessions": 45,
+      "total_users": 12,
+      "avg_session_duration": 180
+    },
+    "wallet_balance": 150.00
+  },
+  "member_usage": [
+    {
+      "email": "member@company.com",
+      "session_count": 10,
+      "avg_score": 82.0
+    }
+  ]
+}
+```
+</ResponseExample>
