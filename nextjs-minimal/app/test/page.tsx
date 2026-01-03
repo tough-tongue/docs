@@ -1,3 +1,16 @@
+/**
+ * Personality Test Page
+ *
+ * Allows users to take the MBTI personality assessment via ToughTongue AI iframe.
+ * Handles session lifecycle events (start, stop, submit, terminate) and stores
+ * session data in the Zustand store.
+ *
+ * Flow:
+ * 1. Landing view - prompt to start or view existing results
+ * 2. Iframe view - embedded ToughTongue AI assessment
+ * 3. Completion view - success message with link to results
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,17 +18,19 @@ import { useAuth } from "@/app/auth/AuthContext";
 import { AuthGuard } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/PageHeader";
+import { TTAIIframe } from "@/components/TTAIIframe";
 import { buildPersonalityTestUrl, createIframeEventListener, SCENARIOS } from "@/lib/ttai";
 import { useAppStore } from "@/lib/store";
 import { ROUTES } from "@/lib/constants";
 import { CheckCircle2, Play, Brain, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+/** Main content component - handles test state and iframe events */
 function TestContent() {
   const { getUserName, getUserEmail } = useAuth();
   const [showTest, setShowTest] = useState(false);
   const [testCompleted, setTestCompleted] = useState(false);
-  const [lastSessionId, setLastSessionId] = useState<string | null>(null);
 
   // Store
   const assessmentSessions = useAppStore((s) => s.assessmentSessions);
@@ -37,7 +52,6 @@ function TestContent() {
           created_at: new Date().toISOString(),
           status: "active",
         });
-        setLastSessionId(event.data.session_id);
       },
       onStop: (event) => {
         console.log("Session stopped:", event.data.session_id);
@@ -46,7 +60,6 @@ function TestContent() {
           duration: event.data.duration_seconds,
           status: "completed",
         });
-        setLastSessionId(event.data.session_id);
       },
       onTerminated: (event) => {
         console.log("Session terminated:", event.data.session_id);
@@ -55,7 +68,6 @@ function TestContent() {
           duration: event.data.duration_seconds,
           status: "terminated",
         });
-        setLastSessionId(event.data.session_id);
         setShowTest(false);
         setTestCompleted(true);
       },
@@ -77,81 +89,117 @@ function TestContent() {
     userEmail: getUserEmail(),
   });
 
-  // Test completed - show success and link to results
   if (testCompleted) {
     return (
-      <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[60vh]">
-        <Card className="max-w-lg w-full bg-card border-green-500/30">
-          <CardHeader className="text-center">
-            <CheckCircle2 className="mx-auto h-16 w-16 text-green-400 mb-4" />
-            <CardTitle className="text-2xl text-green-400">Test Completed!</CardTitle>
-            <CardDescription className="text-green-300/80">
-              Your session has been recorded. View your results to see your personality type.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Link href={ROUTES.RESULTS}>
-              <Button className="w-full bg-teal-600 hover:bg-teal-700">
-                View Results
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setTestCompleted(false);
-                setShowTest(true);
-              }}
-            >
-              Take Another Test
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <TestCompletedView
+        onRetake={() => {
+          setTestCompleted(false);
+          setShowTest(true);
+        }}
+      />
     );
   }
 
-  // Show the test iframe
   if (showTest) {
-    return (
-      <div className="flex flex-col h-[calc(100vh-4rem)]">
-        {/* Header */}
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">MBTI Personality Assessment</h1>
-            <p className="text-muted-foreground text-sm">
-              Complete the assessment to discover your type
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => setShowTest(false)}>
-            Cancel
-          </Button>
-        </div>
-
-        {/* Iframe - full remaining height */}
-        <div className="flex-1 container mx-auto px-4 pb-4">
-          <iframe
-            src={iframeUrl}
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            allow="microphone; camera; display-capture"
-            className="rounded-lg border border-border shadow-lg shadow-teal-500/5"
-          />
-        </div>
-      </div>
-    );
+    return <TestIframeView iframeUrl={iframeUrl} onCancel={() => setShowTest(false)} />;
   }
 
-  // Landing - prompt to start test
+  return (
+    <TestLandingView
+      hasExistingSessions={hasExistingSessions}
+      sessionCount={assessmentSessions.length}
+      onStartTest={() => setShowTest(true)}
+    />
+  );
+}
+
+export default function TestPage() {
+  return (
+    <AuthGuard
+      title="Sign In to Take the Test"
+      description="Create an account to save your personality test results"
+    >
+      <TestContent />
+    </AuthGuard>
+  );
+}
+
+// =============================================================================
+// Test Completed View
+// =============================================================================
+
+function TestCompletedView({ onRetake }: { onRetake: () => void }) {
+  return (
+    <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[60vh]">
+      <Card className="max-w-lg w-full bg-card border-green-500/30">
+        <CardHeader className="text-center">
+          <CheckCircle2 className="mx-auto h-16 w-16 text-green-400 mb-4" />
+          <CardTitle className="text-2xl text-green-400">Test Completed!</CardTitle>
+          <CardDescription className="text-green-300/80">
+            Your session has been recorded. View your results to see your personality type.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <Link href={ROUTES.RESULTS}>
+            <Button className="w-full bg-teal-600 hover:bg-teal-700">
+              View Results
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+          <Button variant="outline" onClick={onRetake}>
+            Take Another Test
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// =============================================================================
+// Test Iframe View
+// =============================================================================
+
+function TestIframeView({ iframeUrl, onCancel }: { iframeUrl: string; onCancel: () => void }) {
+  return (
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">MBTI Personality Assessment</h1>
+          <p className="text-muted-foreground text-sm">
+            Complete the assessment to discover your type
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
+
+      <div className="flex-1 container mx-auto px-4 pb-4">
+        <TTAIIframe src={iframeUrl} />
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// Test Landing View
+// =============================================================================
+
+function TestLandingView({
+  hasExistingSessions,
+  sessionCount,
+  onStartTest,
+}: {
+  hasExistingSessions: boolean;
+  sessionCount: number;
+  onStartTest: () => void;
+}) {
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-foreground">MBTI Personality Assessment</h1>
-        <p className="text-muted-foreground">
-          Take our AI-powered personality test to discover your MBTI type
-        </p>
-      </div>
+      <PageHeader
+        title="MBTI Personality Assessment"
+        description="Take our AI-powered personality test to discover your MBTI type"
+      />
 
       <Card className="max-w-lg mx-auto bg-card border-border">
         <CardHeader className="text-center">
@@ -163,18 +211,14 @@ function TestContent() {
           </CardTitle>
           <CardDescription>
             {hasExistingSessions
-              ? `You have ${assessmentSessions.length} previous session${
-                  assessmentSessions.length > 1 ? "s" : ""
+              ? `You have ${sessionCount} previous session${
+                  sessionCount > 1 ? "s" : ""
                 }. Start a new assessment or view your results.`
               : "Have a conversation with our AI to uncover your unique personality type"}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <Button
-            onClick={() => setShowTest(true)}
-            size="lg"
-            className="w-full bg-teal-600 hover:bg-teal-700"
-          >
+          <Button onClick={onStartTest} size="lg" className="w-full bg-teal-600 hover:bg-teal-700">
             <Play className="h-5 w-5 mr-2" />
             {hasExistingSessions ? "Start New Test" : "Start Assessment"}
           </Button>
@@ -189,16 +233,5 @@ function TestContent() {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-export default function TestPage() {
-  return (
-    <AuthGuard
-      title="Sign In to Take the Test"
-      description="Create an account to save your personality test results"
-    >
-      <TestContent />
-    </AuthGuard>
   );
 }

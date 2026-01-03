@@ -1,10 +1,28 @@
+/**
+ * Results Page
+ *
+ * Displays personality assessment results and session history.
+ * Users can view, fetch, analyze, and mark sessions as their final assessment.
+ *
+ * Features:
+ * - Session listing with status indicators
+ * - Session detail fetching from API
+ * - AI-powered session analysis
+ * - Personality type and dimension display
+ * - Transcript viewing
+ * - Mark session as final assessment for coaching
+ */
+
 "use client";
 
 import { useState } from "react";
 import { AuthGuard } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppStore, type ReportCardItem } from "@/lib/store";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState } from "@/components/EmptyState";
+import { ErrorCard, LoadingCard } from "@/components/StatusCards";
+import { useAppStore, type SessionDetails, type ReportCardItem } from "@/lib/store";
 import { ROUTES } from "@/lib/constants";
 import {
   FileText,
@@ -22,7 +40,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// Map topic keys to readable labels
+// =============================================================================
+// Constants
+// =============================================================================
+
 const DIMENSION_LABELS: Record<string, { label: string; description: string }> = {
   extraversion_introversion: {
     label: "Energy Direction",
@@ -46,7 +67,11 @@ const DIMENSION_LABELS: Record<string, { label: string; description: string }> =
   },
 };
 
-/** Build assessment summary from evaluation results */
+// =============================================================================
+// Utility Functions
+// =============================================================================
+
+/** Builds a summary paragraph from the evaluation report card for coaching context */
 function buildAssessmentSummary(reportCard: ReportCardItem[]): string {
   const typeItem = reportCard.find((item) => item.topic === "personality_assessment");
   const dimensions = reportCard.filter((item) => item.topic !== "personality_assessment");
@@ -65,6 +90,35 @@ function buildAssessmentSummary(reportCard: ReportCardItem[]): string {
     typeItem.note?.split("\n")[0] || ""
   }`;
 }
+
+function getPersonalityData(reportCard?: ReportCardItem[]) {
+  if (!reportCard) return { type: null, typeNote: null, dimensions: [] };
+
+  const typeItem = reportCard.find((item) => item.topic === "personality_assessment");
+  const dimensions = reportCard.filter((item) => item.topic !== "personality_assessment");
+
+  return {
+    type: typeItem?.score_str || null,
+    typeNote: typeItem?.note || null,
+    dimensions,
+  };
+}
+
+function formatDuration(seconds?: number) {
+  if (!seconds) return "-";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${String(secs).padStart(2, "0")}`;
+}
+
+function formatDate(dateStr?: string) {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleString();
+}
+
+// =============================================================================
+// Main Component
+// =============================================================================
 
 function ResultsContent() {
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -101,7 +155,6 @@ function ResultsContent() {
       }
 
       const data = await response.json();
-
       updateSessionDetails(sessionId, {
         scenario_id: data.scenario_id,
         scenario_name: data.scenario_name,
@@ -139,7 +192,6 @@ function ResultsContent() {
         throw new Error(err.error || "Failed to analyze session");
       }
 
-      // Re-fetch session to get updated evaluation
       await fetchSession(sessionId);
     } catch (err) {
       console.error("Error analyzing session:", err);
@@ -153,513 +205,71 @@ function ResultsContent() {
     const session = sessionDetails[sessionId];
     if (!session?.evaluation_results?.report_card) return;
 
-    // Extract the MBTI type from report_card
     const typeItem = session.evaluation_results.report_card.find(
       (item) => item.topic === "personality_assessment"
     );
     const mbtiType = typeItem?.score_str || null;
-
     const summary = buildAssessmentSummary(session.evaluation_results.report_card);
     setUserPersonalityAssessment(mbtiType, summary, sessionId);
   };
 
-  const formatDuration = (seconds?: number) => {
-    if (!seconds) return "-";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${String(secs).padStart(2, "0")}`;
-  };
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return "-";
-    return new Date(dateStr).toLocaleString();
-  };
-
-  // Extract personality type and dimensions from report card
-  const getPersonalityData = (reportCard?: ReportCardItem[]) => {
-    if (!reportCard) return { type: null, dimensions: [] };
-
-    const typeItem = reportCard.find((item) => item.topic === "personality_assessment");
-    const dimensions = reportCard.filter((item) => item.topic !== "personality_assessment");
-
-    return {
-      type: typeItem?.score_str || null,
-      typeNote: typeItem?.note || null,
-      dimensions,
-    };
-  };
-
-  // No sessions
+  // Empty state
   if (assessmentSessions.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-foreground">Results</h1>
-          <p className="text-muted-foreground">View your personality assessment results</p>
-        </div>
-
-        <Card className="max-w-lg mx-auto bg-card border-border">
-          <CardHeader className="text-center">
-            <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <CardTitle>No Sessions Yet</CardTitle>
-            <CardDescription>Take a personality test to see your results here</CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <Link href={ROUTES.TEST}>
-              <Button className="bg-teal-600 hover:bg-teal-700">
-                <Play className="h-4 w-4 mr-2" />
-                Take the Test
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        <PageHeader title="Results" description="View your personality assessment results" />
+        <EmptyState
+          icon={FileText}
+          title="No Sessions Yet"
+          description="Take a personality test to see your results here"
+        >
+          <Link href={ROUTES.TEST}>
+            <Button className="bg-teal-600 hover:bg-teal-700">
+              <Play className="h-4 w-4 mr-2" />
+              Take the Test
+            </Button>
+          </Link>
+        </EmptyState>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-foreground">Results</h1>
-        <p className="text-muted-foreground">View your personality assessment results</p>
-      </div>
+      <PageHeader title="Results" description="View your personality assessment results" />
 
-      {/* Sessions Table */}
-      <Card className="mb-6 bg-card border-border">
-        <CardHeader>
-          <CardTitle>Sessions</CardTitle>
-          <CardDescription>
-            {assessmentSessions.length} session{assessmentSessions.length > 1 ? "s" : ""} recorded
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 px-2 text-muted-foreground font-medium">
-                    Session ID
-                  </th>
-                  <th className="text-left py-2 px-2 text-muted-foreground font-medium">Created</th>
-                  <th className="text-left py-2 px-2 text-muted-foreground font-medium">
-                    Duration
-                  </th>
-                  <th className="text-left py-2 px-2 text-muted-foreground font-medium">Status</th>
-                  <th className="text-left py-2 px-2 text-muted-foreground font-medium">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {assessmentSessions.map((id) => {
-                  const details = sessionDetails[id];
-                  const isSelected = selectedSessionId === id;
-                  const isAnalyzed = !!details?.evaluation_results;
-                  const isFinal = userPersonalitySessionId === id;
-                  return (
-                    <tr
-                      key={id}
-                      className={`border-b border-border/50 cursor-pointer hover:bg-muted/50 ${
-                        isSelected ? "bg-teal-500/10" : ""
-                      }`}
-                      onClick={() => setSelectedSessionId(id)}
-                    >
-                      <td className="py-2 px-2">
-                        <div className="flex items-center gap-2">
-                          {isFinal ? (
-                            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                          ) : null}
-                          <code className="text-xs font-mono break-all">{id}</code>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 w-6 p-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              copyToClipboard(id);
-                            }}
-                          >
-                            {copiedId === id ? (
-                              <CheckCircle className="h-3 w-3 text-green-400" />
-                            ) : (
-                              <Copy className="h-3 w-3" />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                      <td className="py-2 px-2 text-muted-foreground">
-                        {details?.created_at ? formatDate(details.created_at) : "-"}
-                      </td>
-                      <td className="py-2 px-2 text-muted-foreground">
-                        {formatDuration(details?.duration)}
-                      </td>
-                      <td className="py-2 px-2">
-                        {isFinal ? (
-                          <span className="flex items-center gap-1 text-yellow-400">
-                            <Star className="h-3 w-3 fill-yellow-400" />
-                            Final
-                          </span>
-                        ) : isAnalyzed ? (
-                          <span className="flex items-center gap-1 text-green-400">
-                            <CheckCircle className="h-4 w-4" />
-                            Analyzed
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">Pending</span>
-                        )}
-                      </td>
-                      <td className="py-2 px-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedSessionId(id);
-                            fetchSession(id);
-                          }}
-                          disabled={isFetching}
-                        >
-                          <Download className="h-3 w-3 mr-1" />
-                          Fetch
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      <SessionsTable
+        sessions={assessmentSessions}
+        sessionDetails={sessionDetails}
+        selectedSessionId={selectedSessionId}
+        userPersonalitySessionId={userPersonalitySessionId}
+        copiedId={copiedId}
+        isFetching={isFetching}
+        onSelectSession={setSelectedSessionId}
+        onFetchSession={fetchSession}
+        onCopyId={copyToClipboard}
+      />
 
-      {/* Error */}
-      {error ? (
-        <Card className="mb-6 border-red-500/30 bg-red-500/10">
-          <CardHeader>
-            <CardTitle className="text-red-400 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              Error
-            </CardTitle>
-            <CardDescription className="text-red-300/80">{error}</CardDescription>
-          </CardHeader>
-        </Card>
-      ) : null}
+      {error ? <ErrorCard message={error} /> : null}
+      {isFetching ? <LoadingCard message="Fetching Session..." /> : null}
 
-      {/* Loading */}
-      {isFetching ? (
-        <Card className="mb-6 border-blue-500/30 bg-blue-500/10">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
-              <CardTitle className="text-blue-400">Fetching Session...</CardTitle>
-            </div>
-          </CardHeader>
-        </Card>
-      ) : null}
-
-      {/* Selected Session Details */}
       {selectedSessionId && selectedSession ? (
-        <div className="space-y-6">
-          {/* Session Info */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <CardTitle>Session Details</CardTitle>
-                  <CardDescription className="font-mono text-xs mt-1">
-                    {selectedSessionId}
-                  </CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  {selectedSession.evaluation_results?.report_card ? (
-                    <Button
-                      onClick={() => markAsFinalAssessment(selectedSessionId)}
-                      variant={
-                        userPersonalitySessionId === selectedSessionId ? "secondary" : "outline"
-                      }
-                      disabled={userPersonalitySessionId === selectedSessionId}
-                    >
-                      <Star
-                        className={`h-4 w-4 mr-2 ${
-                          userPersonalitySessionId === selectedSessionId
-                            ? "fill-yellow-400 text-yellow-400"
-                            : ""
-                        }`}
-                      />
-                      {userPersonalitySessionId === selectedSessionId
-                        ? "Final Assessment"
-                        : "Mark as Final"}
-                    </Button>
-                  ) : null}
-                  {!selectedSession.evaluation_results ? (
-                    <Button
-                      onClick={() => analyzeSession(selectedSessionId)}
-                      disabled={isAnalyzing}
-                      className="bg-teal-600 hover:bg-teal-700"
-                    >
-                      {isAnalyzing ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Analyzing...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-4 w-4 mr-2" />
-                          Analyze Session
-                        </>
-                      )}
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">User</p>
-                  <p className="font-medium text-foreground">{selectedSession.user_name || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Duration</p>
-                  <p className="font-medium text-foreground">
-                    {formatDuration(selectedSession.duration)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Status</p>
-                  <p className="font-medium text-foreground capitalize">
-                    {selectedSession.status || "-"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Completed</p>
-                  <p className="font-medium text-foreground">
-                    {selectedSession.completed_at
-                      ? new Date(selectedSession.completed_at).toLocaleDateString()
-                      : "-"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Personality Assessment Results */}
-          {selectedSession.evaluation_results?.report_card ? (
-            <>
-              {/* Personality Type Hero */}
-              {(() => {
-                const { type, typeNote, dimensions } = getPersonalityData(
-                  selectedSession.evaluation_results?.report_card
-                );
-                return (
-                  <>
-                    {/* Main Personality Type Card */}
-                    {type ? (
-                      <Card className="bg-gradient-to-br from-teal-500/20 to-cyan-500/10 border-teal-500/30">
-                        <CardHeader className="text-center pb-4">
-                          <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-teal-500/20 flex items-center justify-center">
-                            <User className="h-10 w-10 text-teal-400" />
-                          </div>
-                          <CardTitle className="text-4xl font-bold text-teal-400">{type}</CardTitle>
-                          <CardDescription className="text-lg mt-2">
-                            Your Personality Type
-                          </CardDescription>
-                        </CardHeader>
-                        {typeNote ? (
-                          <CardContent>
-                            <p className="text-sm text-muted-foreground text-center max-w-2xl mx-auto">
-                              {typeNote.split("\n")[0].replace(/^Based on the conversation, /, "")}
-                            </p>
-                          </CardContent>
-                        ) : null}
-                      </Card>
-                    ) : null}
-
-                    {/* Four Dimensions */}
-                    {dimensions.length > 0 ? (
-                      <Card className="bg-card border-border">
-                        <CardHeader>
-                          <CardTitle>Your Personality Dimensions</CardTitle>
-                          <CardDescription>
-                            How you scored across the four MBTI dimensions
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid gap-4 md:grid-cols-2">
-                            {dimensions.map((item) => {
-                              const info = DIMENSION_LABELS[item.topic] || {
-                                label: item.topic,
-                                description: "",
-                              };
-                              return (
-                                <div
-                                  key={item.topic}
-                                  className="p-4 rounded-lg bg-background border border-border"
-                                >
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div>
-                                      <p className="text-sm text-muted-foreground">{info.label}</p>
-                                      <p className="text-xl font-semibold text-teal-400">
-                                        {item.score_str}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <p className="text-xs text-muted-foreground">
-                                    {info.description}
-                                  </p>
-                                  <details className="mt-3">
-                                    <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                                      View details
-                                    </summary>
-                                    <p className="mt-2 text-sm text-muted-foreground">
-                                      {item.note}
-                                    </p>
-                                  </details>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ) : null}
-                  </>
-                );
-              })()}
-            </>
-          ) : null}
-
-          {/* Strengths & Areas for Growth */}
-          {selectedSession.evaluation_results?.strengths ||
-          selectedSession.evaluation_results?.weaknesses ? (
-            <div className="grid gap-6 md:grid-cols-2">
-              {selectedSession.evaluation_results.strengths ? (
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-green-400">
-                      <CheckCircle className="h-5 w-5" />
-                      Key Strengths
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {selectedSession.evaluation_results.strengths
-                        .replace(/####.*?\n/g, "")
-                        .replace(/\*\*(.*?)\*\*/g, "$1")
-                        .replace(/- /g, "• ")
-                        .trim()}
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : null}
-
-              {selectedSession.evaluation_results.weaknesses ? (
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-orange-400">
-                      <AlertCircle className="h-5 w-5" />
-                      Areas for Growth
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {selectedSession.evaluation_results.weaknesses
-                        .replace(/####.*?\n/g, "")
-                        .replace(/\*\*(.*?)\*\*/g, "$1")
-                        .replace(/- /g, "• ")
-                        .trim()}
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : null}
-            </div>
-          ) : null}
-
-          {/* Transcript Accordion */}
-          {selectedSession.finalized_transcript ? (
-            <Card className="bg-card border-border">
-              <CardHeader
-                className="cursor-pointer"
-                onClick={() => setTranscriptOpen(!transcriptOpen)}
-              >
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    {transcriptOpen ? (
-                      <ChevronDown className="h-5 w-5" />
-                    ) : (
-                      <ChevronRight className="h-5 w-5" />
-                    )}
-                    Conversation Transcript
-                  </CardTitle>
-                  <span className="text-sm text-muted-foreground">
-                    Click to {transcriptOpen ? "collapse" : "expand"}
-                  </span>
-                </div>
-              </CardHeader>
-              {transcriptOpen ? (
-                <CardContent>
-                  <div className="max-h-96 overflow-y-auto space-y-2">
-                    {selectedSession.finalized_transcript.split("\n\n").map((line, i) => {
-                      const isAI = line.includes("] AI:");
-                      const isUser = line.includes("] User:");
-                      if (!isAI && !isUser) return null;
-
-                      const match = line.match(/\[(.*?)\] (AI|User): (.*)/);
-                      if (!match) return null;
-
-                      const [, timestamp, role, content] = match;
-
-                      return (
-                        <div
-                          key={i}
-                          className={`p-3 rounded-lg text-sm ${
-                            isAI
-                              ? "bg-teal-500/10 border border-teal-500/20"
-                              : "bg-background border border-border"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <span
-                              className={`text-xs font-medium ${
-                                isAI ? "text-teal-400" : "text-muted-foreground"
-                              }`}
-                            >
-                              {role === "AI" ? "Dr. Sarah Chen" : "You"}
-                            </span>
-                            <span className="text-xs text-muted-foreground">{timestamp}</span>
-                          </div>
-                          <p className="text-foreground">{content}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              ) : null}
-            </Card>
-          ) : null}
-
-          {/* Raw Data */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle>Raw Data</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <details>
-                <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-                  View raw JSON
-                </summary>
-                <pre className="mt-4 overflow-x-auto rounded-lg bg-background p-4 text-xs text-muted-foreground border border-border">
-                  {JSON.stringify(selectedSession, null, 2)}
-                </pre>
-              </details>
-            </CardContent>
-          </Card>
-        </div>
+        <SessionDetailsView
+          sessionId={selectedSessionId}
+          session={selectedSession}
+          userPersonalitySessionId={userPersonalitySessionId}
+          isAnalyzing={isAnalyzing}
+          transcriptOpen={transcriptOpen}
+          onAnalyze={() => analyzeSession(selectedSessionId)}
+          onMarkAsFinal={() => markAsFinalAssessment(selectedSessionId)}
+          onToggleTranscript={() => setTranscriptOpen(!transcriptOpen)}
+        />
       ) : selectedSessionId ? (
-        <Card className="bg-card border-border">
-          <CardHeader className="text-center">
-            <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <CardTitle>Session Not Loaded</CardTitle>
-            <CardDescription>Click "Fetch" to load session details</CardDescription>
-          </CardHeader>
-        </Card>
+        <EmptyState
+          icon={FileText}
+          title="Session Not Loaded"
+          description='Click "Fetch" to load session details'
+        />
       ) : null}
     </div>
   );
@@ -673,5 +283,570 @@ export default function ResultsPage() {
     >
       <ResultsContent />
     </AuthGuard>
+  );
+}
+
+// =============================================================================
+// Sessions Table
+// =============================================================================
+
+/** Displays a table of assessment sessions with selection and fetch controls */
+function SessionsTable({
+  sessions,
+  sessionDetails,
+  selectedSessionId,
+  userPersonalitySessionId,
+  copiedId,
+  isFetching,
+  onSelectSession,
+  onFetchSession,
+  onCopyId,
+}: {
+  sessions: string[];
+  sessionDetails: Record<string, SessionDetails>;
+  selectedSessionId: string | null;
+  userPersonalitySessionId: string | null;
+  copiedId: string | null;
+  isFetching: boolean;
+  onSelectSession: (id: string) => void;
+  onFetchSession: (id: string) => void;
+  onCopyId: (id: string) => void;
+}) {
+  return (
+    <Card className="mb-6 bg-card border-border">
+      <CardHeader>
+        <CardTitle>Sessions</CardTitle>
+        <CardDescription>
+          {sessions.length} session{sessions.length > 1 ? "s" : ""} recorded
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left py-2 px-2 text-muted-foreground font-medium">
+                  Session ID
+                </th>
+                <th className="text-left py-2 px-2 text-muted-foreground font-medium">Created</th>
+                <th className="text-left py-2 px-2 text-muted-foreground font-medium">Duration</th>
+                <th className="text-left py-2 px-2 text-muted-foreground font-medium">Status</th>
+                <th className="text-left py-2 px-2 text-muted-foreground font-medium">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.map((id) => {
+                const details = sessionDetails[id];
+                const isSelected = selectedSessionId === id;
+                const isAnalyzed = !!details?.evaluation_results;
+                const isFinal = userPersonalitySessionId === id;
+
+                return (
+                  <SessionRow
+                    key={id}
+                    id={id}
+                    details={details}
+                    isSelected={isSelected}
+                    isAnalyzed={isAnalyzed}
+                    isFinal={isFinal}
+                    copiedId={copiedId}
+                    isFetching={isFetching}
+                    onSelect={() => onSelectSession(id)}
+                    onFetch={() => {
+                      onSelectSession(id);
+                      onFetchSession(id);
+                    }}
+                    onCopy={() => onCopyId(id)}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SessionRow({
+  id,
+  details,
+  isSelected,
+  isAnalyzed,
+  isFinal,
+  copiedId,
+  isFetching,
+  onSelect,
+  onFetch,
+  onCopy,
+}: {
+  id: string;
+  details?: SessionDetails;
+  isSelected: boolean;
+  isAnalyzed: boolean;
+  isFinal: boolean;
+  copiedId: string | null;
+  isFetching: boolean;
+  onSelect: () => void;
+  onFetch: () => void;
+  onCopy: () => void;
+}) {
+  return (
+    <tr
+      className={`border-b border-border/50 cursor-pointer hover:bg-muted/50 ${
+        isSelected ? "bg-teal-500/10" : ""
+      }`}
+      onClick={onSelect}
+    >
+      <td className="py-2 px-2">
+        <div className="flex items-center gap-2">
+          {isFinal ? <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" /> : null}
+          <code className="text-xs font-mono break-all">{id}</code>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCopy();
+            }}
+          >
+            {copiedId === id ? (
+              <CheckCircle className="h-3 w-3 text-green-400" />
+            ) : (
+              <Copy className="h-3 w-3" />
+            )}
+          </Button>
+        </div>
+      </td>
+      <td className="py-2 px-2 text-muted-foreground">
+        {details?.created_at ? formatDate(details.created_at) : "-"}
+      </td>
+      <td className="py-2 px-2 text-muted-foreground">{formatDuration(details?.duration)}</td>
+      <td className="py-2 px-2">
+        <SessionStatus isFinal={isFinal} isAnalyzed={isAnalyzed} />
+      </td>
+      <td className="py-2 px-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={(e) => {
+            e.stopPropagation();
+            onFetch();
+          }}
+          disabled={isFetching}
+        >
+          <Download className="h-3 w-3 mr-1" />
+          Fetch
+        </Button>
+      </td>
+    </tr>
+  );
+}
+
+function SessionStatus({ isFinal, isAnalyzed }: { isFinal: boolean; isAnalyzed: boolean }) {
+  if (isFinal) {
+    return (
+      <span className="flex items-center gap-1 text-yellow-400">
+        <Star className="h-3 w-3 fill-yellow-400" />
+        Final
+      </span>
+    );
+  }
+  if (isAnalyzed) {
+    return (
+      <span className="flex items-center gap-1 text-green-400">
+        <CheckCircle className="h-4 w-4" />
+        Analyzed
+      </span>
+    );
+  }
+  return <span className="text-muted-foreground">Pending</span>;
+}
+
+// =============================================================================
+// Session Details View
+// =============================================================================
+
+function SessionDetailsView({
+  sessionId,
+  session,
+  userPersonalitySessionId,
+  isAnalyzing,
+  transcriptOpen,
+  onAnalyze,
+  onMarkAsFinal,
+  onToggleTranscript,
+}: {
+  sessionId: string;
+  session: SessionDetails;
+  userPersonalitySessionId: string | null;
+  isAnalyzing: boolean;
+  transcriptOpen: boolean;
+  onAnalyze: () => void;
+  onMarkAsFinal: () => void;
+  onToggleTranscript: () => void;
+}) {
+  const isFinal = userPersonalitySessionId === sessionId;
+
+  return (
+    <div className="space-y-6">
+      <SessionInfoCard
+        sessionId={sessionId}
+        session={session}
+        isFinal={isFinal}
+        isAnalyzing={isAnalyzing}
+        onAnalyze={onAnalyze}
+        onMarkAsFinal={onMarkAsFinal}
+      />
+
+      {session.evaluation_results?.report_card ? (
+        <PersonalityResultsSection reportCard={session.evaluation_results.report_card} />
+      ) : null}
+
+      <StrengthsWeaknessesSection evaluationResults={session.evaluation_results} />
+
+      {session.finalized_transcript ? (
+        <TranscriptAccordion
+          transcript={session.finalized_transcript}
+          isOpen={transcriptOpen}
+          onToggle={onToggleTranscript}
+        />
+      ) : null}
+
+      <RawDataCard data={session} />
+    </div>
+  );
+}
+
+// =============================================================================
+// Session Info Card
+// =============================================================================
+
+/** Displays session metadata with analyze and mark-as-final actions */
+function SessionInfoCard({
+  sessionId,
+  session,
+  isFinal,
+  isAnalyzing,
+  onAnalyze,
+  onMarkAsFinal,
+}: {
+  sessionId: string;
+  session: SessionDetails;
+  isFinal: boolean;
+  isAnalyzing: boolean;
+  onAnalyze: () => void;
+  onMarkAsFinal: () => void;
+}) {
+  const hasReportCard = !!session.evaluation_results?.report_card;
+  const needsAnalysis = !session.evaluation_results;
+
+  return (
+    <Card className="bg-card border-border">
+      <CardHeader>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <CardTitle>Session Details</CardTitle>
+            <CardDescription className="font-mono text-xs mt-1">{sessionId}</CardDescription>
+          </div>
+          <div className="flex gap-2">
+            {hasReportCard ? (
+              <Button
+                onClick={onMarkAsFinal}
+                variant={isFinal ? "secondary" : "outline"}
+                disabled={isFinal}
+              >
+                <Star
+                  className={`h-4 w-4 mr-2 ${isFinal ? "fill-yellow-400 text-yellow-400" : ""}`}
+                />
+                {isFinal ? "Final Assessment" : "Mark as Final"}
+              </Button>
+            ) : null}
+            {needsAnalysis ? (
+              <Button
+                onClick={onAnalyze}
+                disabled={isAnalyzing}
+                className="bg-teal-600 hover:bg-teal-700"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Analyze Session
+                  </>
+                )}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <InfoItem label="User" value={session.user_name || "-"} />
+          <InfoItem label="Duration" value={formatDuration(session.duration)} />
+          <InfoItem label="Status" value={session.status || "-"} capitalize />
+          <InfoItem
+            label="Completed"
+            value={session.completed_at ? new Date(session.completed_at).toLocaleDateString() : "-"}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function InfoItem({
+  label,
+  value,
+  capitalize,
+}: {
+  label: string;
+  value: string;
+  capitalize?: boolean;
+}) {
+  return (
+    <div>
+      <p className="text-muted-foreground">{label}</p>
+      <p className={`font-medium text-foreground ${capitalize ? "capitalize" : ""}`}>{value}</p>
+    </div>
+  );
+}
+
+// =============================================================================
+// Personality Results Section
+// =============================================================================
+
+function PersonalityResultsSection({ reportCard }: { reportCard: ReportCardItem[] }) {
+  const { type, typeNote, dimensions } = getPersonalityData(reportCard);
+
+  return (
+    <>
+      {type ? <PersonalityTypeCard type={type} typeNote={typeNote} /> : null}
+      {dimensions.length > 0 ? <DimensionsCard dimensions={dimensions} /> : null}
+    </>
+  );
+}
+
+function PersonalityTypeCard({ type, typeNote }: { type: string; typeNote: string | null }) {
+  return (
+    <Card className="bg-gradient-to-br from-teal-500/20 to-cyan-500/10 border-teal-500/30">
+      <CardHeader className="text-center pb-4">
+        <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-teal-500/20 flex items-center justify-center">
+          <User className="h-10 w-10 text-teal-400" />
+        </div>
+        <CardTitle className="text-4xl font-bold text-teal-400">{type}</CardTitle>
+        <CardDescription className="text-lg mt-2">Your Personality Type</CardDescription>
+      </CardHeader>
+      {typeNote ? (
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center max-w-2xl mx-auto">
+            {typeNote.split("\n")[0].replace(/^Based on the conversation, /, "")}
+          </p>
+        </CardContent>
+      ) : null}
+    </Card>
+  );
+}
+
+function DimensionsCard({ dimensions }: { dimensions: ReportCardItem[] }) {
+  return (
+    <Card className="bg-card border-border">
+      <CardHeader>
+        <CardTitle>Your Personality Dimensions</CardTitle>
+        <CardDescription>How you scored across the four MBTI dimensions</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-4 md:grid-cols-2">
+          {dimensions.map((item) => (
+            <DimensionItem key={item.topic} item={item} />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DimensionItem({ item }: { item: ReportCardItem }) {
+  const info = DIMENSION_LABELS[item.topic] || { label: item.topic, description: "" };
+
+  return (
+    <div className="p-4 rounded-lg bg-background border border-border">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <p className="text-sm text-muted-foreground">{info.label}</p>
+          <p className="text-xl font-semibold text-teal-400">{item.score_str}</p>
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">{info.description}</p>
+      <details className="mt-3">
+        <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+          View details
+        </summary>
+        <p className="mt-2 text-sm text-muted-foreground">{item.note}</p>
+      </details>
+    </div>
+  );
+}
+
+// =============================================================================
+// Strengths & Weaknesses Section
+// =============================================================================
+
+/** Displays strengths and areas for growth from evaluation results */
+function StrengthsWeaknessesSection({
+  evaluationResults,
+}: {
+  evaluationResults?: SessionDetails["evaluation_results"];
+}) {
+  if (!evaluationResults?.strengths && !evaluationResults?.weaknesses) return null;
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      {evaluationResults.strengths ? (
+        <FeedbackCard
+          title="Key Strengths"
+          content={evaluationResults.strengths}
+          icon={<CheckCircle className="h-5 w-5" />}
+          color="green"
+        />
+      ) : null}
+      {evaluationResults.weaknesses ? (
+        <FeedbackCard
+          title="Areas for Growth"
+          content={evaluationResults.weaknesses}
+          icon={<AlertCircle className="h-5 w-5" />}
+          color="orange"
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function FeedbackCard({
+  title,
+  content,
+  icon,
+  color,
+}: {
+  title: string;
+  content: string;
+  icon: React.ReactNode;
+  color: "green" | "orange";
+}) {
+  const colorClass = color === "green" ? "text-green-400" : "text-orange-400";
+  const formattedContent = content
+    .replace(/####.*?\n/g, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/- /g, "• ")
+    .trim();
+
+  return (
+    <Card className="bg-card border-border">
+      <CardHeader>
+        <CardTitle className={`flex items-center gap-2 ${colorClass}`}>
+          {icon}
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-sm text-muted-foreground whitespace-pre-wrap">{formattedContent}</div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// =============================================================================
+// Transcript Accordion
+// =============================================================================
+
+function TranscriptAccordion({
+  transcript,
+  isOpen,
+  onToggle,
+}: {
+  transcript: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <Card className="bg-card border-border">
+      <CardHeader className="cursor-pointer" onClick={onToggle}>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            {isOpen ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+            Conversation Transcript
+          </CardTitle>
+          <span className="text-sm text-muted-foreground">
+            Click to {isOpen ? "collapse" : "expand"}
+          </span>
+        </div>
+      </CardHeader>
+      {isOpen ? (
+        <CardContent>
+          <div className="max-h-96 overflow-y-auto space-y-2">
+            {transcript.split("\n\n").map((line, i) => (
+              <TranscriptLine key={i} line={line} />
+            ))}
+          </div>
+        </CardContent>
+      ) : null}
+    </Card>
+  );
+}
+
+function TranscriptLine({ line }: { line: string }) {
+  const isAI = line.includes("] AI:");
+  const isUser = line.includes("] User:");
+  if (!isAI && !isUser) return null;
+
+  const match = line.match(/\[(.*?)\] (AI|User): (.*)/);
+  if (!match) return null;
+
+  const [, timestamp, role, content] = match;
+
+  return (
+    <div
+      className={`p-3 rounded-lg text-sm ${
+        isAI ? "bg-teal-500/10 border border-teal-500/20" : "bg-background border border-border"
+      }`}
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <span className={`text-xs font-medium ${isAI ? "text-teal-400" : "text-muted-foreground"}`}>
+          {role === "AI" ? "Dr. Sarah Chen" : "You"}
+        </span>
+        <span className="text-xs text-muted-foreground">{timestamp}</span>
+      </div>
+      <p className="text-foreground">{content}</p>
+    </div>
+  );
+}
+
+// =============================================================================
+// Raw Data Card
+// =============================================================================
+
+/** Expandable card showing raw JSON session data for debugging */
+function RawDataCard({ data }: { data: SessionDetails }) {
+  return (
+    <Card className="bg-card border-border">
+      <CardHeader>
+        <CardTitle>Raw Data</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <details>
+          <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+            View raw JSON
+          </summary>
+          <pre className="mt-4 overflow-x-auto rounded-lg bg-background p-4 text-xs text-muted-foreground border border-border">
+            {JSON.stringify(data, null, 2)}
+          </pre>
+        </details>
+      </CardContent>
+    </Card>
   );
 }

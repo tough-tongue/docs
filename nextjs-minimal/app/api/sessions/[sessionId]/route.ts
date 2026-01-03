@@ -1,6 +1,19 @@
+/**
+ * GET /api/sessions/[sessionId] - Single Session Endpoint
+ *
+ * Returns detailed information about a specific training session.
+ *
+ * Path Parameters:
+ *   - sessionId: The unique identifier of the session
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, ToughTongueError } from "../../ttai/client";
 
+/**
+ * Fetches a single session by its ID.
+ * @returns JSON with session details including status, duration, and timestamps
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }

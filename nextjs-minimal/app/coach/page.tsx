@@ -1,3 +1,16 @@
+/**
+ * Personality Coach Page
+ *
+ * AI-powered coaching sessions based on the user's personality assessment.
+ * Requires a finalized personality assessment before coaching can begin.
+ * Passes the user's personality profile to the coach via dynamic variables.
+ *
+ * Flow:
+ * 1. Assessment required - prompts user to complete and mark a final assessment
+ * 2. Landing view - shows personality profile and start coaching button
+ * 3. Iframe view - embedded ToughTongue AI coaching session
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,12 +18,15 @@ import { useAuth } from "@/app/auth/AuthContext";
 import { AuthGuard } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/PageHeader";
+import { TTAIIframe } from "@/components/TTAIIframe";
 import { buildCoachUrl, createIframeEventListener, SCENARIOS } from "@/lib/ttai";
 import { useAppStore } from "@/lib/store";
 import { AlertCircle, MessageCircle, Loader2, Play, Star, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 
+/** Main content component - handles coaching state and iframe events */
 function CoachContent() {
   const { getUserName, getUserEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -78,128 +94,177 @@ function CoachContent() {
   });
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <Loader2 className="mx-auto h-8 w-8 animate-spin text-teal-500" />
-        <p className="mt-4 text-muted-foreground">Loading...</p>
-      </div>
-    );
+    return <LoadingView />;
   }
 
-  // No assessment - prompt to select one
   if (!hasAssessment) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-[70vh] flex flex-col items-center justify-center">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-foreground">Personality Coach</h1>
-          <p className="text-muted-foreground">
-            Talk to your AI coach about personality insights and growth
-          </p>
-        </div>
-
-        <Card className="max-w-lg w-full bg-card border-yellow-500/30">
-          <CardHeader className="text-center">
-            <AlertCircle className="mx-auto h-12 w-12 text-yellow-400 mb-4" />
-            <CardTitle className="text-yellow-400">Assessment Required</CardTitle>
-            <CardDescription>
-              To get personalized coaching, you need to complete a personality assessment first and
-              mark it as your final result.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-              <p className="text-sm text-yellow-300/80">
-                <strong>How it works:</strong>
-                <br />
-                1. Take the personality test on the Test page
-                <br />
-                2. View and analyze your results
-                <br />
-                3. Click "Mark as Final" on the session you want to use
-                <br />
-                4. Return here to start coaching
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Link href={ROUTES.TEST} className="flex-1">
-                <Button className="w-full bg-teal-600 hover:bg-teal-700">
-                  <Play className="h-4 w-4 mr-2" />
-                  Take Test
-                </Button>
-              </Link>
-              <Link href={ROUTES.RESULTS} className="flex-1">
-                <Button variant="outline" className="w-full">
-                  View Results
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <AssessmentRequiredView />;
   }
 
-  // Show coach interface - when showing iframe, use full height layout
   if (showCoach) {
     return (
-      <div className="flex flex-col h-[calc(100vh-4rem)]">
-        {/* Header */}
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Your Personality Coach</h1>
-            <p className="text-muted-foreground text-sm">
-              {userPersonalityType
-                ? `Talk to your coach to explore how to leverage your ${userPersonalityType} personality`
-                : "Talk to your AI coach about personality insights and growth"}
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => setShowCoach(false)}>
-            End Session
-          </Button>
-        </div>
-
-        {/* Iframe - full remaining height */}
-        <div className="flex-1 container mx-auto px-4 pb-4">
-          <iframe
-            src={iframeUrl}
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            allow="microphone; camera; display-capture"
-            className="rounded-lg border border-border shadow-lg shadow-teal-500/5"
-          />
-        </div>
-      </div>
+      <CoachIframeView
+        iframeUrl={iframeUrl}
+        personalityType={userPersonalityType}
+        onEndSession={() => setShowCoach(false)}
+      />
     );
   }
 
-  // Landing - show profile and start button
   return (
-    <div className="container mx-auto px-4 py-8">
+    <CoachLandingView
+      personalityType={userPersonalityType}
+      personalityAssessment={userPersonalityAssessment}
+      onStartCoach={() => setShowCoach(true)}
+    />
+  );
+}
+
+export default function CoachPage() {
+  return (
+    <AuthGuard title="Sign In for Coaching" description="Sign in to access personalized coaching">
+      <CoachContent />
+    </AuthGuard>
+  );
+}
+
+// =============================================================================
+// Loading View
+// =============================================================================
+
+function LoadingView() {
+  return (
+    <div className="container mx-auto px-4 py-20 text-center">
+      <Loader2 className="mx-auto h-8 w-8 animate-spin text-teal-500" />
+      <p className="mt-4 text-muted-foreground">Loading...</p>
+    </div>
+  );
+}
+
+// =============================================================================
+// Assessment Required View
+// =============================================================================
+
+function AssessmentRequiredView() {
+  return (
+    <div className="container mx-auto px-4 py-8 min-h-[70vh] flex flex-col items-center justify-center">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-foreground">Your Personality Coach</h1>
+        <h1 className="text-3xl font-bold mb-2 text-foreground">Personality Coach</h1>
         <p className="text-muted-foreground">
-          {userPersonalityType
-            ? `Talk to your coach to explore how to leverage your ${userPersonalityType} personality`
-            : "Talk to your AI coach about personality insights and growth"}
+          Talk to your AI coach about personality insights and growth
         </p>
       </div>
 
-      <Card className="mb-6 border-teal-500/30 bg-teal-500/10">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-            <CardTitle className="text-teal-400">Your Personality Profile</CardTitle>
-          </div>
-          <CardDescription className="text-teal-300/80">
-            Your coach will use this to provide personalized guidance
+      <Card className="max-w-lg w-full bg-card border-yellow-500/30">
+        <CardHeader className="text-center">
+          <AlertCircle className="mx-auto h-12 w-12 text-yellow-400 mb-4" />
+          <CardTitle className="text-yellow-400">Assessment Required</CardTitle>
+          <CardDescription>
+            To get personalized coaching, you need to complete a personality assessment first and
+            mark it as your final result.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-foreground leading-relaxed">{userPersonalityAssessment}</p>
+        <CardContent className="space-y-4">
+          <HowItWorksBox />
+          <div className="flex gap-3">
+            <Link href={ROUTES.TEST} className="flex-1">
+              <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                <Play className="h-4 w-4 mr-2" />
+                Take Test
+              </Button>
+            </Link>
+            <Link href={ROUTES.RESULTS} className="flex-1">
+              <Button variant="outline" className="w-full">
+                View Results
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function HowItWorksBox() {
+  return (
+    <div className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+      <p className="text-sm text-yellow-300/80">
+        <strong>How it works:</strong>
+        <br />
+        1. Take the personality test on the Test page
+        <br />
+        2. View and analyze your results
+        <br />
+        3. Click "Mark as Final" on the session you want to use
+        <br />
+        4. Return here to start coaching
+      </p>
+    </div>
+  );
+}
+
+// =============================================================================
+// Coach Iframe View
+// =============================================================================
+
+function CoachIframeView({
+  iframeUrl,
+  personalityType,
+  onEndSession,
+}: {
+  iframeUrl: string;
+  personalityType: string | null;
+  onEndSession: () => void;
+}) {
+  return (
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Your Personality Coach</h1>
+          <p className="text-muted-foreground text-sm">
+            {personalityType
+              ? `Talk to your coach to explore how to leverage your ${personalityType} personality`
+              : "Talk to your AI coach about personality insights and growth"}
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onEndSession}>
+          End Session
+        </Button>
+      </div>
+
+      <div className="flex-1 container mx-auto px-4 pb-4">
+        <TTAIIframe src={iframeUrl} />
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// Coach Landing View
+// =============================================================================
+
+function CoachLandingView({
+  personalityType,
+  personalityAssessment,
+  onStartCoach,
+}: {
+  personalityType: string | null;
+  personalityAssessment: string | null;
+  onStartCoach: () => void;
+}) {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <PageHeader
+        title="Your Personality Coach"
+        description={
+          personalityType
+            ? `Talk to your coach to explore how to leverage your ${personalityType} personality`
+            : "Talk to your AI coach about personality insights and growth"
+        }
+      />
+
+      <PersonalityProfileCard assessment={personalityAssessment} />
 
       <Card className="max-w-lg mx-auto bg-card border-border">
         <CardHeader className="text-center">
@@ -210,11 +275,7 @@ function CoachContent() {
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <Button
-            onClick={() => setShowCoach(true)}
-            size="lg"
-            className="bg-teal-600 hover:bg-teal-700"
-          >
+          <Button onClick={onStartCoach} size="lg" className="bg-teal-600 hover:bg-teal-700">
             <Play className="h-5 w-5 mr-2" />
             Start Coach Session
           </Button>
@@ -224,10 +285,23 @@ function CoachContent() {
   );
 }
 
-export default function CoachPage() {
+function PersonalityProfileCard({ assessment }: { assessment: string | null }) {
+  if (!assessment) return null;
+
   return (
-    <AuthGuard title="Sign In for Coaching" description="Sign in to access personalized coaching">
-      <CoachContent />
-    </AuthGuard>
+    <Card className="mb-6 border-teal-500/30 bg-teal-500/10">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+          <CardTitle className="text-teal-400">Your Personality Profile</CardTitle>
+        </div>
+        <CardDescription className="text-teal-300/80">
+          Your coach will use this to provide personalized guidance
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-foreground leading-relaxed">{assessment}</p>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,7 +1,22 @@
+/**
+ * GET /api/sessions - List Sessions Endpoint
+ *
+ * Returns a paginated list of training sessions from ToughTongue AI.
+ * Requires admin authentication via Bearer token.
+ *
+ * Query Parameters:
+ *   - scenario_id (optional): Filter sessions by scenario
+ *   - limit (optional): Max number of sessions to return
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { listSessions, ToughTongueError } from "../ttai/client";
 import { verifyAdminToken, unauthorizedResponse } from "@/lib/auth";
 
+/**
+ * Lists sessions with optional filtering by scenario and pagination.
+ * @returns JSON with `sessions` array containing session metadata
+ */
 export async function GET(request: NextRequest) {
   if (!verifyAdminToken(request)) return unauthorizedResponse();
 
