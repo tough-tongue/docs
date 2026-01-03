@@ -23,18 +23,94 @@ import {
   Check,
   Database,
   Save,
+  Trash2,
+  Key,
 } from "lucide-react";
 
 // =============================================================================
-// Types
+// Admin Token Input Component
 // =============================================================================
 
-interface AdminStats {
-  balance: Balance | null;
-  sessions: SessionListItem[];
-  isLoadingBalance: boolean;
-  isLoadingSessions: boolean;
-  error: string | null;
+function AdminTokenInput({
+  variant = "full",
+  onTokenSet,
+}: {
+  variant?: "full" | "compact";
+  onTokenSet?: () => void;
+}) {
+  const [input, setInput] = useState("");
+  const adminToken = useAppStore((s) => s.adminToken);
+  const setAdminToken = useAppStore((s) => s.setAdminToken);
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (input.trim()) {
+      setAdminToken(input.trim());
+      setInput("");
+      onTokenSet?.();
+    }
+  };
+
+  // Compact variant - just input + button inline
+  if (variant === "compact") {
+    return (
+      <div className="flex items-center gap-2">
+        <Input
+          type="password"
+          placeholder={adminToken ? "Change token..." : "Enter token"}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          className="w-40 h-8 text-sm"
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+        />
+        <Button size="sm" onClick={() => handleSubmit()} disabled={!input.trim()}>
+          <Key className="h-3 w-3 mr-1" />
+          {adminToken ? "Update" : "Set"}
+        </Button>
+      </div>
+    );
+  }
+
+  // Full variant - card with explanation
+  return (
+    <Card className="w-full max-w-md bg-card border-border">
+      <CardHeader>
+        <div className="flex items-center justify-center mb-4">
+          <div className="rounded-full bg-teal-500/20 p-3">
+            <Lock className="h-8 w-8 text-teal-400" />
+          </div>
+        </div>
+        <CardTitle className="text-center text-foreground">Admin Access</CardTitle>
+        <CardDescription className="text-center">
+          Enter your admin token to access the dashboard
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            type="password"
+            placeholder="Enter admin token"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <Button
+            type="submit"
+            className="w-full bg-teal-600 hover:bg-teal-700"
+            disabled={!input.trim()}
+          >
+            <Key className="h-4 w-4 mr-2" />
+            Set Admin Token
+          </Button>
+        </form>
+        <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+          <p className="text-sm text-yellow-400">
+            <AlertTriangle className="inline h-4 w-4 mr-1" />
+            Token is stored locally and sent with admin API requests.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 // =============================================================================
@@ -97,11 +173,17 @@ function getStatusIcon(status: string) {
 // =============================================================================
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [tokenInput, setTokenInput] = useState("");
-  const [loginError, setLoginError] = useState("");
+  const adminToken = useAppStore((s) => s.adminToken);
+  const clearAll = useAppStore((s) => s.clearAll);
+  const appStore = useAppStore();
 
-  const [stats, setStats] = useState<AdminStats>({
+  const [stats, setStats] = useState<{
+    balance: Balance | null;
+    sessions: SessionListItem[];
+    isLoadingBalance: boolean;
+    isLoadingSessions: boolean;
+    error: string | null;
+  }>({
     balance: null,
     sessions: [],
     isLoadingBalance: false,
@@ -116,10 +198,11 @@ export default function AdminPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Store editor state
-  const appStore = useAppStore();
   const [storeJson, setStoreJson] = useState("");
   const [storeError, setStoreError] = useState<string | null>(null);
   const [storeSaved, setStoreSaved] = useState(false);
+
+  const isAuthenticated = !!adminToken;
 
   // Initialize store JSON when authenticated
   useEffect(() => {
@@ -150,64 +233,53 @@ export default function AdminPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Check session storage for existing auth
-  useEffect(() => {
-    const authenticated = sessionStorage.getItem("admin_authenticated");
-    if (authenticated === "true") {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  // Fetch data when authenticated
+  // Fetch data
   const fetchBalance = useCallback(async () => {
+    if (!adminToken) return;
     setStats((prev) => ({ ...prev, isLoadingBalance: true, error: null }));
     try {
-      const response = await fetch("/api/balance");
-      if (!response.ok) throw new Error("Failed to fetch balance");
+      const response = await fetch("/api/balance", {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      if (!response.ok)
+        throw new Error(response.status === 401 ? "Invalid token" : "Failed to fetch");
       const data = await response.json();
-      // Validate response structure
       if (typeof data.available_minutes === "number") {
         setStats((prev) => ({ ...prev, balance: data as Balance, isLoadingBalance: false }));
-      } else {
-        throw new Error("Invalid balance response");
       }
-    } catch {
+    } catch (err) {
       setStats((prev) => ({
         ...prev,
         balance: null,
         isLoadingBalance: false,
-        error: "Failed to load balance",
+        error: err instanceof Error ? err.message : "Failed to load balance",
       }));
     }
-  }, []);
+  }, [adminToken]);
 
   const fetchSessions = useCallback(async () => {
+    if (!adminToken) return;
     setStats((prev) => ({ ...prev, isLoadingSessions: true, error: null }));
     try {
       const response = await fetch(
-        `/api/sessions?scenario_id=${SCENARIOS.PERSONALITY_TEST}&limit=100`
+        `/api/sessions?scenario_id=${SCENARIOS.PERSONALITY_TEST}&limit=100`,
+        { headers: { Authorization: `Bearer ${adminToken}` } }
       );
-      if (!response.ok) throw new Error("Failed to fetch sessions");
+      if (!response.ok)
+        throw new Error(response.status === 401 ? "Invalid token" : "Failed to fetch");
       const data = await response.json();
-
-      // Filter to last 30 days
       const recentSessions = (data.sessions || []).filter((s: SessionListItem) =>
         isWithinLast30Days(s.created_at)
       );
-
-      setStats((prev) => ({
-        ...prev,
-        sessions: recentSessions,
-        isLoadingSessions: false,
-      }));
-    } catch {
+      setStats((prev) => ({ ...prev, sessions: recentSessions, isLoadingSessions: false }));
+    } catch (err) {
       setStats((prev) => ({
         ...prev,
         isLoadingSessions: false,
-        error: "Failed to load sessions",
+        error: err instanceof Error ? err.message : "Failed to load sessions",
       }));
     }
-  }, []);
+  }, [adminToken]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -218,8 +290,7 @@ export default function AdminPage() {
 
   // Handle analysis
   const handleAnalyze = async () => {
-    if (!selectedSession) return;
-
+    if (!selectedSession || !adminToken) return;
     setIsAnalyzing(true);
     setAnalysisError(null);
     setAnalysisResult(null);
@@ -230,14 +301,8 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: selectedSession }),
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Analysis failed");
-      }
-
-      const result: SessionAnalysis = await response.json();
-      setAnalysisResult(result);
+      if (!response.ok) throw new Error((await response.json()).error || "Analysis failed");
+      setAnalysisResult(await response.json());
     } catch (err) {
       setAnalysisError(err instanceof Error ? err.message : "Analysis failed");
     } finally {
@@ -258,8 +323,7 @@ export default function AdminPage() {
             </div>
             <CardTitle className="text-center text-foreground">Admin Disabled</CardTitle>
             <CardDescription className="text-center">
-              The admin panel is disabled in production mode. Set{" "}
-              <code className="bg-muted px-1 rounded">NEXT_PUBLIC_IS_DEV=true</code> to enable it.
+              Set <code className="bg-muted px-1 rounded">NEXT_PUBLIC_IS_DEV=true</code> to enable.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -267,61 +331,11 @@ export default function AdminPage() {
     );
   }
 
-  // Login form
+  // Not authenticated
   if (!isAuthenticated) {
-    const handleLogin = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (tokenInput === AppConfig.admin.token) {
-        setIsAuthenticated(true);
-        setLoginError("");
-        sessionStorage.setItem("admin_authenticated", "true");
-      } else {
-        setLoginError("Invalid admin token");
-      }
-    };
-
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="w-full max-w-md bg-card border-border">
-          <CardHeader>
-            <div className="flex items-center justify-center mb-4">
-              <div className="rounded-full bg-teal-500/20 p-3">
-                <Lock className="h-8 w-8 text-teal-400" />
-              </div>
-            </div>
-            <CardTitle className="text-center text-foreground">Admin Access</CardTitle>
-            <CardDescription className="text-center">
-              Enter the admin token to access the dashboard
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Enter admin token"
-                  value={tokenInput}
-                  onChange={(e) => setTokenInput(e.target.value)}
-                  className="w-full"
-                />
-                {loginError && <p className="text-sm text-destructive mt-2">{loginError}</p>}
-              </div>
-              <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700">
-                Access Admin Dashboard
-              </Button>
-            </form>
-
-            <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-              <p className="text-sm text-yellow-400">
-                <AlertTriangle className="inline h-4 w-4 mr-1" />
-                Dev mode enabled. Default token:{" "}
-                <code className="font-mono bg-yellow-500/20 px-1 rounded">
-                  {AppConfig.admin.defaultToken}
-                </code>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <AdminTokenInput variant="full" />
       </div>
     );
   }
@@ -330,35 +344,31 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold mb-2 text-foreground">Admin Dashboard</h1>
           <p className="text-muted-foreground">Monitor usage and manage sessions</p>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => {
-            sessionStorage.removeItem("admin_authenticated");
-            setIsAuthenticated(false);
-          }}
-        >
-          Logout
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <AdminTokenInput variant="compact" />
+          <Button variant="destructive" size="sm" onClick={clearAll}>
+            <Trash2 className="h-4 w-4 mr-1" />
+            Clear State
+          </Button>
+        </div>
       </div>
 
-      {/* Dev Mode Banner */}
-      <Card className="mb-6 border-yellow-500/30 bg-yellow-500/10">
-        <CardContent className="py-3">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-400" />
-            <p className="text-sm text-yellow-400">
-              Development mode active. Disable{" "}
-              <code className="font-mono bg-yellow-500/20 px-1 rounded">NEXT_PUBLIC_IS_DEV</code> in
-              production.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Error Banner */}
+      {stats.error ? (
+        <Card className="mb-6 border-red-500/30 bg-red-500/10">
+          <CardContent className="py-3">
+            <div className="flex items-center gap-2">
+              <XCircle className="h-4 w-4 text-red-400" />
+              <p className="text-sm text-red-400">{stats.error}</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {/* Balance Card */}
       <Card className="mb-6 bg-card border-border">
@@ -384,7 +394,7 @@ export default function AdminPage() {
               <Loader2 className="h-4 w-4 animate-spin" />
               Loading...
             </div>
-          ) : stats.balance && typeof stats.balance.available_minutes === "number" ? (
+          ) : stats.balance ? (
             <div className="text-3xl font-bold text-foreground">
               {stats.balance.available_minutes.toFixed(1)}{" "}
               <span className="text-lg font-normal text-muted-foreground">minutes</span>
@@ -401,9 +411,7 @@ export default function AdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Sessions (Last 30 Days)</CardTitle>
-              <CardDescription>
-                Personality test sessions • Scenario: {SCENARIOS.PERSONALITY_TEST}
-              </CardDescription>
+              <CardDescription>Scenario: {SCENARIOS.PERSONALITY_TEST}</CardDescription>
             </div>
             <Button
               variant="ghost"
@@ -422,9 +430,7 @@ export default function AdminPage() {
               Loading sessions...
             </div>
           ) : stats.sessions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No sessions found in the last 30 days
-            </div>
+            <div className="text-center py-8 text-muted-foreground">No sessions found</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -451,7 +457,7 @@ export default function AdminPage() {
                   {stats.sessions.map((session) => (
                     <tr
                       key={session.id}
-                      className={`border-b border-border/50 hover:bg-muted/30 cursor-pointer transition-colors ${
+                      className={`border-b border-border/50 hover:bg-muted/30 cursor-pointer ${
                         selectedSession === session.id ? "bg-teal-500/10" : ""
                       }`}
                       onClick={() => setSelectedSession(session.id)}
@@ -467,11 +473,10 @@ export default function AdminPage() {
                       </td>
                       <td className="py-3 px-2">
                         <div className="flex items-center gap-2">
-                          <code className="font-mono text-xs text-foreground">{session.id}</code>
+                          <code className="font-mono text-xs">{session.id}</code>
                           <button
                             onClick={(e) => copyToClipboard(session.id, e)}
-                            className="p-1 hover:bg-muted rounded transition-colors"
-                            title="Copy session ID"
+                            className="p-1 hover:bg-muted rounded"
                           >
                             {copiedId === session.id ? (
                               <Check className="h-3 w-3 text-green-400" />
@@ -481,14 +486,10 @@ export default function AdminPage() {
                           </button>
                         </div>
                       </td>
-                      <td className="py-3 px-2 text-foreground">
-                        {session.user_name || session.user_email || (
-                          <span className="text-muted-foreground">Anonymous</span>
-                        )}
+                      <td className="py-3 px-2">
+                        {session.user_name || session.user_email || "-"}
                       </td>
-                      <td className="py-3 px-2 text-foreground">
-                        {formatDuration(session.duration)}
-                      </td>
+                      <td className="py-3 px-2">{formatDuration(session.duration)}</td>
                       <td className="py-3 px-2">
                         <span
                           className={`flex items-center gap-1 ${getStatusColor(session.status)}`}
@@ -507,16 +508,11 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Action Bar */}
-          {stats.sessions.length > 0 && (
+          {stats.sessions.length > 0 ? (
             <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                {stats.sessions.length} session{stats.sessions.length !== 1 ? "s" : ""} •{" "}
-                {selectedSession ? (
-                  <span className="text-teal-400">Selected</span>
-                ) : (
-                  "Select a session to analyze"
-                )}
+                {stats.sessions.length} session{stats.sessions.length !== 1 ? "s" : ""}
+                {selectedSession ? <span className="text-teal-400 ml-2">• Selected</span> : null}
               </p>
               <Button
                 onClick={handleAnalyze}
@@ -524,33 +520,25 @@ export default function AdminPage() {
                 className="bg-teal-600 hover:bg-teal-700"
               >
                 {isAnalyzing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Run Analysis
-                  </>
+                  <FileText className="h-4 w-4 mr-2" />
                 )}
+                {isAnalyzing ? "Analyzing..." : "Run Analysis"}
               </Button>
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
 
       {/* Analysis Results */}
-      {(analysisResult || analysisError) && (
-        <Card className="bg-card border-border">
+      {analysisResult || analysisError ? (
+        <Card className="mb-6 bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-teal-400" />
               Analysis Results
             </CardTitle>
-            {analysisResult && (
-              <CardDescription>Session: {analysisResult.session_id}</CardDescription>
-            )}
           </CardHeader>
           <CardContent>
             {analysisError ? (
@@ -559,73 +547,8 @@ export default function AdminPage() {
               </div>
             ) : analysisResult ? (
               <div className="space-y-4">
-                {/* Summary */}
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Summary</h4>
-                  <p className="text-muted-foreground">{analysisResult.summary}</p>
-                </div>
-
-                {/* Evaluation */}
-                {analysisResult.evaluation && (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {analysisResult.evaluation.score !== undefined && (
-                      <div className="p-3 bg-muted/30 rounded-lg">
-                        <p className="text-sm text-muted-foreground">Score</p>
-                        <p className="text-2xl font-bold text-foreground">
-                          {analysisResult.evaluation.score}
-                        </p>
-                      </div>
-                    )}
-                    {analysisResult.evaluation.feedback && (
-                      <div className="p-3 bg-muted/30 rounded-lg">
-                        <p className="text-sm text-muted-foreground">Feedback</p>
-                        <p className="text-foreground">{analysisResult.evaluation.feedback}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Strengths & Improvements */}
-                {(analysisResult.evaluation?.strengths ||
-                  analysisResult.evaluation?.improvements) && (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {analysisResult.evaluation?.strengths && (
-                      <div>
-                        <h4 className="font-medium text-green-400 mb-2">Strengths</h4>
-                        <ul className="space-y-1">
-                          {analysisResult.evaluation.strengths.map((s, i) => (
-                            <li
-                              key={i}
-                              className="text-sm text-muted-foreground flex items-start gap-2"
-                            >
-                              <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
-                              {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {analysisResult.evaluation?.improvements && (
-                      <div>
-                        <h4 className="font-medium text-orange-400 mb-2">Areas for Improvement</h4>
-                        <ul className="space-y-1">
-                          {analysisResult.evaluation.improvements.map((s, i) => (
-                            <li
-                              key={i}
-                              className="text-sm text-muted-foreground flex items-start gap-2"
-                            >
-                              <AlertTriangle className="h-4 w-4 text-orange-400 mt-0.5 flex-shrink-0" />
-                              {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Raw JSON */}
-                <details className="mt-4">
+                <p className="text-muted-foreground">{analysisResult.summary}</p>
+                <details>
                   <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
                     View raw JSON
                   </summary>
@@ -637,10 +560,10 @@ export default function AdminPage() {
             ) : null}
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       {/* Local Store Editor */}
-      <Card className="mt-6 bg-card border-border">
+      <Card className="bg-card border-border">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -653,42 +576,24 @@ export default function AdminPage() {
               size="sm"
               className="bg-teal-600 hover:bg-teal-700"
             >
-              {storeSaved ? (
-                <>
-                  <Check className="h-4 w-4 mr-2" />
-                  Saved
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
-                </>
-              )}
+              {storeSaved ? <Check className="h-4 w-4 mr-1" /> : <Save className="h-4 w-4 mr-1" />}
+              {storeSaved ? "Saved" : "Save"}
             </Button>
           </div>
-          <CardDescription>
-            Edit the local Zustand store directly. Changes persist to localStorage.
-          </CardDescription>
         </CardHeader>
         <CardContent>
-          {storeError && (
+          {storeError ? (
             <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
               <p className="text-sm text-red-400">{storeError}</p>
             </div>
-          )}
+          ) : null}
           <textarea
             value={storeJson}
             onChange={(e) => setStoreJson(e.target.value)}
-            className="w-full h-80 font-mono text-xs p-4 bg-background border border-border rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+            className="w-full h-60 font-mono text-xs p-4 bg-background border border-border rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-teal-500/50"
             spellCheck={false}
           />
-          <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              Keys: <code className="bg-muted px-1 rounded">user</code>,{" "}
-              <code className="bg-muted px-1 rounded">assessmentSessions</code>,{" "}
-              <code className="bg-muted px-1 rounded">coachSessions</code>,{" "}
-              <code className="bg-muted px-1 rounded">sessionDetails</code>
-            </span>
+          <div className="mt-2 flex justify-end">
             <Button
               variant="ghost"
               size="sm"

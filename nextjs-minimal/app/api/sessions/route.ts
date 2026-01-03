@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listSessions, ToughTongueError } from "../ttai/client";
+import { verifyAdminToken, unauthorizedResponse } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  if (!verifyAdminToken(request)) return unauthorizedResponse();
+
   try {
     const { searchParams } = new URL(request.url);
     const scenario_id = searchParams.get("scenario_id") || undefined;

@@ -34,6 +34,9 @@ function CoachContent() {
         console.log("Coach session started:", event.data.session_id);
         addCoachSession(event.data.session_id, {
           scenarioId: SCENARIOS.PERSONALITY_COACH,
+          scenario_id: event.data.scenario_id,
+          created_at: new Date().toISOString(),
+          status: "active",
         });
       },
       onStop: (event) => {
@@ -41,6 +44,15 @@ function CoachContent() {
         updateSessionDetails(event.data.session_id, {
           completed_at: new Date().toISOString(),
           duration: event.data.duration_seconds,
+          status: "completed",
+        });
+      },
+      onTerminated: (event) => {
+        console.log("Coach session terminated:", event.data.session_id);
+        updateSessionDetails(event.data.session_id, {
+          completed_at: new Date().toISOString(),
+          duration: event.data.duration_seconds,
+          status: "terminated",
         });
       },
       onError: (error) => {

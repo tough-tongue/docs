@@ -33,6 +33,9 @@ function TestContent() {
         console.log("Session started:", event.data.session_id);
         addAssessmentSession(event.data.session_id, {
           scenarioId: SCENARIOS.PERSONALITY_TEST,
+          scenario_id: event.data.scenario_id,
+          created_at: new Date().toISOString(),
+          status: "active",
         });
         setLastSessionId(event.data.session_id);
       },
@@ -40,6 +43,19 @@ function TestContent() {
         console.log("Session stopped:", event.data.session_id);
         updateSessionDetails(event.data.session_id, {
           completed_at: new Date().toISOString(),
+          duration: event.data.duration_seconds,
+          status: "completed",
+        });
+        setShowTest(false);
+        setTestCompleted(true);
+        setLastSessionId(event.data.session_id);
+      },
+      onTerminated: (event) => {
+        console.log("Session terminated:", event.data.session_id);
+        updateSessionDetails(event.data.session_id, {
+          completed_at: new Date().toISOString(),
+          duration: event.data.duration_seconds,
+          status: "terminated",
         });
         setShowTest(false);
         setTestCompleted(true);
