@@ -278,12 +278,54 @@ The project uses Tailwind CSS. Customize:
 
 ## 📡 API Routes
 
-### `POST /api/tough-tongue/scenarios`
+### `GET /api/balance`
+
+Get account balance (available minutes):
+
+```typescript
+const response = await fetch("/api/balance");
+const data = await response.json();
+// { available_minutes: 1616.5, last_updated: "2026-01-02T18:25:26.018000" }
+```
+
+### `GET /api/sessions`
+
+List sessions with optional filtering:
+
+```typescript
+const response = await fetch("/api/sessions?scenario_id=xxx&limit=100");
+const data = await response.json();
+// { sessions: [...] }
+```
+
+### `GET /api/sessions/[sessionId]`
+
+Get session details:
+
+```typescript
+const response = await fetch(`/api/sessions/${sessionId}`);
+const data = await response.json();
+```
+
+### `POST /api/sessions/analyze`
+
+Analyze a completed session:
+
+```typescript
+const response = await fetch("/api/sessions/analyze", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ session_id: sessionId }),
+});
+const analysis = await response.json();
+```
+
+### `POST /api/scenarios`
 
 Create a new scenario:
 
 ```typescript
-const response = await fetch("/api/tough-tongue/scenarios", {
+const response = await fetch("/api/scenarios", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -292,28 +334,6 @@ const response = await fetch("/api/tough-tongue/scenarios", {
     ai_instructions: "AI instructions...",
   }),
 });
-```
-
-### `GET /api/tough-tongue/sessions/[sessionId]`
-
-Get session details:
-
-```typescript
-const response = await fetch(`/api/tough-tongue/sessions/${sessionId}`);
-const data = await response.json();
-```
-
-### `POST /api/tough-tongue/sessions/analyze`
-
-Analyze a completed session:
-
-```typescript
-const response = await fetch("/api/tough-tongue/sessions/analyze", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ session_id: sessionId }),
-});
-const analysis = await response.json();
 ```
 
 ## 👨‍💼 Admin Panel

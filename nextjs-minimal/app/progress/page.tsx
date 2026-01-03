@@ -5,13 +5,7 @@ import { useAuth } from "@/app/auth/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ROUTES } from "@/lib/constants";
-import {
-  loadTestResult,
-  loadCoachSessions,
-  saveTestResult,
-  type PersonalityTestResult,
-  type CoachSession,
-} from "@/lib/toughtongue";
+import { useAppStore, selectLatestAssessment, selectPersonalityType } from "@/lib/store";
 import {
   AlertCircle,
   CheckCircle2,
@@ -25,46 +19,30 @@ import Link from "next/link";
 
 export default function ProgressPage() {
   const { loading: authLoading } = useAuth();
-  const [testResult, setTestResult] = useState<PersonalityTestResult | null>(null);
-  const [coachSessions, setCoachSessions] = useState<CoachSession[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = () => {
-    const result = loadTestResult();
-    if (result) {
-      setTestResult(result);
-    }
-
-    const sessions = loadCoachSessions();
-    setCoachSessions(sessions);
-
-    setIsLoading(false);
-  };
+  // Store
+  const latestAssessment = useAppStore(selectLatestAssessment);
+  const personalityType = useAppStore(selectPersonalityType);
+  const assessmentSessions = useAppStore((s) => s.assessmentSessions);
+  const coachSessions = useAppStore((s) => s.coachSessions);
+  const sessionDetails = useAppStore((s) => s.sessionDetails);
+  const updateSessionDetails = useAppStore((s) => s.updateSessionDetails);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      // Refresh test result if exists
-      if (testResult?.sessionId) {
-        const response = await fetch("/api/tough-tongue/sessions/analyze", {
+      // Refresh latest assessment analysis if exists
+      if (latestAssessment?.id) {
+        const response = await fetch("/api/sessions/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: testResult.sessionId }),
+          body: JSON.stringify({ session_id: latestAssessment.id }),
         });
 
         if (response.ok) {
           const analysisData = await response.json();
-          const updatedResult: PersonalityTestResult = {
-            ...testResult,
-            analysisData,
-          };
-          saveTestResult(updatedResult);
-          setTestResult(updatedResult);
+          updateSessionDetails(latestAssessment.id, { analysisData });
         }
       }
 
@@ -77,10 +55,11 @@ export default function ProgressPage() {
     }
   };
 
-  const completedCoachSessions = coachSessions.filter((s) => s.completedAt).length;
-  const totalCoachSessions = coachSessions.length;
+  const completedCoachSessions = coachSessions.filter(
+    (id) => sessionDetails[id]?.completedAt
+  ).length;
 
-  if (authLoading || isLoading) {
+  if (authLoading) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
         <div className="animate-pulse">
@@ -97,7 +76,9 @@ export default function ProgressPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2 text-foreground">Your Progress</h1>
-          <p className="text-muted-foreground">Track your personality journey and coaching sessions</p>
+          <p className="text-muted-foreground">
+            Track your personality journey and coaching sessions
+          </p>
         </div>
         <Button onClick={handleRefresh} disabled={isRefreshing} variant="outline" className="gap-2">
           <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
@@ -114,11 +95,13 @@ export default function ProgressPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">
-              {testResult ? testResult.personalityType || "Completed" : "Not Taken"}
+              {personalityType || (assessmentSessions.length > 0 ? "Completed" : "Not Taken")}
             </div>
             <p className="text-xs text-muted-foreground">
-              {testResult
-                ? `Completed ${new Date(testResult.completedAt).toLocaleDateString()}`
+              {assessmentSessions.length > 0
+                ? `${assessmentSessions.length} assessment${
+                    assessmentSessions.length > 1 ? "s" : ""
+                  }`
                 : "Take the test to discover your type"}
             </p>
           </CardContent>
@@ -130,10 +113,10 @@ export default function ProgressPage() {
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{totalCoachSessions}</div>
+            <div className="text-2xl font-bold text-foreground">{coachSessions.length}</div>
             <p className="text-xs text-muted-foreground">
-              {completedCoachSessions} completed • {totalCoachSessions - completedCoachSessions} in
-              progress
+              {completedCoachSessions} completed • {coachSessions.length - completedCoachSessions}{" "}
+              in progress
             </p>
           </CardContent>
         </Card>
@@ -145,10 +128,12 @@ export default function ProgressPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">
-              {testResult && totalCoachSessions > 0 ? "Active" : "Getting Started"}
+              {assessmentSessions.length > 0 && coachSessions.length > 0
+                ? "Active"
+                : "Getting Started"}
             </div>
             <p className="text-xs text-muted-foreground">
-              {testResult && totalCoachSessions > 0
+              {assessmentSessions.length > 0 && coachSessions.length > 0
                 ? "You're on your journey!"
                 : "Complete the test and start coaching"}
             </p>
@@ -160,7 +145,7 @@ export default function ProgressPage() {
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4 text-foreground">Personality Test</h2>
 
-        {!testResult ? (
+        {assessmentSessions.length === 0 ? (
           <Card className="border-dashed border-border bg-card">
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -189,12 +174,14 @@ export default function ProgressPage() {
                     <CardTitle className="text-green-400">Test Completed</CardTitle>
                     <CardDescription className="text-green-300/80">
                       Your personality type:{" "}
-                      <strong className="text-lg">{testResult.personalityType || "Unknown"}</strong>
+                      <strong className="text-lg">{personalityType || "Analyzing..."}</strong>
                     </CardDescription>
-                    <p className="text-sm text-green-300/60 mt-1">
-                      <Clock className="inline h-3 w-3 mr-1" />
-                      {new Date(testResult.completedAt).toLocaleString()}
-                    </p>
+                    {latestAssessment?.completedAt && (
+                      <p className="text-sm text-green-300/60 mt-1">
+                        <Clock className="inline h-3 w-3 mr-1" />
+                        {new Date(latestAssessment.completedAt).toLocaleString()}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <Link href={ROUTES.PERSONALITY_TEST}>
@@ -204,16 +191,18 @@ export default function ProgressPage() {
                 </Link>
               </div>
             </CardHeader>
-            <CardContent>
-              <details className="mt-4">
-                <summary className="cursor-pointer font-medium text-green-400 hover:text-green-300">
-                  View Full Analysis
-                </summary>
-                <pre className="mt-4 overflow-x-auto rounded-lg bg-background p-4 text-sm border border-border text-muted-foreground">
-                  {JSON.stringify(testResult.analysisData, null, 2)}
-                </pre>
-              </details>
-            </CardContent>
+            {latestAssessment?.analysisData ? (
+              <CardContent>
+                <details className="mt-4">
+                  <summary className="cursor-pointer font-medium text-green-400 hover:text-green-300">
+                    View Full Analysis
+                  </summary>
+                  <pre className="mt-4 overflow-x-auto rounded-lg bg-background p-4 text-sm border border-border text-muted-foreground">
+                    {JSON.stringify(latestAssessment.analysisData, null, 2)}
+                  </pre>
+                </details>
+              </CardContent>
+            ) : null}
           </Card>
         )}
       </div>
@@ -246,36 +235,40 @@ export default function ProgressPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {coachSessions.map((session, index) => (
-              <Card key={session.sessionId} className="bg-card border-border">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-foreground">Session {coachSessions.length - index}</CardTitle>
-                      <CardDescription>
-                        Started: {new Date(session.startedAt).toLocaleString()}
-                      </CardDescription>
-                      {session.completedAt && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Completed: {new Date(session.completedAt).toLocaleString()}
-                        </p>
-                      )}
+            {coachSessions.map((sessionId, index) => {
+              const session = sessionDetails[sessionId];
+              if (!session) return null;
+              return (
+                <Card key={sessionId} className="bg-card border-border">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-foreground">
+                          Session {coachSessions.length - index}
+                        </CardTitle>
+                        <CardDescription className="font-mono text-xs">{sessionId}</CardDescription>
+                        {session.completedAt && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Completed: {new Date(session.completedAt).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        {session.completedAt ? (
+                          <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
+                            Completed
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-medium text-yellow-400">
+                            In Progress
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      {session.completedAt ? (
-                        <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
-                          Completed
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-medium text-yellow-400">
-                          In Progress
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
+                  </CardHeader>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

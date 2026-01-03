@@ -8,27 +8,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import {
   buildPersonalityTestUrl,
   createIframeEventListener,
-  loadTestResult,
-  saveTestResult,
-  clearTestResult,
   extractMBTIType,
-  type PersonalityTestResult,
+  SCENARIOS,
   type SessionAnalysis,
-} from "@/lib/toughtongue";
+} from "@/lib/ttai";
+import { useAppStore, selectLatestAssessment } from "@/lib/store";
 import { CheckCircle2, Loader2 } from "lucide-react";
 
 function PersonalityTestContent() {
   const { getUserName, getUserEmail } = useAuth();
-  const [testResult, setTestResult] = useState<PersonalityTestResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Load existing test result on mount
+  // Store
+  const latestAssessment = useAppStore(selectLatestAssessment);
+  const addAssessmentSession = useAppStore((s) => s.addAssessmentSession);
+  const updateSessionDetails = useAppStore((s) => s.updateSessionDetails);
+  const assessmentSessions = useAppStore((s) => s.assessmentSessions);
+
   useEffect(() => {
-    const result = loadTestResult();
-    if (result) {
-      setTestResult(result);
-    }
     setIsLoading(false);
   }, []);
 
@@ -37,6 +35,10 @@ function PersonalityTestContent() {
     const cleanup = createIframeEventListener({
       onStart: (event) => {
         console.log("Session started:", event.data.session_id);
+        // Add session immediately when started
+        addAssessmentSession(event.data.session_id, {
+          scenarioId: SCENARIOS.PERSONALITY_TEST,
+        });
       },
       onStop: async (event) => {
         console.log("Session stopped:", event.data.session_id);
@@ -48,12 +50,12 @@ function PersonalityTestContent() {
     });
 
     return cleanup;
-  }, []);
+  }, [addAssessmentSession]);
 
   const analyzeSession = async (sessionId: string) => {
     setIsAnalyzing(true);
     try {
-      const response = await fetch("/api/tough-tongue/sessions/analyze", {
+      const response = await fetch("/api/sessions/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId }),
@@ -64,17 +66,14 @@ function PersonalityTestContent() {
       }
 
       const analysisData: SessionAnalysis = await response.json();
+      const personalityType = extractMBTIType(analysisData);
 
-      // Create and save result
-      const result: PersonalityTestResult = {
-        sessionId,
-        analysisData,
+      // Update session details with analysis
+      updateSessionDetails(sessionId, {
         completedAt: new Date().toISOString(),
-        personalityType: extractMBTIType(analysisData),
-      };
-
-      saveTestResult(result);
-      setTestResult(result);
+        personalityType,
+        analysisData,
+      });
     } catch (error) {
       console.error("Error analyzing session:", error);
     } finally {
@@ -83,11 +82,8 @@ function PersonalityTestContent() {
   };
 
   const handleRetake = () => {
-    if (
-      confirm("Are you sure you want to retake the test? This will replace your current results.")
-    ) {
-      clearTestResult();
-      setTestResult(null);
+    if (confirm("Are you sure you want to retake the test? This will start a new session.")) {
+      // Just allow them to take the test again - sessions are accumulated
     }
   };
 
@@ -115,7 +111,7 @@ function PersonalityTestContent() {
       </div>
 
       {/* Test Completed Banner */}
-      {testResult && (
+      {latestAssessment?.completedAt ? (
         <Card className="mb-8 border-green-500/30 bg-green-500/10">
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -128,19 +124,22 @@ function PersonalityTestContent() {
               </Button>
             </div>
             <CardDescription className="text-green-300/80">
-              Completed on {new Date(testResult.completedAt).toLocaleDateString()}
-              {testResult.personalityType && (
+              Completed on {new Date(latestAssessment.completedAt).toLocaleDateString()}
+              {latestAssessment.personalityType ? (
                 <span className="ml-2 font-semibold">
-                  • Your Type: {testResult.personalityType}
+                  • Your Type: {latestAssessment.personalityType}
                 </span>
-              )}
+              ) : null}
+              {assessmentSessions.length > 1 ? (
+                <span className="ml-2">• {assessmentSessions.length} total sessions</span>
+              ) : null}
             </CardDescription>
           </CardHeader>
         </Card>
-      )}
+      ) : null}
 
       {/* Analyzing Banner */}
-      {isAnalyzing && (
+      {isAnalyzing ? (
         <Card className="mb-8 border-blue-500/30 bg-blue-500/10">
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -152,7 +151,7 @@ function PersonalityTestContent() {
             </CardDescription>
           </CardHeader>
         </Card>
-      )}
+      ) : null}
 
       {/* ToughTongue AI Iframe */}
       <div className="mb-8">
@@ -167,7 +166,7 @@ function PersonalityTestContent() {
       </div>
 
       {/* Results Card */}
-      {testResult && (
+      {latestAssessment?.analysisData ? (
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle>Your Results</CardTitle>
@@ -175,11 +174,11 @@ function PersonalityTestContent() {
           </CardHeader>
           <CardContent>
             <pre className="overflow-x-auto rounded-lg bg-background p-4 text-sm text-muted-foreground border border-border">
-              {JSON.stringify(testResult.analysisData, null, 2)}
+              {JSON.stringify(latestAssessment.analysisData, null, 2)}
             </pre>
           </CardContent>
         </Card>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -5,33 +5,23 @@ import { useAuth } from "@/app/auth/AuthContext";
 import { AuthGuard } from "@/components/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  buildCoachUrl,
-  createIframeEventListener,
-  loadTestResult,
-  loadCoachSessions,
-  addCoachSession,
-  updateCoachSession,
-  type PersonalityTestResult,
-  type CoachSession,
-} from "@/lib/toughtongue";
+import { buildCoachUrl, createIframeEventListener, SCENARIOS } from "@/lib/ttai";
+import { useAppStore, selectPersonalityType } from "@/lib/store";
 import { AlertCircle, MessageCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 function PersonalityCoachContent() {
   const { getUserName, getUserEmail } = useAuth();
-  const [testResult, setTestResult] = useState<PersonalityTestResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [coachSessions, setCoachSessions] = useState<CoachSession[]>([]);
 
-  // Load data on mount
+  // Store
+  const personalityType = useAppStore(selectPersonalityType);
+  const coachSessions = useAppStore((s) => s.coachSessions);
+  const sessionDetails = useAppStore((s) => s.sessionDetails);
+  const addCoachSession = useAppStore((s) => s.addCoachSession);
+  const updateSessionDetails = useAppStore((s) => s.updateSessionDetails);
+
   useEffect(() => {
-    const result = loadTestResult();
-    if (result) {
-      setTestResult(result);
-    }
-    const sessions = loadCoachSessions();
-    setCoachSessions(sessions);
     setIsLoading(false);
   }, []);
 
@@ -40,23 +30,17 @@ function PersonalityCoachContent() {
     const cleanup = createIframeEventListener({
       onStart: (event) => {
         console.log("Coach session started:", event.data.session_id);
-
-        const newSession: CoachSession = {
-          sessionId: event.data.session_id,
-          startedAt: new Date().toISOString(),
-          personalityType: testResult?.personalityType,
-        };
-
-        const updated = addCoachSession(newSession);
-        setCoachSessions(updated);
+        addCoachSession(event.data.session_id, {
+          scenarioId: SCENARIOS.PERSONALITY_COACH,
+          personalityType,
+        });
       },
       onStop: (event) => {
         console.log("Coach session stopped:", event.data.session_id);
-
-        const updated = updateCoachSession(event.data.session_id, {
+        updateSessionDetails(event.data.session_id, {
           completedAt: new Date().toISOString(),
+          duration: event.data.duration_seconds,
         });
-        setCoachSessions(updated);
       },
       onError: (error) => {
         console.error("Iframe error:", error);
@@ -64,12 +48,12 @@ function PersonalityCoachContent() {
     });
 
     return cleanup;
-  }, [testResult?.personalityType]);
+  }, [personalityType, addCoachSession, updateSessionDetails]);
 
   const iframeUrl = buildCoachUrl({
     userName: getUserName(),
     userEmail: getUserEmail(),
-    personalityType: testResult?.personalityType,
+    personalityType,
   });
 
   if (isLoading) {
@@ -91,7 +75,7 @@ function PersonalityCoachContent() {
       </div>
 
       {/* No Test Result Warning */}
-      {!testResult && (
+      {!personalityType && (
         <Card className="mb-8 border-yellow-500/30 bg-yellow-500/10">
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -116,7 +100,7 @@ function PersonalityCoachContent() {
       )}
 
       {/* Personalized Coaching Banner */}
-      {testResult && (
+      {personalityType && (
         <Card className="mb-8 border-teal-500/30 bg-teal-500/10">
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -124,8 +108,8 @@ function PersonalityCoachContent() {
               <div>
                 <CardTitle className="text-teal-400">Personalized Coaching Available</CardTitle>
                 <CardDescription className="text-teal-300/80">
-                  Your personality type: <strong>{testResult.personalityType}</strong> • Your coach
-                  knows your type and can provide tailored guidance
+                  Your personality type: <strong>{personalityType}</strong> • Your coach knows your
+                  type and can provide tailored guidance
                 </CardDescription>
               </div>
             </div>
@@ -156,31 +140,33 @@ function PersonalityCoachContent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {coachSessions.map((session, index) => (
-                <div
-                  key={session.sessionId}
-                  className="flex items-center justify-between rounded-lg border border-border bg-background p-4"
-                >
-                  <div>
-                    <p className="font-medium text-foreground">
-                      Session {coachSessions.length - index}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Started: {new Date(session.startedAt).toLocaleString()}
-                    </p>
-                    {session.completedAt && (
-                      <p className="text-sm text-muted-foreground">
-                        Completed: {new Date(session.completedAt).toLocaleString()}
+              {coachSessions.map((sessionId, index) => {
+                const session = sessionDetails[sessionId];
+                if (!session) return null;
+                return (
+                  <div
+                    key={sessionId}
+                    className="flex items-center justify-between rounded-lg border border-border bg-background p-4"
+                  >
+                    <div>
+                      <p className="font-medium text-foreground">
+                        Session {coachSessions.length - index}
                       </p>
+                      <p className="text-sm text-muted-foreground font-mono">{sessionId}</p>
+                      {session.completedAt && (
+                        <p className="text-sm text-muted-foreground">
+                          Completed: {new Date(session.completedAt).toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                    {!session.completedAt && (
+                      <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
+                        In Progress
+                      </span>
                     )}
                   </div>
-                  {!session.completedAt && (
-                    <span className="rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
-                      In Progress
-                    </span>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

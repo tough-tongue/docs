@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
-import AdminTokenBanner from "../components/AdminTokenBanner";
 import { AuthProvider } from "./auth/AuthContext";
 import { AppConfig } from "@/lib/config";
 
@@ -28,9 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+      >
         <AuthProvider>
-          <AdminTokenBanner />
           <Header />
           <main>{children}</main>
         </AuthProvider>
