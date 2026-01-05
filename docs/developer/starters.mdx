@@ -1,0 +1,107 @@
+---
+title: Starter Templates
+sidebarTitle: Starter Templates
+description: Production-ready templates to jump-start your ToughTongue AI integration
+---
+
+Get up and running quickly with our starter templates. Each template demonstrates 
+best practices for integrating ToughTongue AI into your application.
+
+<CardGroup cols={2}>
+  <Card title="Next.js Starter" icon="react" href="/developer/nextjs-starter/overview" color="#6366f1">
+    **TypeScript + Next.js 15**
+    
+    Complete personality assessment app with Firebase Auth, Zustand state management,
+    and modern UI components.
+    
+    - React 19 + TypeScript
+    - Firebase Authentication
+    - Tailwind CSS + shadcn/ui
+    - Admin dashboard
+  </Card>
+  
+  <Card title="Flask Starter" icon="python" href="/developer/flask-starter" color="#fbbf24">
+    **Python + Flask**
+    
+    Lightweight Python template with Preact frontend. Simple and straightforward, 
+    perfect for quick prototypes.
+    
+    - Flask backend
+    - Preact frontend
+    - No build tools required
+    - Vercel-ready
+  </Card>
+</CardGroup>
+
+---
+
+## Quick Comparison
+
+| Feature | Next.js | Flask |
+|---------|---------|-------|
+| **Language** | TypeScript | Python |
+| **Framework** | Next.js 15 | Flask |
+| **Frontend** | React 19 | Preact |
+| **Authentication** | Firebase | None |
+| **State Management** | Zustand | localStorage |
+| **Styling** | Tailwind CSS | CSS |
+| **Type Safety** | ✅ Full | ❌ No |
+| **Best For** | Production apps | Simple prototypes |
+
+---
+
+## What Both Templates Include
+
+<AccordionGroup>
+  <Accordion title="Iframe Integration" icon="window">
+    Ready-to-use ToughTongue AI iframe embedding with proper permissions
+    for microphone access and event handling.
+  </Accordion>
+  
+  <Accordion title="Event Handling" icon="bolt">
+    Pre-configured listeners for `onStart`, `onStop`, and `onTerminated` events
+    to track session lifecycle.
+  </Accordion>
+  
+  <Accordion title="API Proxy" icon="server">
+    Server-side routes that securely proxy API calls, keeping your API key safe
+    from client-side exposure.
+  </Accordion>
+  
+  <Accordion title="Session Analysis" icon="chart-line">
+    Built-in integration with the analyze endpoint to get AI-powered insights
+    from completed sessions.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Getting Started
+
+<Steps>
+  <Step title="Get API Credentials">
+    Sign up at [ToughTongue AI](https://www.toughtongueai.com/) and get your API key from
+    the [Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys).
+  </Step>
+  
+  <Step title="Choose Your Template">
+    Pick the template that matches your tech stack and follow the quickstart guide.
+  </Step>
+  
+  <Step title="Configure & Run">
+    Add your credentials, update scenario IDs, and run the development server.
+  </Step>
+</Steps>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Next.js Starter" icon="rocket" href="/developer/nextjs-starter/overview">
+    Full guide for the Next.js starter
+  </Card>
+  <Card title="Flask Starter" icon="rocket" href="/developer/flask-starter">
+    Full guide for the Flask starter
+  </Card>
+</CardGroup>

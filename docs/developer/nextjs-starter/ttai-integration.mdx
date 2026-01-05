@@ -1,0 +1,290 @@
+---
+title: ToughTongue Integration
+sidebarTitle: ToughTongue Integration
+description: How the starter template integrates with ToughTongue AI
+---
+
+The starter template provides a clean abstraction for ToughTongue AI integration
+in the `lib/ttai/` module.
+
+## Module Structure
+
+```
+lib/ttai/
+├── index.ts        # Public exports
+├── constants.ts    # Scenario IDs
+├── types.ts        # TypeScript definitions
+└── client.ts       # URL builders + event handlers
+```
+
+---
+
+## Scenario Configuration
+
+Define your scenarios in `lib/ttai/constants.ts`:
+
+```typescript
+export const SCENARIOS = {
+  PERSONALITY_TEST: "your_test_scenario_id",
+  PERSONALITY_COACH: "your_coach_scenario_id",
+} as const;
+
+export const EMBED_BASE_URL = "https://app.toughtongueai.com/embed";
+```
+
+---
+
+## Building Embed URLs
+
+The `client.ts` file provides URL builder functions:
+
+```typescript
+import { buildPersonalityTestUrl, buildCoachUrl } from "@/lib/ttai";
+
+// Test URL with user info
+const testUrl = buildPersonalityTestUrl({
+  userName: "John",
+  userEmail: "john@example.com",
+});
+
+// Coach URL with personality context
+const coachUrl = buildCoachUrl({
+  userName: "John",
+  userPersonalityAssessment: "User is INTJ - strategic thinker...",
+});
+```
+
+### URL Builder Implementation
+
+```typescript
+export function buildPersonalityTestUrl(options: {
+  userName?: string;
+  userEmail?: string;
+}) {
+  const params = new URLSearchParams();
+  
+  // Visual customization
+  params.set("bg", "black");
+  params.set("color", "teal-500");
+  
+  // User info
+  if (options.userName) params.set("userName", options.userName);
+  if (options.userEmail) params.set("userEmail", options.userEmail);
+  
+  return `${EMBED_BASE_URL}/${SCENARIOS.PERSONALITY_TEST}?${params}`;
+}
+```
+
+---
+
+## Iframe Event Handling
+
+The template provides a helper for listening to iframe events:
+
+```typescript
+import { createIframeEventListener } from "@/lib/ttai";
+
+useEffect(() => {
+  const cleanup = createIframeEventListener({
+    onStart: (event) => {
+      console.log("Session started:", event.data.session_id);
+      // Save session ID to store
+      addAssessmentSession(event.data.session_id);
+    },
+    onStop: (event) => {
+      console.log("Session completed:", event.data.session_id);
+      // Update session status, trigger analysis
+      updateSessionDetails(event.data.session_id, { status: "completed" });
+    },
+    onTerminated: (event) => {
+      console.log("Session terminated (max duration reached)");
+    },
+    onError: (error) => {
+      console.error("Error:", error.message);
+    },
+  });
+
+  return cleanup;
+}, []);
+```
+
+### Event Listener Implementation
+
+```typescript
+export function createIframeEventListener(handlers: {
+  onStart?: (event: MessageEvent) => void;
+  onStop?: (event: MessageEvent) => void;
+  onTerminated?: (event: MessageEvent) => void;
+  onError?: (error: Error) => void;
+}) {
+  const handleMessage = (event: MessageEvent) => {
+    // Verify origin
+    if (event.origin !== "https://app.toughtongueai.com") return;
+
+    const { event: eventType, sessionId, timestamp } = event.data;
+
+    switch (eventType) {
+      case "onStart":
+        handlers.onStart?.(event);
+        break;
+      case "onStop":
+        handlers.onStop?.(event);
+        break;
+      case "onTerminated":
+        handlers.onTerminated?.(event);
+        break;
+    }
+  };
+
+  window.addEventListener("message", handleMessage);
+  
+  // Return cleanup function
+  return () => window.removeEventListener("message", handleMessage);
+}
+```
+
+---
+
+## TTAIIframe Component
+
+The `components/TTAIIframe.tsx` component wraps the iframe with proper permissions:
+
+```typescript
+import { TTAIIframe } from "@/components/TTAIIframe";
+
+<TTAIIframe src={embedUrl} className="h-[600px]" />;
+```
+
+### Component Implementation
+
+```typescript
+interface TTAIIframeProps {
+  src: string;
+  className?: string;
+}
+
+export function TTAIIframe({ src, className }: TTAIIframeProps) {
+  return (
+    <iframe
+      src={src}
+      className={cn("w-full rounded-lg shadow-lg", className)}
+      allow="microphone; camera; display-capture"
+    />
+  );
+}
+```
+
+The `allow` attribute grants:
+- **microphone**: Voice conversations
+- **camera**: Video features (if enabled)
+- **display-capture**: Screen sharing (if enabled)
+
+---
+
+## Server-Side API Client
+
+The `app/api/ttai/client.ts` file handles server-side API calls:
+
+```typescript
+const API_BASE = "https://api.toughtongueai.com/api/public";
+const API_KEY = process.env.TOUGH_TONGUE_API_KEY;
+
+export async function analyzeSession(sessionId: string) {
+  const response = await fetch(`${API_BASE}/sessions/analyze`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ session_id: sessionId }),
+  });
+  
+  return response.json();
+}
+
+export async function getSession(sessionId: string) {
+  const response = await fetch(`${API_BASE}/sessions/${sessionId}`, {
+    headers: { "Authorization": `Bearer ${API_KEY}` },
+  });
+  
+  return response.json();
+}
+
+export async function getBalance() {
+  const response = await fetch(`${API_BASE}/balance`, {
+    headers: { "Authorization": `Bearer ${API_KEY}` },
+  });
+  
+  return response.json();
+}
+```
+
+---
+
+## API Routes
+
+The starter provides these API routes:
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/api/sessions` | GET | List sessions (with scenario filter) |
+| `/api/sessions/[id]` | GET | Get session details |
+| `/api/sessions/analyze` | POST | Analyze a completed session |
+| `/api/balance` | GET | Get account balance |
+
+### Example: Analyze Route
+
+```typescript
+// app/api/sessions/analyze/route.ts
+import { NextResponse } from "next/server";
+import { analyzeSession } from "@/app/api/ttai/client";
+
+export async function POST(request: Request) {
+  const { session_id } = await request.json();
+  
+  if (!session_id) {
+    return NextResponse.json(
+      { error: "session_id required" },
+      { status: 400 }
+    );
+  }
+  
+  const analysis = await analyzeSession(session_id);
+  return NextResponse.json(analysis);
+}
+```
+
+---
+
+## Dynamic Variables
+
+Pass context to scenarios using URL parameters:
+
+```typescript
+const coachUrl = buildCoachUrl({
+  userName: user.displayName,
+  userPersonalityAssessment: `
+    User is ${personalityType}.
+    Energy: ${assessment.energy}
+    Mind: ${assessment.mind}
+    Nature: ${assessment.nature}
+    Tactics: ${assessment.tactics}
+  `,
+});
+```
+
+The scenario can reference these via `{{userName}}` and `{{userPersonalityAssessment}}` 
+in the AI instructions.
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="State & Auth" icon="database" href="/developer/nextjs-starter/state-and-auth">
+    State management and authentication
+  </Card>
+  <Card title="Deployment" icon="rocket" href="/developer/nextjs-starter/deployment">
+    Deploy to production
+  </Card>
+</CardGroup>

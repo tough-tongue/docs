@@ -1,0 +1,146 @@
+---
+title: Next.js Starter Overview
+sidebarTitle: Overview
+description: Production-ready personality assessment app with Next.js 15, TypeScript, and ToughTongue AI
+---
+
+The **Next.js starter template** is a complete MBTI personality assessment application 
+with Firebase Auth, Zustand state management, and modern UI components.
+
+<Note>
+  This template demonstrates best practices for integrating ToughTongue AI into 
+  a production Next.js application, including secure API key handling, iframe 
+  event management, and state persistence.
+</Note>
+
+## Quick Start
+
+<Steps>
+  <Step title="Clone the template">
+
+```bash
+npx degit tough-tongue/docs/nextjs-minimal my-ttai-app
+cd my-ttai-app
+```
+
+  </Step>
+  <Step title="Install dependencies">
+
+```bash
+pnpm install
+```
+
+  </Step>
+  <Step title="Configure environment">
+
+```bash
+cp .env.example .env.local
+```
+
+Add your ToughTongue AI API key:
+
+```env .env.local
+TOUGH_TONGUE_API_KEY=your_api_key_here
+```
+
+Get your API key from the [Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys).
+
+  </Step>
+  <Step title="Run the app">
+
+```bash
+pnpm dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000)
+
+  </Step>
+</Steps>
+
+---
+
+## What's Included
+
+<CardGroup cols={2}>
+  <Card title="Personality Test" icon="brain">
+    AI-powered MBTI assessment via embedded ToughTongue scenario
+  </Card>
+  <Card title="Results Dashboard" icon="chart-bar">
+    Detailed personality analysis with dimension breakdowns
+  </Card>
+  <Card title="AI Coach" icon="comments">
+    Personalized coaching based on your assessed personality type
+  </Card>
+  <Card title="Admin Panel" icon="shield">
+    Session management, API balance, and data export
+  </Card>
+</CardGroup>
+
+---
+
+## Tech Stack
+
+- **Next.js 15** with App Router and Turbopack
+- **React 19** with TypeScript
+- **Tailwind CSS 4** with shadcn/ui components
+- **Zustand** for state management with localStorage persistence
+- **Firebase Auth** (optional) for Google OAuth
+
+---
+
+## Application Flow
+
+### 1. Landing Page (`/`)
+
+- Hero section with app description
+- Interactive MBTI type explorer (16 clickable type cards)
+- Modal dialogs with type details
+
+### 2. Personality Test (`/test`)
+
+<Steps>
+  <Step title="User clicks Start">
+    ToughTongue iframe loads with the personality test scenario
+  </Step>
+  <Step title="Session begins">
+    `onStart` event fires → session ID saved to store
+  </Step>
+  <Step title="Conversation completes">
+    `onStop` or `onTerminated` fires → session marked complete
+  </Step>
+  <Step title="Redirect to Results">
+    View and analyze the completed session
+  </Step>
+</Steps>
+
+### 3. Results Dashboard (`/results`)
+
+- Lists all assessment sessions
+- Run AI analysis to get MBTI type breakdown
+- **"Mark as Final"** button saves assessment for coach personalization
+
+### 4. Personality Coach (`/coach`)
+
+- Requires a finalized assessment
+- Passes personality context via `dynamicVariables`
+- The coach scenario uses this for personalized guidance
+
+### 5. Admin Panel (`/admin`)
+
+- Protected by admin token
+- View ToughTongue account balance
+- List and analyze sessions
+- Export data and manage local storage
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Project Structure" icon="folder" href="/developer/nextjs-starter/project-structure">
+    Understand the file organization
+  </Card>
+  <Card title="ToughTongue Integration" icon="plug" href="/developer/nextjs-starter/ttai-integration">
+    Learn the integration patterns
+  </Card>
+</CardGroup>

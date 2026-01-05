@@ -70,21 +70,25 @@
               "developer/overview",
               {
                 "group": "Integration",
-                "pages": ["developer/iframe", "developer/api", "developer/authentication"]
-              },
-              {
-                "group": "Guides",
-                "pages": ["developer/guides/webhooks", "developer/guides/troubleshooting"]
-              },
-              {
-                "group": "Starter Templates",
                 "pages": [
-                  "developer/starters/overview",
-                  "developer/starters/nextjs",
-                  "developer/starters/firebase-auth",
-                  "developer/starters/flask"
+                  "developer/integration/iframe",
+                  "developer/integration/api",
+                  "developer/integration/authentication"
                 ]
-              }
+              },
+              "developer/troubleshooting",
+              "developer/starters",
+              {
+                "group": "Next.js Starter",
+                "pages": [
+                  "developer/nextjs-starter/overview",
+                  "developer/nextjs-starter/project-structure",
+                  "developer/nextjs-starter/ttai-integration",
+                  "developer/nextjs-starter/state-and-auth",
+                  "developer/nextjs-starter/deployment"
+                ]
+              },
+              "developer/flask-starter"
             ]
           }
         ]

@@ -37,6 +37,4 @@ export {
   buildCoachUrl,
   // Event handling
   createIframeEventListener,
-  // Utilities
-  extractMBTIType,
 } from "./client";

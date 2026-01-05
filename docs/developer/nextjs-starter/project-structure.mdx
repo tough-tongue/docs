@@ -1,0 +1,225 @@
+---
+title: Project Structure
+sidebarTitle: Project Structure
+description: File organization and architecture of the Next.js starter
+---
+
+Understanding the project structure helps you navigate and customize the starter template.
+
+## Directory Overview
+
+```
+nextjs-minimal/
+├── app/                         # Next.js App Router pages
+│   ├── page.tsx                 # Landing page with MBTI explorer
+│   ├── layout.tsx               # Root layout with providers
+│   ├── test/page.tsx            # Personality test (iframe embed)
+│   ├── results/page.tsx         # Results dashboard with analysis
+│   ├── coach/page.tsx           # AI coaching with dynamic context
+│   ├── admin/                   # Admin panel (modular components)
+│   │   ├── page.tsx             # Main admin page
+│   │   ├── BalanceCard.tsx      # Account balance display
+│   │   ├── SessionsCard.tsx     # Sessions list
+│   │   └── ...                  # Other admin components
+│   ├── auth/
+│   │   ├── AuthContext.tsx      # Auth provider (Firebase + local)
+│   │   └── signin/page.tsx      # Sign-in page
+│   └── api/
+│       ├── ttai/client.ts       # Server-side ToughTongue API client
+│       ├── sessions/            # Session CRUD + analyze endpoints
+│       │   ├── route.ts         # GET /api/sessions
+│       │   ├── [sessionId]/route.ts
+│       │   └── analyze/route.ts
+│       └── balance/route.ts     # GET /api/balance
+│
+├── components/
+│   ├── TTAIIframe.tsx           # ToughTongue iframe wrapper
+│   ├── Header.tsx               # Navigation header
+│   ├── PageHeader.tsx           # Page title component
+│   ├── EmptyState.tsx           # Empty state placeholder
+│   ├── StatusCards.tsx          # Status display cards
+│   ├── auth/                    # Auth-related components
+│   │   ├── AuthCard.tsx         # Auth form card
+│   │   ├── AuthGuard.tsx        # Route protection
+│   │   └── index.ts             # Exports
+│   └── ui/                      # shadcn/ui components
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── dialog.tsx
+│       └── ...
+│
+├── lib/
+│   ├── config.ts                # Centralized environment config
+│   ├── constants.ts             # Routes + MBTI type data (16 types)
+│   ├── store.ts                 # Zustand store with localStorage
+│   ├── firebase.ts              # Firebase initialization
+│   ├── auth.ts                  # Admin auth utilities
+│   ├── utils.ts                 # Utility functions (cn, etc.)
+│   └── ttai/                    # ToughTongue client module
+│       ├── index.ts             # Public exports
+│       ├── constants.ts         # Scenario IDs
+│       ├── types.ts             # Type definitions
+│       └── client.ts            # URL builders + event handlers
+│
+├── public/                      # Static assets
+│   └── icons/                   # App icons
+│
+├── .env.example                 # Environment template
+├── tailwind.config.ts           # Tailwind configuration
+├── tsconfig.json                # TypeScript config
+└── package.json
+```
+
+---
+
+## Key Directories
+
+### `/app` - Pages and API Routes
+
+The `app/` directory uses Next.js App Router conventions:
+
+- **`page.tsx`** files define route pages
+- **`layout.tsx`** files define shared layouts
+- **`api/`** contains server-side API route handlers
+
+### `/components` - Reusable Components
+
+Components are organized by scope:
+
+- **Root level**: App-wide components (`Header`, `TTAIIframe`)
+- **`auth/`**: Authentication-related components
+- **`ui/`**: shadcn/ui primitive components
+
+### `/lib` - Utilities and Configuration
+
+Core application logic:
+
+- **`config.ts`**: Centralized environment variables
+- **`constants.ts`**: App-wide constants and MBTI data
+- **`store.ts`**: Zustand state management
+- **`ttai/`**: ToughTongue AI integration module
+
+---
+
+## Key Files Explained
+
+### `lib/config.ts`
+
+Centralizes all environment configuration:
+
+```typescript
+export const AppConfig = {
+  app: {
+    name: "Discover Your Personality",
+    shortName: "Personality",
+    description: "AI-powered personality assessment",
+  },
+  ttai: {
+    apiKey: process.env.TOUGH_TONGUE_API_KEY,
+    baseUrl: "https://app.toughtongueai.com",
+    apiBaseUrl: "https://api.toughtongueai.com/api/public",
+  },
+  firebase: {
+    // Firebase config from env vars
+  },
+  isDev: process.env.NEXT_PUBLIC_IS_DEV === "true",
+};
+```
+
+### `lib/constants.ts`
+
+Contains routes and static data:
+
+```typescript
+export const ROUTES = {
+  HOME: "/",
+  TEST: "/test",
+  RESULTS: "/results",
+  COACH: "/coach",
+  ADMIN: "/admin",
+} as const;
+
+export const MBTI_TYPES = [
+  { type: "INTJ", name: "The Architect", ... },
+  // ... all 16 types
+];
+```
+
+### `lib/store.ts`
+
+Zustand store with localStorage persistence:
+
+```typescript
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      assessmentSessions: [],
+      coachSessions: [],
+      sessionDetails: {},
+      // ... actions
+    }),
+    { name: "ttai-app-store" }
+  )
+);
+```
+
+### `lib/ttai/`
+
+ToughTongue integration module - see [ToughTongue Integration](/developer/nextjs-starter/ttai-integration).
+
+---
+
+## Adding New Features
+
+### Adding a New Page
+
+1. Create directory in `app/`:
+
+```
+app/my-feature/page.tsx
+```
+
+2. Add route to `lib/constants.ts`:
+
+```typescript
+export const ROUTES = {
+  // ...existing routes
+  MY_FEATURE: "/my-feature",
+} as const;
+```
+
+3. Add navigation link in `components/Header.tsx`
+
+### Adding a New Component
+
+- **Shared component**: Add to `components/`
+- **Feature-specific**: Keep in the feature's directory
+- **UI primitive**: Add to `components/ui/` using shadcn/ui patterns
+
+### Adding a New API Route
+
+Create route handler in `app/api/`:
+
+```typescript
+// app/api/my-endpoint/route.ts
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  // Your logic
+  return NextResponse.json({ data: "..." });
+}
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="ToughTongue Integration" icon="plug" href="/developer/nextjs-starter/ttai-integration">
+    Learn the integration patterns
+  </Card>
+  <Card title="State & Auth" icon="database" href="/developer/nextjs-starter/state-and-auth">
+    State management and authentication
+  </Card>
+</CardGroup>

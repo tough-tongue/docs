@@ -1,0 +1,412 @@
+---
+title: Flask Starter
+sidebarTitle: Flask Starter
+description: Build a ToughTongue AI integration with Flask and Preact
+---
+
+The **Flask starter template** is a lightweight Python application with a Preact
+frontend. Perfect for developers who prefer Python and want a simple, no-build-tools
+approach.
+
+## Quick Start
+
+<Steps>
+  <Step title="Clone the template">
+
+```bash
+npx degit tough-tongue/docs/flask-minimal my-ttai-app
+cd my-ttai-app
+```
+
+  </Step>
+  <Step title="Create virtual environment">
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+```
+
+  </Step>
+  <Step title="Install dependencies">
+
+```bash
+pip install -r requirements.txt
+```
+
+  </Step>
+  <Step title="Configure environment">
+
+Create a `.env` file:
+
+```env .env
+TTAI_TOKEN=your_api_key_here
+API_BASE_URL=https://api.toughtongueai.com/api/public
+PORT=8008
+```
+
+Get your API key from the [Developer Portal](https://app.toughtongueai.com/developer?tab=api-keys).
+
+  </Step>
+  <Step title="Update scenario ID">
+
+Edit `www/config.js`:
+
+```javascript www/config.js
+export const toughTongueConfig = {
+  baseUrl: "https://app.toughtongueai.com",
+  scenarioId: "YOUR_SCENARIO_ID_HERE",
+  defaultStyles: {
+    name: "Assessment",
+    color: "indigo-500",
+    background: "white",
+  },
+};
+```
+
+  </Step>
+  <Step title="Run the app">
+
+```bash
+python app.py
+```
+
+Visit [http://localhost:8008](http://localhost:8008)
+
+  </Step>
+</Steps>
+
+---
+
+## What's Included
+
+<CardGroup cols={2}>
+  <Card title="Flask Backend" icon="server">
+    Secure API proxy routes to protect your API key
+  </Card>
+  <Card title="Preact Frontend" icon="code">
+    Lightweight React alternative, no build tools needed
+  </Card>
+  <Card title="Iframe Integration" icon="window">
+    Ready-to-use ToughTongue embed with event handling
+  </Card>
+  <Card title="Session Analysis" icon="chart-line">
+    Built-in analysis endpoint integration
+  </Card>
+</CardGroup>
+
+---
+
+## Project Structure
+
+```
+flask-minimal/
+├── app.py                 # Main Flask app (static file server)
+├── api/
+│   └── index.py           # API routes for ToughTongue integration
+├── www/                   # Frontend assets
+│   ├── index.html         # Main HTML page
+│   ├── app.js             # Main application logic (Preact)
+│   ├── assessment.js      # Assessment page with iframe handling
+│   ├── config.js          # Configuration (scenario ID, styles)
+│   ├── styles.css         # Application styling
+│   └── components/
+│       └── results.js     # Results display component
+├── requirements.txt       # Python dependencies
+└── vercel.json            # Vercel deployment config
+```
+
+---
+
+## Core Integration Patterns
+
+### 1. Embedding the Iframe
+
+The iframe is embedded in `www/assessment.js`:
+
+```javascript
+const buildIframeUrl = () => {
+  let baseUrl = `${toughTongueConfig.baseUrl}/embed/${toughTongueConfig.scenarioId}`;
+  const params = new URLSearchParams();
+  params.append("name", toughTongueConfig.defaultStyles.name);
+  params.append("color", toughTongueConfig.defaultStyles.color);
+  params.append("bg", toughTongueConfig.defaultStyles.background);
+  params.append("pulse", "true");
+  params.append("transcribe", "true");
+  return `${baseUrl}?${params.toString()}`;
+};
+```
+
+### 2. Listening for Events
+
+Handle iframe events in `www/assessment.js`:
+
+```javascript
+useEffect(() => {
+  const handleMessage = async (event) => {
+    const data = event.data;
+    if (data && data.event) {
+      switch (data.event) {
+        case "onStart":
+          // Session started - store session ID
+          setSessionData({
+            sessionId: data.sessionId,
+            status: "started",
+            timestamp: data.timestamp,
+          });
+          break;
+        case "onStop":
+          // Session completed - ready for analysis
+          setSessionData((prev) => ({
+            ...prev,
+            status: "completed",
+            timestamp: data.timestamp,
+          }));
+          break;
+      }
+    }
+  };
+  window.addEventListener("message", handleMessage);
+  return () => window.removeEventListener("message", handleMessage);
+}, []);
+```
+
+### 3. Analyzing Sessions
+
+After a session completes, analyze it via the backend API:
+
+**Frontend** (`www/assessment.js`):
+
+```javascript
+const analyzeSession = async (sessionId) => {
+  const response = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId }),
+  });
+  return await response.json();
+};
+```
+
+**Backend** (`api/index.py`):
+
+```python
+@app.route("/api/analyze", methods=["POST"])
+def analyze():
+    data = request.json
+    response = requests.post(
+        f"{API_BASE_URL}/sessions/analyze",
+        json=data,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {TTAI_TOKEN}",
+        },
+    )
+    return jsonify(response.json()), response.status_code
+```
+
+---
+
+## API Endpoints
+
+The Flask backend provides these API proxy routes:
+
+### POST `/api/analyze`
+
+Analyzes a completed session:
+
+```json
+// Request
+{ "session_id": "SESSION_ID" }
+
+// Response
+{
+  "session_id": "SESSION_ID",
+  "analysis": {
+    "overall_score": 85,
+    "strengths": ["Clear communication"],
+    "areas_for_improvement": ["Response time"]
+  }
+}
+```
+
+### GET `/api/sessions/<session_id>`
+
+Retrieves session details:
+
+```json
+{
+  "id": "session_id",
+  "scenario_id": "scenario_id",
+  "transcript": "...",
+  "duration": 300,
+  "created_at": "2024-01-01T00:00:00Z"
+}
+```
+
+---
+
+## Customization
+
+### Changing the Scenario
+
+Update the scenario ID in `www/config.js`:
+
+```javascript
+export const toughTongueConfig = {
+  scenarioId: "YOUR_NEW_SCENARIO_ID",
+  // ...
+};
+```
+
+### Styling
+
+Modify `www/styles.css` to customize appearance. The starter includes:
+
+- Responsive layout
+- Card-based UI components
+- Smooth transitions
+- CSS variables for theming
+
+### Adding New API Endpoints
+
+Add routes in `api/index.py`:
+
+```python
+@app.route("/api/your-endpoint", methods=["POST"])
+def your_endpoint():
+    data = request.json
+    # Your logic here
+    return jsonify({"result": "success"})
+```
+
+### Adding New Components
+
+Create files in `www/components/`:
+
+```javascript
+// www/components/my-component.js
+import { h } from "https://unpkg.com/preact?module";
+
+export function MyComponent({ prop }) {
+  return h("div", { class: "my-component" }, prop);
+}
+```
+
+---
+
+## Environment Variables
+
+| Variable       | Required | Default                                    | Description                   |
+| -------------- | -------- | ------------------------------------------ | ----------------------------- |
+| `TTAI_TOKEN`   | Yes      | -                                          | Your ToughTongue AI API token |
+| `API_BASE_URL` | No       | `https://api.toughtongueai.com/api/public` | API base URL                  |
+| `PORT`         | No       | `8008`                                     | Server port                   |
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+The project includes `vercel.json` for serverless deployment:
+
+<Steps>
+  <Step title="Install Vercel CLI">
+
+```bash
+npm install -g vercel
+```
+
+  </Step>
+  <Step title="Deploy">
+
+```bash
+cd flask-minimal
+vercel
+```
+
+  </Step>
+  <Step title="Add environment variables">
+    In Vercel dashboard, add `TTAI_TOKEN` to your project's environment variables.
+  </Step>
+  <Step title="Deploy to production">
+
+```bash
+vercel --prod
+```
+
+  </Step>
+</Steps>
+
+### Other Platforms
+
+For other platforms (Heroku, Railway, etc.):
+
+1. Ensure Python 3.9+ is available
+2. Set environment variables
+3. Configure start command: `python app.py`
+4. Ensure port is configurable via `PORT` environment variable
+
+For production, consider using gunicorn:
+
+```bash
+pip install gunicorn
+gunicorn app:app
+```
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="API Token Issues">
+    **Check:**
+    - Verify `TTAI_TOKEN` is set correctly in `.env`
+    - Check token hasn't expired
+    - Ensure token has necessary permissions
+  </Accordion>
+
+{" "}
+<Accordion title="Iframe Not Loading">
+  **Check:** - Verify scenario ID is correct in `www/config.js` - Check scenario is set to
+  `is_public: true` in ToughTongue AI dashboard - Review browser console for errors - Ensure HTTPS
+  is used in production (required for microphone access)
+</Accordion>
+
+{" "}
+<Accordion title="Static Files Not Serving">
+  **Check:** - Check `WWW_DIR` path in `app.py` is correct - Verify files exist in `www/` directory
+  - Check file permissions
+</Accordion>
+
+  <Accordion title="CORS Errors">
+    Flask-CORS is already configured in `api/index.py`.
+    If issues persist, check API base URL is correct.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Dependencies
+
+- **Flask 2.0+**: Web framework
+- **requests**: HTTP library for API calls
+- **flask-cors**: CORS support
+- **python-dotenv**: Environment variable management
+- **gunicorn**: Production WSGI server (optional)
+
+---
+
+## Learn More
+
+<CardGroup cols={3}>
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    ToughTongue AI API documentation
+  </Card>
+  <Card title="Iframe Events" icon="message" href="/developer/integration/iframe">
+    Complete iframe integration guide
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/developer/troubleshooting">
+    Common issues and solutions
+  </Card>
+</CardGroup>

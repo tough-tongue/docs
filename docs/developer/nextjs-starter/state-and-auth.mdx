@@ -1,0 +1,284 @@
+---
+title: State & Authentication
+sidebarTitle: State & Auth
+description: State management with Zustand and authentication patterns
+---
+
+The starter template uses Zustand for state management and supports both local
+and Firebase authentication.
+
+## State Management
+
+### Zustand Store
+
+The app uses Zustand with localStorage persistence (`lib/store.ts`):
+
+```typescript
+import { useAppStore } from "@/lib/store";
+
+function MyComponent() {
+  // User data
+  const user = useAppStore((s) => s.user);
+
+  // Assessment sessions
+  const assessmentSessions = useAppStore((s) => s.assessmentSessions);
+  const addAssessmentSession = useAppStore((s) => s.addAssessmentSession);
+
+  // Coach sessions
+  const coachSessions = useAppStore((s) => s.coachSessions);
+
+  // Session details (keyed by session ID)
+  const sessionDetails = useAppStore((s) => s.sessionDetails);
+  const updateSessionDetails = useAppStore((s) => s.updateSessionDetails);
+
+  // Personality data (from finalized assessment)
+  const personalityType = useAppStore((s) => s.userPersonalityType);
+  const personalityAssessment = useAppStore((s) => s.userPersonalityAssessment);
+}
+```
+
+### Store State Shape
+
+```typescript
+interface AppState {
+  // User
+  user: User | null;
+  setUser: (user: User | null) => void;
+
+  // Assessment sessions
+  assessmentSessions: string[];
+  addAssessmentSession: (sessionId: string) => void;
+
+  // Coach sessions
+  coachSessions: string[];
+  addCoachSession: (sessionId: string) => void;
+
+  // Session details
+  sessionDetails: Record<string, SessionDetails>;
+  updateSessionDetails: (id: string, details: Partial<SessionDetails>) => void;
+
+  // Finalized personality
+  userPersonalityType: string | null;
+  userPersonalityAssessment: string | null;
+  setPersonality: (type: string, assessment: string) => void;
+
+  // Reset
+  clearAllData: () => void;
+}
+```
+
+### Using Selectors
+
+Access specific state slices to avoid unnecessary re-renders:
+
+```typescript
+// ✅ Good - only re-renders when assessmentSessions changes
+const sessions = useAppStore((s) => s.assessmentSessions);
+
+// ❌ Bad - re-renders on any state change
+const store = useAppStore();
+const sessions = store.assessmentSessions;
+```
+
+### Storage Key
+
+All data persists under the localStorage key: `ttai-app-store`
+
+---
+
+## Authentication
+
+The template supports two authentication modes:
+
+### 1. Local User Auth (No Setup Required)
+
+Simple auth for development or apps that don't need full authentication:
+
+```typescript
+const { signInAsLocalUser, currentUser, logout } = useAuth();
+
+// Sign in with just a name
+signInAsLocalUser("John");
+
+// User object
+// { id: "local-user", displayName: "John", email: null, isLocal: true }
+```
+
+### 2. Firebase Auth (Google OAuth)
+
+Full authentication with Firebase:
+
+```typescript
+const { signInWithGoogle, signIn, signUp, currentUser, logout } = useAuth();
+
+// Google OAuth
+await signInWithGoogle();
+
+// Email/password
+await signIn(email, password);
+await signUp(email, password);
+```
+
+### AuthContext Provider
+
+The `AuthContext` wraps your app in `app/layout.tsx`:
+
+```typescript
+import { AuthProvider } from "@/app/auth/AuthContext";
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Using Auth in Components
+
+```typescript
+"use client";
+import { useAuth } from "@/app/auth/AuthContext";
+
+export default function ProfilePage() {
+  const { currentUser, loading, logout } = useAuth();
+
+  if (loading) return <p>Loading...</p>;
+  if (!currentUser) return <p>Please sign in</p>;
+
+  return (
+    <div>
+      <p>Welcome, {currentUser.displayName || currentUser.email}!</p>
+      <button onClick={logout}>Sign Out</button>
+    </div>
+  );
+}
+```
+
+### Protecting Routes
+
+Use the `AuthGuard` component:
+
+```typescript
+import { AuthGuard } from "@/components/auth";
+
+export default function ProtectedPage() {
+  return (
+    <AuthGuard title="Sign In Required" description="Create an account to continue">
+      <YourProtectedContent />
+    </AuthGuard>
+  );
+}
+```
+
+---
+
+## Firebase Setup
+
+<Steps>
+  <Step title="Create Firebase Project">
+    Go to [Firebase Console](https://console.firebase.google.com/) and create a new project.
+  </Step>
+  
+  <Step title="Enable Authentication">
+    Navigate to **Authentication** → **Sign-in method** and enable:
+    - Email/Password
+    - Google
+  </Step>
+  
+  <Step title="Get Config">
+    Go to **Project Settings** → **General** → **Your apps** → Web app.
+    Copy the configuration object.
+  </Step>
+  
+  <Step title="Add Environment Variables">
+
+```env .env.local
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+  </Step>
+</Steps>
+
+<Warning>
+  All Firebase config variables must be prefixed with `NEXT_PUBLIC_` to be accessible in the
+  browser. Never commit `.env.local` to version control!
+</Warning>
+
+---
+
+## Integrating Auth with ToughTongue
+
+Pass user info to scenarios:
+
+```typescript
+const { currentUser } = useAuth();
+
+const testUrl = buildPersonalityTestUrl({
+  userName: currentUser?.displayName || "",
+  userEmail: currentUser?.email || "",
+});
+```
+
+Store sessions with user context:
+
+```typescript
+const saveSession = (sessionId: string, analysis: any) => {
+  updateSessionDetails(sessionId, {
+    ...analysis,
+    userId: currentUser?.uid,
+    completedAt: new Date().toISOString(),
+  });
+};
+```
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Firebase: Error (auth/invalid-api-key)">
+    **Solution:**
+    - Double-check all Firebase config values in `.env.local`
+    - Ensure all 6 Firebase variables are set
+    - Restart dev server after changes
+  </Accordion>
+
+{" "}
+
+<Accordion title="Google Sign-In not working">
+  **Solution:** - Verify Google provider is enabled in Firebase Console - Add your domain to
+  authorized domains in Firebase Console → Authentication → Settings - For localhost, it should be
+  authorized by default
+</Accordion>
+
+  <Accordion title="Data not persisting">
+    **Cause:** Zustand store uses localStorage (per-browser, per-domain).
+    
+    **Notes:**
+    - Clearing browser data clears saved results
+    - Data doesn't sync across browsers/devices
+    - For production, consider syncing to Firestore
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Deployment" icon="rocket" href="/developer/nextjs-starter/deployment">
+    Deploy to production
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/overview">
+    Full API documentation
+  </Card>
+</CardGroup>

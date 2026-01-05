@@ -12,21 +12,49 @@ Documentation site built with **Mintlify**. Lives in `docs/` directory.
 
 ## Directory Structure
 
+**CRITICAL RULE**: Directory structure MUST mirror the navigation structure in `docs.json`.
+
+- Navigation groups → directories
+- Navigation pages → `.mdx` files
+- Nested groups → nested directories
+- Single pages (not in a group) → files at that level
+
 ```
 docs/
-├── mint.json                 # Mintlify config (nav, tabs, API settings)
+├── docs.json                 # Mintlify config (nav, tabs, API settings)
 ├── getting-started/          # Intro & quickstart
+│   └── introduction.mdx
 ├── product/                  # Product documentation
+│   ├── scenario-studio.mdx
+│   └── use-cases/            # Nested group
+│       └── sales-coaching.mdx
 ├── developer/                # Developer guides
+│   ├── overview.mdx          # Single page at group level
+│   ├── troubleshooting.mdx   # Single page (not nested)
+│   ├── starters.mdx          # Single page (not nested)
+│   ├── integration/          # "Integration" group → directory
+│   │   ├── iframe.mdx
+│   │   ├── api.mdx
+│   │   └── authentication.mdx
+│   ├── nextjs-starter/       # "Next.js Starter" group → directory
+│   │   ├── overview.mdx
+│   │   ├── project-structure.mdx
+│   │   └── ...
+│   └── flask-starter.mdx     # Single page (not a group)
 ├── api-reference/
-│   ├── overview.mdx          # API overview with test endpoint
-│   ├── endpoints/            # Individual API endpoint pages
-│   └── openapi.json          # OpenAPI spec
-├── guides/                   # How-to guides
-├── starters/                 # Starter template docs
-├── use-cases/                # Use case examples
+│   ├── overview.mdx
+│   ├── endpoints/
+│   │   └── scenarios/
+│   │       └── list-scenarios.mdx
+│   └── openapi.json
 └── public/                   # Static assets (logos, favicon)
 ```
+
+### Why This Matters
+
+- Easier to find files when they match sidebar structure
+- Prevents broken links when navigation changes
+- Clearer mental model for contributors
 
 ## MDX Guidelines
 
@@ -127,31 +155,34 @@ description: "Create a new scenario"
 </ResponseExample>
 ```
 
-## mint.json Key Settings
+## docs.json Key Settings
 
 ### Tabs
 
 ```json
 "tabs": [
-  { "name": "API Reference", "url": "api-reference" }
+  { "tab": "Documentation", "groups": [...] },
+  { "tab": "API Reference", "groups": [...] }
 ]
 ```
-
-First tab (Documentation) is implicit/default.
 
 ### API Configuration
 
 ```json
 "api": {
-  "baseUrl": "https://api.toughtongueai.com/api/public",
-  "auth": { "method": "bearer" },
-  "playground": { "mode": "show" }
+  "openapi": "api-reference/openapi.json",
+  "playground": { "display": "interactive" },
+  "mdx": {
+    "server": "https://api.toughtongueai.com/api/public",
+    "auth": { "method": "bearer" }
+  }
 }
 ```
 
 ### Navigation
 
 Pages must be listed in `navigation` to appear in sidebar.
+**Directory structure must match navigation paths.**
 
 ## Content Guidelines
 
@@ -182,20 +213,49 @@ Pages must be listed in `navigation` to appear in sidebar.
 
 ### Add a New Page
 
-1. Create `.mdx` file in appropriate directory
-2. Add to `mint.json` navigation
-3. Add frontmatter with title/description
+1. Determine where it goes in navigation (which group/section)
+2. Create `.mdx` file in the **matching directory** (directory = group)
+3. Add to `docs.json` navigation
+4. Add frontmatter with title/description
+
+**Example**: Adding a page to "Integration" group:
+
+- Navigation: `developer/integration/new-page`
+- File: `docs/developer/integration/new-page.mdx`
+
+### Add a New Group
+
+1. Create a new directory matching the group name (kebab-case)
+2. Add pages as `.mdx` files inside that directory
+3. Update `docs.json` with the new group and pages
+
+**Example**: Adding "Advanced Topics" group under Developer:
+
+```
+docs/developer/advanced-topics/
+├── caching.mdx
+└── webhooks.mdx
+```
+
+Navigation in `docs.json`:
+
+```json
+{
+  "group": "Advanced Topics",
+  "pages": ["developer/advanced-topics/caching", "developer/advanced-topics/webhooks"]
+}
+```
 
 ### Add API Endpoint
 
 1. Create `api-reference/endpoints/endpoint-name.mdx`
 2. Use `api` frontmatter with relative path
 3. Add `<ParamField>`, `<RequestExample>`, `<ResponseExample>`
-4. Add to `mint.json` navigation under API Reference
+4. Add to `docs.json` navigation under API Reference
 
 ### Update Navigation
 
-Edit `mint.json` → `navigation` array. Structure:
+Edit `docs.json` → `navigation` array. Structure:
 
 ```json
 {
@@ -203,6 +263,8 @@ Edit `mint.json` → `navigation` array. Structure:
   "pages": ["path/to/page", "path/to/other"]
 }
 ```
+
+**Remember**: File paths in navigation must match actual file locations!
 
 ## Testing Changes
 

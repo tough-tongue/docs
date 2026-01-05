@@ -216,19 +216,3 @@ export function createIframeEventListener(handlers: IframeEventHandlers): () => 
   window.addEventListener("message", handleMessage);
   return () => window.removeEventListener("message", handleMessage);
 }
-
-// =============================================================================
-// MBTI Type Extraction
-// =============================================================================
-
-const MBTI_PATTERN =
-  /\b(INTJ|INTP|ENTJ|ENTP|INFJ|INFP|ENFJ|ENFP|ISTJ|ISFJ|ESTJ|ESFJ|ISTP|ISFP|ESTP|ESFP)\b/i;
-
-/**
- * Extracts MBTI type from analysis data
- */
-export function extractMBTIType(analysisData: unknown): string | undefined {
-  const text = JSON.stringify(analysisData).toUpperCase();
-  const match = text.match(MBTI_PATTERN);
-  return match ? match[1] : undefined;
-}
