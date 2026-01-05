@@ -6,6 +6,27 @@
 const DEFAULT_ADMIN_TOKEN = "TTAI-STARTER-ADMIN-TOKEN";
 
 /**
+ * Feature Flags
+ * Control optional features at build/runtime
+ */
+export const FeatureFlags = {
+  /**
+   * Enable SAT (Scenario Access Token) mode for embedding scenarios.
+   * When enabled, embed URLs will be generated using short-lived access tokens
+   * instead of direct scenario URLs. This is required for private scenarios.
+   *
+   * Set NEXT_PUBLIC_USE_SAT=true to enable.
+   */
+  useSAT: process.env.NEXT_PUBLIC_USE_SAT === "true",
+
+  /**
+   * Default SAT token duration in hours (1-24).
+   * Only used when useSAT is enabled.
+   */
+  satDurationHours: parseInt(process.env.SAT_DURATION_HOURS || "4", 10),
+} as const;
+
+/**
  * Application Configuration
  * Centralized config object with nested structure
  */
@@ -34,6 +55,8 @@ export const AppConfig = {
     token: process.env.ADMIN_TOKEN || DEFAULT_ADMIN_TOKEN,
     defaultToken: DEFAULT_ADMIN_TOKEN,
   },
+
+  features: FeatureFlags,
 } as const;
 
 // Validation helper (not exported)

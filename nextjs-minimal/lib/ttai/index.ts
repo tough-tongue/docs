@@ -7,6 +7,9 @@
  *
  * @example
  * import { buildPersonalityTestUrl, createIframeEventListener, SCENARIOS } from '@/lib/ttai';
+ *
+ * // With SAT support (for private scenarios)
+ * import { fetchSAT, buildSATEmbedUrl, getEmbedUrlWithSAT, isSATEnabled } from '@/lib/ttai';
  */
 
 // Re-export constants
@@ -23,6 +26,10 @@ export type {
   IframeReadyEvent,
   // Embed types
   EmbedUrlOptions,
+  // SAT types
+  CreateSATRequest,
+  SATResponse,
+  SATEmbedOptions,
   // Response types (for consuming API responses)
   SessionAnalysis,
   SessionListItem,
@@ -35,6 +42,11 @@ export {
   buildEmbedUrl,
   buildPersonalityTestUrl,
   buildCoachUrl,
+  // SAT utilities
+  fetchSAT,
+  isSATEnabled,
+  buildSATEmbedUrl,
+  getEmbedUrlWithSAT,
   // Event handling
   createIframeEventListener,
 } from "./client";

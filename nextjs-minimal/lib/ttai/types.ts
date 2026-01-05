@@ -50,7 +50,13 @@ export interface Balance {
 // Iframe Event Types
 // =============================================================================
 
-export type IframeEventType = "onStart" | "onStop" | "onTerminated" | "onSubmit" | "onError" | "onReady";
+export type IframeEventType =
+  | "onStart"
+  | "onStop"
+  | "onTerminated"
+  | "onSubmit"
+  | "onError"
+  | "onReady";
 
 /**
  * Normalized iframe event data after parsing
@@ -116,4 +122,39 @@ export interface EmbedUrlOptions {
   userEmail?: string;
   promptUserInfo?: boolean;
   dynamicVariables?: Record<string, string>;
+  /** SAT token for authenticated access (required for private scenarios) */
+  accessToken?: string;
+}
+
+// =============================================================================
+// SAT (Scenario Access Token) Types
+// =============================================================================
+
+/**
+ * Request to create a Scenario Access Token
+ */
+export interface CreateSATRequest {
+  scenario_id: string;
+  /** Token validity duration in hours (1-24, default: 4) */
+  duration_hours?: number;
+  /** Optional user email for org context */
+  email?: string;
+}
+
+/**
+ * Response from creating a Scenario Access Token
+ */
+export interface SATResponse {
+  access_token: string;
+  expires_at: string;
+  /** Pre-built iframe src URL with the access token included */
+  iframe_src: string;
+}
+
+/**
+ * Options for building an embed URL with SAT support
+ */
+export interface SATEmbedOptions extends Omit<EmbedUrlOptions, "accessToken"> {
+  /** Pre-fetched SAT token. If not provided and useSAT is enabled, caller must fetch it */
+  sat?: SATResponse;
 }

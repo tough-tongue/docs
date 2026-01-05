@@ -83,6 +83,20 @@ export interface Balance {
   last_updated: string;
 }
 
+// SAT (Scenario Access Token) types
+export interface CreateSATRequest {
+  scenario_id: string;
+  duration_hours?: number;
+  email?: string;
+}
+
+export interface SATResponse {
+  access_token: string;
+  expires_at: string;
+  /** Pre-built iframe src URL with the access token included */
+  iframe_src: string;
+}
+
 // =============================================================================
 // Error Class
 // =============================================================================
@@ -184,4 +198,21 @@ export async function analyzeSession(request: AnalyzeSessionRequest): Promise<Se
 /** Check if API is configured */
 export function isConfigured(): boolean {
   return !!AppConfig.toughTongue.apiKey;
+}
+
+/**
+ * Create a Scenario Access Token (SAT) for embedding private scenarios.
+ * Tokens are valid for 1-24 hours.
+ */
+export async function createSAT(request: CreateSATRequest): Promise<SATResponse> {
+  const durationHours = Math.min(24, Math.max(1, request.duration_hours ?? 4));
+
+  return apiRequest<SATResponse>("/scenario-access-token", {
+    method: "POST",
+    body: {
+      scenario_id: request.scenario_id,
+      duration_hours: durationHours,
+      ...(request.email && { email: request.email }),
+    },
+  });
 }

@@ -69,16 +69,12 @@ function HeroSection() {
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link href={ROUTES.TEST}>
-            <Button size="lg" className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white">
+            <Button size="lg" className="w-full sm:w-auto">
               Take Personality Test
             </Button>
           </Link>
           <Link href={ROUTES.COACH}>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full sm:w-auto border-border hover:bg-accent"
-            >
+            <Button size="lg" variant="outline" className="w-full sm:w-auto">
               Talk to Your Coach
             </Button>
           </Link>
@@ -233,11 +229,7 @@ function CTASection() {
           Start your journey to self-discovery with our AI-powered personality assessment
         </p>
         <Link href={ROUTES.TEST}>
-          <Button
-            size="lg"
-            variant="secondary"
-            className="bg-white text-teal-700 hover:bg-gray-100"
-          >
+          <Button size="lg" className="bg-white text-teal-700 hover:bg-gray-100 active:bg-gray-200">
             Get Started Now
           </Button>
         </Link>
@@ -353,9 +345,7 @@ function DialogCTA() {
     <div className="pt-4 border-t border-border">
       <p className="text-sm text-muted-foreground mb-3">Want to discover your personality type?</p>
       <Link href={ROUTES.TEST}>
-        <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">
-          Take the Personality Test
-        </Button>
+        <Button className="w-full">Take the Personality Test</Button>
       </Link>
     </div>
   );

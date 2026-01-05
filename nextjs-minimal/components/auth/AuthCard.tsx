@@ -92,12 +92,13 @@ export function AuthCard({
             {/* Google Sign In */}
             <Button
               type="button"
-              variant="outline"
-              className={`w-full ${compact ? "h-10" : "h-12"} text-base`}
+              variant="social"
+              size={compact ? "lg" : "xl"}
+              className="w-full"
               onClick={handleGoogleSignIn}
               disabled={loading}
             >
-              <GoogleIcon className="mr-3 h-5 w-5" />
+              <GoogleIcon className="mr-2 h-5 w-5" />
               Continue with Google
             </Button>
 
@@ -113,12 +114,13 @@ export function AuthCard({
             {/* Local User */}
             <Button
               type="button"
-              variant="secondary"
-              className={`w-full ${compact ? "h-10" : "h-12"} text-base`}
+              variant="outline"
+              size={compact ? "lg" : "xl"}
+              className="w-full"
               onClick={() => setMode("local")}
               disabled={loading}
             >
-              <UserIcon className="mr-3 h-5 w-5" />
+              <UserIcon className="mr-2 h-5 w-5" />
               Continue as Guest
             </Button>
 
@@ -151,9 +153,8 @@ export function AuthCard({
 
             <Button
               type="submit"
-              className={`w-full ${
-                compact ? "h-10" : "h-12"
-              } text-base bg-teal-600 hover:bg-teal-700`}
+              size={compact ? "lg" : "xl"}
+              className="w-full"
               disabled={loading}
             >
               Get Started
@@ -162,6 +163,7 @@ export function AuthCard({
             <Button
               type="button"
               variant="ghost"
+              size="default"
               className="w-full"
               onClick={() => {
                 setMode("choose");
