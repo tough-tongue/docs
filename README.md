@@ -8,7 +8,7 @@
 ## Start Here
 
 This repo is the fastest path from “I want to build on ToughTongue AI” to a
-working voice-agent app. It is intentionally split for two audiences:
+working voice-agent app. It is organized around common builder profiles:
 
 | You are | Start with | Why |
 |---|---|---|
@@ -98,9 +98,8 @@ ToughTongue AI iframe embed for the voice session.
 Prompt sequences for AI builders. Start here if you want Lovable, v0, Bolt, or
 Cursor to generate the app around ToughTongue AI.
 
-```bash
-open starter-prompts/README.md
-```
+Read [`starter-prompts/README.md`](starter-prompts/README.md), choose the prompt
+that matches your app idea, and paste it into your builder.
 
 Use the canonical docs links above in the same builder session so the generated
 app has the right embed URLs, API endpoints, and server-side token handling.

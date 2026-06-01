@@ -259,7 +259,7 @@ function Footer() {
         </p>
         <p className="text-xs">
           <a
-            href="https://docs.toughtongueai.com/developer/starters/nextjs"
+            href="https://app.toughtongueai.com/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-teal-400"
