@@ -31,7 +31,14 @@ pip install -r requirements.txt
 
 ### 3. Configuration
 
-Create a `.env` file in the `flask-minimal/` directory:
+Copy the sample environment file and create a local `.env` file in the
+`flask-minimal/` directory:
+
+```bash
+cp .env.sample .env
+```
+
+Then set:
 
 ```env
 TTAI_TOKEN=your_api_token_here
@@ -346,10 +353,10 @@ gunicorn app:app
 
 ## Next Steps
 
-- Explore the [full documentation](/docs/flask-minimal)
-- Learn about [API integration](/docs/api-integration)
-- Check out [deployment options](/docs/deployment)
-- Review [best practices](/docs/best-practices)
+- Review the root [quickstart overview](../README.md)
+- Compare this starter with the [Next.js starter](../nextjs-minimal/README.md)
+- Use the [scenario manager](../scenario-manager/README.md) to version-control scenarios
+- Use [`starter-prompts/`](../starter-prompts/) when you want an AI builder to scaffold a complete app around this integration pattern
 
 ## Support
 

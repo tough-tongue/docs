@@ -1,22 +1,22 @@
 # Discover Your Personality - Next.js Starter Template
 
-A production-ready personality assessment app built with Next.js 15, ToughTongue AI, Firebase Authentication, and TypeScript. Users can take an MBTI personality test, get personalized coaching, and track their progress.
+A production-ready personality assessment app built with Next.js 16, ToughTongue AI, Firebase Authentication, and TypeScript. Users can take an MBTI personality test, get personalized coaching, and review their session results.
 
 ## ✨ Features
 
 - **🧠 MBTI Personality Test**: Interactive AI-powered assessment to discover your personality type
 - **💬 Personality Coach**: AI coach that provides personalized guidance based on your type
-- **📊 Progress Dashboard**: Track test results and coaching session history
-- **🔐 Firebase Authentication**: Email/password + Google OAuth sign-in
+- **📊 Results Dashboard**: Track test results and coaching session history
+- **🔐 Authentication**: Firebase Google sign-in plus local guest sessions
 - **💾 Local Storage**: Results saved in browser localStorage for persistence
 - **👨‍💼 Admin Panel**: Secure admin dashboard for data management
-- **⚡ Modern Stack**: Next.js 15 App Router, React 19, TypeScript, Tailwind CSS
+- **⚡ Modern Stack**: Next.js 16 App Router, React 19, TypeScript, Tailwind CSS
 
 ## 🚀 Quick Start (5 minutes)
 
 ### Prerequisites
 
-- **Node.js 18+** ([Download](https://nodejs.org/))
+- **Node.js 20+** ([Download](https://nodejs.org/))
 - **pnpm** (Install: `npm install -g pnpm`)
 - **ToughTongue AI Account** ([Sign up](https://www.toughtongueai.com/))
 
@@ -65,7 +65,7 @@ ADMIN_TOKEN=your_secure_admin_token_here
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Create a new project (or use existing)
-3. Enable **Authentication** → **Email/Password** and **Google** providers
+3. Enable **Authentication** → **Google** provider
 4. Go to Project Settings → General → Your apps → Web app
 5. Copy the config values into your `.env.local`
 
@@ -73,7 +73,7 @@ ADMIN_TOKEN=your_secure_admin_token_here
 
 The template includes a default personality test scenario. To use your own scenarios:
 
-1. Open `lib/constants.ts`
+1. Open `lib/ttai/constants.ts`
 2. Update the `SCENARIOS` object with your scenario IDs:
 
 ```typescript
@@ -99,37 +99,41 @@ nextjs-minimal/
 │   ├── page.tsx                         # Landing page
 │   ├── layout.tsx                       # Root layout with auth
 │   │
-│   ├── personality-test/
+│   ├── test/
 │   │   └── page.tsx                     # MBTI personality test
 │   │
-│   ├── personality-coach/
+│   ├── coach/
 │   │   └── page.tsx                     # AI personality coach
 │   │
-│   ├── progress/
-│   │   └── page.tsx                     # Progress dashboard
+│   ├── results/
+│   │   └── page.tsx                     # Results dashboard
 │   │
 │   ├── admin/
 │   │   └── page.tsx                     # Admin panel (token-protected)
 │   │
 │   ├── auth/
 │   │   ├── AuthContext.tsx              # Firebase auth provider
-│   │   ├── signin/page.tsx              # Sign-in page
-│   │   └── signup/page.tsx              # Sign-up page
+│   │   └── signin/page.tsx              # Sign-in page
 │   │
-│   └── api/tough-tongue/                # API routes (server-side)
-│       ├── scenarios/route.ts           # Create scenarios
+│   └── api/                             # API routes (server-side)
+│       ├── balance/route.ts             # Account balance proxy
+│       ├── sat/route.ts                 # Scenario Access Token proxy
 │       └── sessions/
+│           ├── route.ts                 # List sessions
 │           ├── [sessionId]/route.ts     # Get session details
-│           └── analyze/route.ts         # Analyze session
+│           ├── analyze/route.ts         # Analyze session
+│           └── post-process/route.ts    # Async analysis/extraction
 │
 ├── components/
 │   ├── ui/                              # shadcn/ui components
-│   ├── AdminTokenBanner.tsx             # Security warning banner
+│   ├── auth/                            # Auth guard and sign-in card
+│   ├── TTAIIframe.tsx                   # ToughTongue AI iframe wrapper
 │   └── Header.tsx                       # Navigation header
 │
 ├── lib/
 │   ├── config.ts                        # Centralized env config
-│   ├── constants.ts                     # App constants & scenario IDs
+│   ├── constants.ts                     # App constants and routes
+│   ├── ttai/                            # ToughTongue AI embed helpers
 │   ├── firebase.ts                      # Firebase initialization
 │   └── utils.ts                         # Utility functions
 │
@@ -144,7 +148,7 @@ nextjs-minimal/
 - Explains the MBTI assessment
 - Call-to-action buttons to take test or talk to coach
 
-### 2. **Personality Test** (`/personality-test`)
+### 2. **Personality Test** (`/test`)
 
 - Embeds ToughTongue AI personality assessment scenario
 - Listens for session completion events
@@ -153,14 +157,14 @@ nextjs-minimal/
 - Shows previous test results if completed
 - Allows retaking the test
 
-### 3. **Personality Coach** (`/personality-coach`)
+### 3. **Personality Coach** (`/coach`)
 
 - Embeds ToughTongue AI coaching scenario
 - Personalizes conversation with user's MBTI type (if test taken)
 - Tracks all coaching sessions in localStorage
 - Shows session history
 
-### 4. **Progress Dashboard** (`/progress`)
+### 4. **Results Dashboard** (`/results`)
 
 - Displays personality test results (with MBTI type)
 - Lists all coaching sessions with timestamps
@@ -176,15 +180,15 @@ nextjs-minimal/
 - Clear individual data types or all data
 - Security warnings if using default token
 
-### 6. **Admin Token Banner**
+### 6. **Configuration Warnings**
 
-- Appears on all pages if using default admin token
-- Reminds admins to set custom ADMIN_TOKEN
-- Dismissible but reappears on page refresh
+- The admin page warns when the default token is still active
+- Production deployments should always set a custom `ADMIN_TOKEN`
 
 ## 🔐 Authentication Flow
 
-The template uses **Firebase Authentication**:
+The template uses **Firebase Authentication** for Google sign-in and a local
+guest user mode for no-account trials.
 
 ### Using Auth in Components
 
@@ -193,15 +197,15 @@ The template uses **Firebase Authentication**:
 import { useAuth } from "@/app/auth/AuthContext";
 
 function MyComponent() {
-  const { user, loading, signOut } = useAuth();
+  const { currentUser, loading, logout, getUserName } = useAuth();
 
   if (loading) return <p>Loading...</p>;
-  if (!user) return <p>Please sign in</p>;
+  if (!currentUser) return <p>Please sign in</p>;
 
   return (
     <div>
-      <p>Welcome, {user.email}</p>
-      <button onClick={signOut}>Sign Out</button>
+      <p>Welcome, {getUserName()}</p>
+      <button onClick={logout}>Sign Out</button>
     </div>
   );
 }
@@ -252,14 +256,20 @@ All data is persisted under the localStorage key: `ttai-app-store`
 Edit `lib/config.ts`:
 
 ```typescript
-export const APP_NAME = "Your App Name";
-export const APP_DESCRIPTION = "Your app description";
+export const AppConfig = {
+  app: {
+    name: "Your App Name",
+    shortName: "Your App",
+    description: "Your app description",
+  },
+  // ...
+} as const;
 ```
 
 ### Add New Scenarios
 
 1. Get scenario ID from ToughTongue AI
-2. Add to `lib/constants.ts`:
+2. Add to `lib/ttai/constants.ts`:
 
 ```typescript
 export const SCENARIOS = {
@@ -270,7 +280,7 @@ export const SCENARIOS = {
 ```
 
 3. Create a new page in `app/your-scenario/page.tsx`
-4. Use the scenario URL: `SCENARIO_URLS.YOUR_NEW_SCENARIO`
+4. Build the iframe URL with `buildEmbedUrl({ scenarioId: SCENARIOS.YOUR_NEW_SCENARIO })`
 
 ### Styling
 
@@ -331,18 +341,33 @@ const response = await fetch("/api/sessions/analyze", {
 const analysis = await response.json();
 ```
 
-### `POST /api/scenarios`
+### `POST /api/sat`
 
-Create a new scenario:
+Create a Scenario Access Token for private scenario embeds:
 
 ```typescript
-const response = await fetch("/api/scenarios", {
+const response = await fetch("/api/sat", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: "Scenario Name",
-    description: "Description",
-    ai_instructions: "AI instructions...",
+    scenario_id: "your_scenario_id",
+    duration_hours: 4,
+  }),
+});
+```
+
+### `POST /api/sessions/post-process`
+
+Trigger async analysis and extraction after a session ends:
+
+```typescript
+await fetch("/api/sessions/post-process", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    session_id: sessionId,
+    run_analysis: true,
+    run_extraction: true,
   }),
 });
 ```
@@ -398,7 +423,7 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 **Solution**:
 
 1. Double-check all Firebase config values in `.env.local`
-2. Ensure you've enabled Email/Password and Google authentication in Firebase Console
+2. Ensure you've enabled Google authentication in Firebase Console
 3. Restart dev server: `pnpm dev`
 
 ### ❌ ToughTongue AI Session Not Starting
@@ -412,7 +437,7 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 **Solution**:
 
 1. Verify `TOUGH_TONGUE_API_KEY` in [Developer Portal](https://app.toughtongueai.com/developer)
-2. Check scenario IDs in `lib/constants.ts`
+2. Check scenario IDs in `lib/ttai/constants.ts`
 3. Allow microphone access when prompted
 
 ### ❌ Admin Panel Won't Accept Token

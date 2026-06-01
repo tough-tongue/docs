@@ -45,10 +45,9 @@ Examples of **forbidden** files in any project directory:
 
 ### AGENTS.local.md
 
-`AGENTS.local.md` at repo root is gitignored and machine-specific. It layers on
-top of this file — additive by default, may override sections when it says so
-explicitly. Use it for: local port overrides, SSH tunnel URLs, shell quirks,
-alternate credentials.
+`AGENTS.local.md` at repo root is tracked for this repo. It layers on top of
+this file and may explicitly override repo-wide workflow restrictions. Continue
+to keep secrets, credentials, and machine-specific ports out of tracked docs.
 
 ---
 
@@ -57,13 +56,11 @@ alternate credentials.
 ```
 voice-ai-quickstart/
 ├── marketing-agent-demo/  Voice AI co-navigation demo (flagship)
-│   └── app/               Next.js 15 app — deploy directly to Vercel
+│   └── app/               Next.js 16 app — deploy directly to Vercel
 ├── nextjs-minimal/        Next.js 16.1+ + Firebase starter app
 ├── flask-minimal/         Flask + Preact minimal starter
-├── starter-prompts/       One-shot prompts for Lovable/v0/Bolt
+├── starter-prompts/       AI builder prompt sequences for Lovable/v0/Bolt
 ├── scenario-manager/      ttcli — YAML-driven scenario sync CLI
-├── archived/
-│   └── mintlify-docs/     Mintlify docs site (archived — see README to reactivate)
 └── _0ven/                 Gitignored scratch (specs, AI notes)
 ```
 
@@ -75,7 +72,6 @@ voice-ai-quickstart/
 | Next.js starter  | `nextjs-minimal/AGENTS.md`         | App Router, Firebase, shadcn/ui, lib/ttai   |
 | Flask starter    | `flask-minimal/AGENTS.md`          | Python server, Preact embed, API proxy      |
 | Scenario manager | `scenario-manager/README.md`       | ttcli bash script, YAML schema, CI usage    |
-| Mintlify docs    | `archived/mintlify-docs/README.md` | Archived — see README to reactivate         |
 
 ---
 
@@ -83,7 +79,7 @@ voice-ai-quickstart/
 
 | Area            | Tech                                                                               |
 | --------------- | ---------------------------------------------------------------------------------- |
-| Co-nav demo     | Next.js 15, TypeScript, React 19, Tailwind 4, shadcn/ui, Vercel                    |
+| Co-nav demo     | Next.js 16, TypeScript, React 19, Tailwind 4, shadcn/ui, Vercel                    |
 | Next.js starter | Next.js 16.1+, TypeScript, React 19, Tailwind 4, Zustand, Firebase Auth, shadcn/ui |
 | Flask starter   | Python 3.9+, Flask 2.0+, Preact (no build tools), Vercel                           |
 
@@ -158,14 +154,14 @@ Every page and component file:
 | Path                                                     | Purpose                                        |
 | -------------------------------------------------------- | ---------------------------------------------- |
 | `AGENTS.md`                                              | This file — repo-wide agent rules              |
-| `AGENTS.local.md`                                        | Machine-local overrides (gitignored)           |
+| `AGENTS.local.md`                                        | Tracked local workflow override                |
 | `marketing-agent-demo/README.md`                         | Co-nav demo — getting started guide            |
 | `marketing-agent-demo/app/lib/ttai.ts`                   | Scenario IDs + embed URL builder               |
 | `marketing-agent-demo/app/lib/command-store.ts`          | In-memory command store (swap for Redis)       |
 | `marketing-agent-demo/app/hooks/useNavigationSession.ts` | Session ID + long-poll hook                    |
 | `nextjs-minimal/AGENTS.md`                               | Next.js starter area guide                     |
 | `flask-minimal/AGENTS.md`                                | Flask starter area guide                       |
-| `starter-prompts/README.md`                              | One-shot prompt index + integration reference  |
+| `starter-prompts/README.md`                              | Builder prompt sequences + integration reference |
 | `scenario-manager/README.md`                             | ttcli usage guide                              |
 | `scenario-manager/ttcli`                                 | Bash CLI — push/pull/diff/list scenarios       |
 | `scenario-manager/scenarios/example.yml`                 | Annotated scenario YAML reference              |

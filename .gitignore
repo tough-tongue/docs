@@ -57,9 +57,6 @@ node_modules
 .env.*.local
 *.env
 
-# Machine-local agent rules
-AGENTS.local.md
-
 # OS files
 .DS_Store
 *.pem

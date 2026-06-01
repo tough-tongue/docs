@@ -2,7 +2,7 @@
  * Application Constants
  *
  * MBTI personality types and application routes.
- * ToughTongue AI specific constants are in lib/toughtongue/
+ * ToughTongue AI specific constants are in lib/ttai/
  */
 
 // =============================================================================

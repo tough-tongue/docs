@@ -10,19 +10,33 @@
 ## What is this?
 
 ToughTongue AI is a voice agent platform for high-stakes conversation practice
-(interviews, sales, coaching, negotiations). These templates show you how to embed
-a TTAI agent into your own website and wire it up so the agent can:
+(interviews, sales, coaching, negotiations). This repo is a practical quickstart
+hub for adding a ToughTongue AI voice agent to your own app.
+
+The examples show how to:
 
 - **Talk** to your visitor via a floating voice widget
 - **Navigate** the visitor's browser to any page or section on command
 - **Show** slides, product pages, or any URL during the conversation
-- **Analyse** the session and display a debrief after the call
+- **Analyze** the session and display a debrief after the call
 
 You bring the website. The agent brings the intelligence.
 
 ---
 
-## Templates
+## Choose a starting point
+
+| Goal | Start here |
+|---|---|
+| Add real-time agent-driven browser navigation | [`marketing-agent-demo/`](marketing-agent-demo/) |
+| Build an authenticated Next.js app with session analysis | [`nextjs-minimal/`](nextjs-minimal/) |
+| Add a small Python backend proxy around an iframe embed | [`flask-minimal/`](flask-minimal/) |
+| Version-control scenario definitions as YAML | [`scenario-manager/`](scenario-manager/) |
+| Prompt an AI builder to scaffold a site | [`starter-prompts/`](starter-prompts/) |
+
+---
+
+## Active quickstarts
 
 ### [marketing-agent-demo/](marketing-agent-demo/) — Voice AI co-navigation
 
@@ -56,7 +70,7 @@ the command.
 
 ### [nextjs-minimal/](nextjs-minimal/) — Next.js + Firebase starter
 
-Production-ready Next.js 15 app with Firebase auth, protected routes, and an
+Production-ready Next.js 16 app with Firebase auth, protected routes, and an
 embedded TTAI conversation widget. The fastest path from zero to a live
 authenticated ToughTongue AI integration.
 
@@ -72,7 +86,7 @@ session analysis · API token proxy · Tailwind + shadcn/ui
 
 **Live demo:** [nextjs-ttai-starter-demo.vercel.app](https://nextjs-ttai-starter-demo.vercel.app)
 
-→ [Setup guide](nextjs-minimal/AGENTS.md)
+→ [Setup guide](nextjs-minimal/README.md)
 
 ---
 
@@ -87,26 +101,21 @@ npx degit tough-tongue/voice-ai-quickstart/flask-minimal my-app
 cd my-app
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
-python app.py   # → http://localhost:5001
+cp .env.sample .env
+python app.py   # → http://localhost:8008
 ```
 
 ---
 
-### [starter-prompts/](starter-prompts/) — One-shot AI prompts
+### [starter-prompts/](starter-prompts/) — AI builder prompts
 
 Copy-paste prompts for [Lovable](https://lovable.dev), [v0](https://v0.dev),
-and [Bolt](https://bolt.new) that generate a complete ToughTongue AI app in a
-single paste — no manual wiring.
+and [Bolt](https://bolt.new) that generate a complete ToughTongue AI app through
+small, ordered prompt sequences.
 
-| Prompt | App |
-|---|---|
-| `personality-assessment-lovable.md` | MBTI test + AI personality coach |
-| `interview-coach-lovable.md` | Resume-aware interview practice |
-| `sales-training-lovable.md` | Cold call + objection handling |
-| `negotiation-trainer-lovable.md` | Salary & deal negotiation |
-| `customer-support-training-lovable.md` | Support rep CSAT training |
-| `leadership-coaching-lovable.md` | Manager coaching — feedback & conflict |
+| Sequence | Files | App |
+|---|---|---|
+| Real estate marketing site | `real-estate-1-build-site.md` → `real-estate-4-admin-panel.md` | Luxury property microsite with voice agent, remote navigation, and admin tooling |
 
 → [Prompt index + usage](starter-prompts/README.md)
 
@@ -138,7 +147,14 @@ ttcli diff scenarios/cold-call.yml       # preview changes before push
 2. Open **Developer → API Keys**
 3. Create a key — it looks like `ttai_pat_...`
 
-Set it as `TOUGHTONGUE_API_TOKEN` (server-side) or `TTAI_PAT_TOKEN` (CLI).
+Use the variable name expected by the example you are running:
+
+| Example | Variable |
+|---|---|
+| `marketing-agent-demo/app` | `TOUGHTONGUE_API_TOKEN` |
+| `nextjs-minimal` | `TOUGH_TONGUE_API_KEY` |
+| `flask-minimal` | `TTAI_TOKEN` |
+| `scenario-manager/ttcli` | `TTAI_PAT_TOKEN` |
 
 ---
 

@@ -7,25 +7,17 @@ paste directly into [Lovable](https://lovable.dev), [Bolt](https://bolt.new),
 
 ## The idea
 
-Each prompt (or prompt sequence) builds a real, deployable website.
+Each prompt sequence builds a real, deployable website.
 By the end you have a site where users can open a voice AI agent in a widget,
 have a live conversation, and see a scored analysis of their session — all
-powered by ToughTongue AI with no backend required.
+powered by ToughTongue AI.
 
 ---
 
-## Single-shot prompts
+## Available prompts
 
-One prompt → one complete app. Paste and go.
-
-| File                                   | App                                                  | Platform |
-| -------------------------------------- | ---------------------------------------------------- | -------- |
-| `personality-assessment-lovable.md`    | Discover Your Personality — MBTI test + coach        | Lovable  |
-| `interview-coach-lovable.md`           | Interview Practice — resume-aware AI coach           | Lovable  |
-| `sales-training-lovable.md`            | Sales Training — cold call + objection handling      | Lovable  |
-| `negotiation-trainer-lovable.md`       | NegotiateIQ — salary & deal negotiation              | Lovable  |
-| `customer-support-training-lovable.md` | SupportPro — CSAT training for support reps          | Lovable  |
-| `leadership-coaching-lovable.md`       | LeadWell — management coaching with competency radar | Lovable  |
+The checked-in prompts currently focus on a multi-step real-estate marketing
+site. Add new one-shot prompts here after their files are committed and tested.
 
 ---
 
@@ -35,8 +27,8 @@ Paste each step in order into the same project session. Each step builds on the 
 
 ### Real estate marketing site
 
-By Step 3 you have a luxury property microsite with a ToughTongue AI voice agent
-wired in — choose whichever integration fits your setup.
+By Step 4 you have a luxury property microsite with a ToughTongue AI voice agent,
+remote navigation, and an admin panel.
 
 | Step | File                                   | What gets built                                                             |
 | ---- | -------------------------------------- | --------------------------------------------------------------------------- |
@@ -48,12 +40,6 @@ wired in — choose whichever integration fits your setup.
 ---
 
 ## How to use
-
-**Single-shot:**
-1. Open the prompt file, copy its content.
-2. Paste into a new Lovable / Bolt / v0 project.
-3. Set `VITE_TTAI_API_KEY` to your ToughTongue AI API key.
-4. Deploy.
 
 **Multi-step sequence:**
 1. Paste Step 1 into a new project — get the base site working.
