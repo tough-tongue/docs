@@ -362,6 +362,9 @@ gunicorn app:app
 
 - [API Playground](https://app.toughtongueai.com/api-playground)
 - [Developer Portal](https://app.toughtongueai.com/developer)
+- [Platform Docs](https://app.toughtongueai.com/docs)
+- [AI-readable docs](https://app.toughtongueai.com/llms.txt)
+- [Full API reference](https://app.toughtongueai.com/llms-full.txt)
 - [Developer Community](https://discord.com/invite/jfq2wVAP)
 - [Support Email](mailto:help@getarchieai.com)
 

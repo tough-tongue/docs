@@ -460,7 +460,9 @@ By default, the token is: `TTAI-STARTER-ADMIN-TOKEN`
 
 ## 📚 Learn More
 
-- **[ToughTongue AI Documentation](https://docs.toughtongueai.com)**
+- **[ToughTongue AI Documentation](https://app.toughtongueai.com/docs)**
+- **[ToughTongue AI llms.txt](https://app.toughtongueai.com/llms.txt)**
+- **[ToughTongue AI full API reference](https://app.toughtongueai.com/llms-full.txt)**
 - **[Next.js Documentation](https://nextjs.org/docs)**
 - **[Firebase Documentation](https://firebase.google.com/docs)**
 - **[Tailwind CSS](https://tailwindcss.com/docs)**
