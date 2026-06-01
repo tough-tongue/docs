@@ -16,8 +16,8 @@ export const TOP_ROUTES = [
 
 export const DECKS = [
   {
-    id: "property-type-a",
-    label: "Property Type A",
+    id: "wraparound-residence",
+    label: "Wraparound Residence",
     slides: [
       { n: 1, label: "The Wraparound Residence" },
       { n: 2, label: "Open Arrival" },
@@ -27,8 +27,8 @@ export const DECKS = [
     ],
   },
   {
-    id: "property-type-b",
-    label: "Property Type B",
+    id: "sky-penthouse",
+    label: "Sky Penthouse",
     slides: [
       { n: 1, label: "The Sky Penthouse" },
       { n: 2, label: "Garden in the Sky" },
@@ -41,7 +41,7 @@ export const DECKS = [
     id: "amenities",
     label: "Amenities",
     slides: [
-      { n: 1, label: "The Sanctuary" },
+      { n: 1, label: "The Camellias Club" },
       { n: 2, label: "Spa & Pools" },
       { n: 3, label: "Golf Courses" },
       { n: 4, label: "Specsheet" },

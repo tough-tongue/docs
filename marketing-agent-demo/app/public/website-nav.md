@@ -60,35 +60,35 @@ Entry point listing all three decks. Navigate here to let the visitor choose a d
 
 | Deck ID | URL base | Slides | When to use |
 |---------|----------|--------|-------------|
-| `property-type-a` | `/slides/property-type-a` | 5 | Show a 4-BHK wraparound-style residence |
-| `property-type-b` | `/slides/property-type-b` | 5 | Show the sky penthouse / duplex |
+| `wraparound-residence` | `/slides/wraparound-residence` | 5 | Show a 4-BHK wraparound-style residence |
+| `sky-penthouse` | `/slides/sky-penthouse` | 5 | Show the sky penthouse / duplex |
 | `amenities` | `/slides/amenities` | 4 | Show clubhouse, spa, golf, lifestyle |
 
-#### Property Type A (4-BHK Wraparound)
+#### The Wraparound Residence (4-BHK)
 
 | Slide | URL | Headline |
 |-------|-----|---------|
-| 1 | `/slides/property-type-a/1` | The Wraparound Residence |
-| 2 | `/slides/property-type-a/2` | An open arrival, a private wing |
-| 3 | `/slides/property-type-a/3` | Configuration & Areas |
-| 4 | `/slides/property-type-a/4` | Light, gathered along the long edge |
-| 5 | `/slides/property-type-a/5` | Four bedrooms. Four moods |
+| 1 | `/slides/wraparound-residence/1` | The Wraparound Residence |
+| 2 | `/slides/wraparound-residence/2` | An open arrival, a private wing |
+| 3 | `/slides/wraparound-residence/3` | Configuration & Areas |
+| 4 | `/slides/wraparound-residence/4` | Light, gathered along the long edge |
+| 5 | `/slides/wraparound-residence/5` | Four bedrooms. Four moods |
 
-#### Property Type B (Sky Penthouse)
+#### The Sky Penthouse
 
 | Slide | URL | Headline |
 |-------|-----|---------|
-| 1 | `/slides/property-type-b/1` | The Sky Penthouse |
-| 2 | `/slides/property-type-b/2` | A garden in the sky |
-| 3 | `/slides/property-type-b/3` | Configuration & Areas |
-| 4 | `/slides/property-type-b/4` | Double-height. Single horizon |
-| 5 | `/slides/property-type-b/5` | A suite with three windows of light |
+| 1 | `/slides/sky-penthouse/1` | The Sky Penthouse |
+| 2 | `/slides/sky-penthouse/2` | A garden in the sky |
+| 3 | `/slides/sky-penthouse/3` | Configuration & Areas |
+| 4 | `/slides/sky-penthouse/4` | Double-height. Single horizon |
+| 5 | `/slides/sky-penthouse/5` | A suite with three windows of light |
 
 #### Amenities
 
 | Slide | URL | Headline |
 |-------|-----|---------|
-| 1 | `/slides/amenities/1` | The Sanctuary |
+| 1 | `/slides/amenities/1` | The Camellias Club |
 | 2 | `/slides/amenities/2` | Spa, pools and a fitness studio above the trees |
 | 3 | `/slides/amenities/3` | Two championship courses, one drive away |
 | 4 | `/slides/amenities/4` | A short list, kept short (spec sheet) |
@@ -112,10 +112,10 @@ Use these rules to decide what to navigate to:
 |------------------------|-------------------|
 | "Tell me about the project / what is this?" | Scroll to `#intro` |
 | "What are the highlights?" | Scroll to `#highlights` |
-| "Show me the apartments / flats" | Navigate to `/slides/property-type-a/1` |
-| "What is the sky penthouse / duplex?" | Navigate to `/slides/property-type-b/1` |
+| "Show me the apartments / flats" | Navigate to `/slides/wraparound-residence/1` |
+| "What is the sky penthouse / duplex?" | Navigate to `/slides/sky-penthouse/1` |
 | "Show me amenities / clubhouse / pool" | Navigate to `/slides/amenities/1` |
-| "Show me configuration / floor plan / area" | Navigate to Type A Slide 3 or Type B Slide 3 |
+| "Show me configuration / floor plan / area" | Navigate to Wraparound Residence Slide 3 or Sky Penthouse Slide 3 |
 | "Sustainability / LEED / green" | Scroll to `#sustainability` |
 | "Who designed it / architects / designers" | Scroll to `#masters` |
 | "Book a visit / consultation / call Priya" | Scroll to bottom of page (Priya section) |
@@ -135,7 +135,7 @@ Use these rules to decide what to navigate to:
 ### Command shape
 
 ```json
-{ "url": "/slides/property-type-a/2" }     // route change
+{ "url": "/slides/wraparound-residence/2" }     // route change
 { "section": "#sustainability" }            // scroll to anchor
 ```
 

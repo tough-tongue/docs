@@ -19,9 +19,9 @@ navigation command to your frontend.
 ```
 Visitor opens widget → agent starts voice session
 Agent decides to show the visitor a slide deck
-Agent calls  POST /api/agent-navigate  { session_code: "ABCD", url: "/slides/property-type-a/1" }
+Agent calls  POST /api/agent-navigate  { session_code: "ABCD", url: "/slides/wraparound-residence/1" }
 Your server wakes the long-poll for session ABCD
-Visitor's browser navigates to /slides/property-type-a/1
+Visitor's browser navigates to /slides/wraparound-residence/1
 ```
 
 No SDK. No WebSockets. Just one HTTP endpoint and a long-poll.
@@ -74,7 +74,7 @@ In your ToughTongue AI scenario, add a **custom function** with this schema:
       },
       "url": {
         "type": "string",
-        "description": "Relative URL to navigate to, e.g. /slides/property-type-a/1"
+        "description": "Relative URL to navigate to, e.g. /slides/wraparound-residence/1"
       },
       "section": {
         "type": "string",

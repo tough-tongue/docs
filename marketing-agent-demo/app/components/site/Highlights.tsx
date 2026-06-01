@@ -54,8 +54,8 @@ const StatTile = ({ tile, index }) => {
 };
 
 const Strip = ({ strip, index }) => {
-    const r1 = useReveal<HTMLDivElement>();
-    const r2 = useReveal<HTMLDivElement>();
+    const imageRef = useReveal<HTMLDivElement>();
+    const copyRef = useReveal<HTMLDivElement>();
     const parallaxRef = useParallax<HTMLDivElement>(0.22);
     const reverse = index % 2 === 1;
 
@@ -68,7 +68,7 @@ const Strip = ({ strip, index }) => {
         >
             <div
                 ref={(el) => {
-                    r1.current = el;
+                    imageRef.current = el;
                     parallaxRef.current = el;
                 }}
                 className={`reveal relative overflow-hidden md:col-span-7 h-[60vh] md:h-auto ${
@@ -86,7 +86,7 @@ const Strip = ({ strip, index }) => {
             </div>
 
             <div
-                ref={r2}
+                ref={copyRef}
                 className={`reveal md:col-span-5 bg-[#FAF9F6] flex flex-col justify-center px-8 md:px-14 lg:px-20 py-20 ${
                     reverse ? "md:order-1" : ""
                 }`}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Wallet, ExternalLink } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { OUR_SCENARIOS } from "../constants";
 
 // account-tab ------------------------------------------------------------------
@@ -65,7 +65,11 @@ function ScenarioCard({
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (data?.ai_instructions) setInstructions(data.ai_instructions as string);
+    if (!data?.ai_instructions) return;
+    const frame = requestAnimationFrame(() => {
+      setInstructions(data.ai_instructions as string);
+    });
+    return () => cancelAnimationFrame(frame);
   }, [data]);
 
   const save = async () => {

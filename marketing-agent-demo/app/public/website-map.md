@@ -11,20 +11,20 @@ Accessible at: `/website-map.md`
 |------|-------------|
 | `/` | Landing page — full marketing site |
 | `/slides` | Slide deck index |
-| `/slides/property-type-a` | Property Type A — opens at slide 1 |
-| `/slides/property-type-a/1` | Property Type A — Slide 1: The Wraparound Residence |
-| `/slides/property-type-a/2` | Property Type A — Slide 2: An open arrival, a private wing |
-| `/slides/property-type-a/3` | Property Type A — Slide 3: Configuration & Areas |
-| `/slides/property-type-a/4` | Property Type A — Slide 4: Light, gathered along the long edge |
-| `/slides/property-type-a/5` | Property Type A — Slide 5: Four bedrooms. Four moods |
-| `/slides/property-type-b` | Property Type B — opens at slide 1 |
-| `/slides/property-type-b/1` | Property Type B — Slide 1: The Sky Penthouse |
-| `/slides/property-type-b/2` | Property Type B — Slide 2: A garden in the sky |
-| `/slides/property-type-b/3` | Property Type B — Slide 3: Configuration & Areas |
-| `/slides/property-type-b/4` | Property Type B — Slide 4: Double-height. Single horizon |
-| `/slides/property-type-b/5` | Property Type B — Slide 5: A suite with three windows of light |
+| `/slides/wraparound-residence` | The Wraparound Residence — opens at slide 1 |
+| `/slides/wraparound-residence/1` | The Wraparound Residence — Slide 1: The Wraparound Residence |
+| `/slides/wraparound-residence/2` | The Wraparound Residence — Slide 2: An open arrival, a private wing |
+| `/slides/wraparound-residence/3` | The Wraparound Residence — Slide 3: Configuration & Areas |
+| `/slides/wraparound-residence/4` | The Wraparound Residence — Slide 4: Light, gathered along the long edge |
+| `/slides/wraparound-residence/5` | The Wraparound Residence — Slide 5: Four bedrooms. Four moods |
+| `/slides/sky-penthouse` | The Sky Penthouse — opens at slide 1 |
+| `/slides/sky-penthouse/1` | The Sky Penthouse — Slide 1: The Sky Penthouse |
+| `/slides/sky-penthouse/2` | The Sky Penthouse — Slide 2: A garden in the sky |
+| `/slides/sky-penthouse/3` | The Sky Penthouse — Slide 3: Configuration & Areas |
+| `/slides/sky-penthouse/4` | The Sky Penthouse — Slide 4: Double-height. Single horizon |
+| `/slides/sky-penthouse/5` | The Sky Penthouse — Slide 5: A suite with three windows of light |
 | `/slides/amenities` | Amenities — opens at slide 1 |
-| `/slides/amenities/1` | Amenities — Slide 1: The Sanctuary |
+| `/slides/amenities/1` | Amenities — Slide 1: The Camellias Club |
 | `/slides/amenities/2` | Amenities — Slide 2: Spa, pools and a fitness studio above the trees |
 | `/slides/amenities/3` | Amenities — Slide 3: Two championship courses, one drive away |
 | `/slides/amenities/4` | Amenities — Slide 4: A short list, kept short |
@@ -48,8 +48,8 @@ Accessible at: `/website-map.md`
 
 | Deck ID | Title | Slide Count | Slides |
 |---------|-------|-------------|--------|
-| `property-type-a` | Property Type A | 5 | 1 – 5 |
-| `property-type-b` | Property Type B | 5 | 1 – 5 |
+| `wraparound-residence` | The Wraparound Residence | 5 | 1 – 5 |
+| `sky-penthouse` | The Sky Penthouse | 5 | 1 – 5 |
 | `amenities` | Amenities | 4 | 1 – 4 |
 
 ---
@@ -63,7 +63,7 @@ The Admin at `/admin` can then target that session ID and dispatch `url` or `sec
 
 ### Command shape
 ```json
-{ "url": "/slides/property-type-a/2" }   // navigate to a route
+{ "url": "/slides/wraparound-residence/2" }   // navigate to a route
 { "section": "#highlights" }              // scroll to a landing page section
 ```
 

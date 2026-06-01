@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "@/context/SessionContext";
 import { Unplug } from "lucide-react";

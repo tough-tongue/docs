@@ -1,26 +1,26 @@
 {
     "meta": {
-        "id": "property-type-b",
-        "name": "Type B — The Sky Penthouse",
+        "id": "sky-penthouse",
+        "name": "The Sky Penthouse",
         "tagline": "Upper-floor residences with private terrace gardens.",
         "description": "Upper-floor penthouses with private rooftop terrace gardens, double-height living, and uninterrupted views in three directions. Best for the connoisseur who wants altitude, privacy and outdoor entertaining.",
         "useWhen": "Pitch when a client wants the highest possible vantage, terrace-led entertaining, and a residence that doubles as a vertical retreat. Often paired with private elevator lobby and concierge service.",
-        "cover": "/images/img233.jpg",
+        "cover": "/images/camellias/penthouse-tower-crown.jpg",
         "accent": "#C5A059"
     },
     "slides": [
         {
             "id": "type-b-01",
             "order": 1,
-            "eyebrow": "Type B",
+            "eyebrow": "Penthouse",
             "title": "The Sky Penthouse",
             "subtitle": "Altitude, privacy and a sky one can step into.",
             "body": "Reserved for the uppermost floors of the crowning tower, the Sky Penthouse rises above the surrounding green canopy — a residence where the boundary between interior and horizon is studied with care.",
             "layout": "fullbleed",
             "images": [
                 {
-                    "src": "/images/DLF-Camellias-19-10-1504.jpg",
-                    "alt": "The Camellias — upper tower elevation"
+                    "src": "/images/camellias/penthouse-tower-crown.jpg",
+                    "alt": "Upper tower elevation of The Camellias penthouse levels"
                 }
             ],
             "draft": true
@@ -34,16 +34,16 @@
             "layout": "mosaic",
             "images": [
                 {
-                    "src": "/images/1A1A9724.jpg",
-                    "alt": "Outdoor pool reflection"
+                    "src": "/images/camellias/clubhouse-green-roof.jpg",
+                    "alt": "The Camellias Club green-roof terraces and water garden"
                 },
                 {
-                    "src": "/images/events/sustainable_effort.jpg",
-                    "alt": "Towers reflecting at sunset"
+                    "src": "/images/camellias/clubhouse-water-garden.jpg",
+                    "alt": "Water garden and petal-roof clubhouse architecture"
                 },
                 {
-                    "src": "/images/img235.jpg",
-                    "alt": "Curved façade detail"
+                    "src": "/images/camellias/clubhouse-night-water-garden.jpg",
+                    "alt": "The Camellias Club water garden lit for evening entertaining"
                 }
             ],
             "draft": true
@@ -57,16 +57,16 @@
             "layout": "specsheet",
             "images": [
                 {
-                    "src": "/images/img234.jpg",
-                    "alt": "Site plan — top view"
+                    "src": "/images/camellias/elevation-panorama.jpg",
+                    "alt": "Panoramic tower elevation used for penthouse context"
                 }
             ],
             "specs": [
-                { "label": "Configuration", "value": "5 BHK Penthouse + Family Lounge + Servant" },
-                { "label": "Built-up Area", "value": "~ 12,500", "unit": "sq ft" },
-                { "label": "Terrace Garden", "value": "~ 3,200", "unit": "sq ft" },
-                { "label": "Ceiling Height", "value": "Double-height living, 6.4", "unit": "m" },
-                { "label": "Aspects", "value": "North, East & South" },
+                { "label": "Configuration", "value": "Penthouse + Family Lounge + Staff" },
+                { "label": "Saleable Area", "value": "13,000 – 16,000", "unit": "sq ft" },
+                { "label": "Vertical Access", "value": "Internal private lift" },
+                { "label": "Frontage", "value": "4 bedrooms + living/dining face golf frontage" },
+                { "label": "Staff Areas", "value": "Double staff accommodation vs standard units" },
                 { "label": "Parking", "value": "Six covered bays + valet bay" }
             ],
             "draft": true
@@ -80,8 +80,8 @@
             "layout": "split",
             "images": [
                 {
-                    "src": "/images/img235.jpg",
-                    "alt": "Material palette study"
+                    "src": "/images/camellias/clubhouse-water-garden.jpg",
+                    "alt": "Clubhouse water garden used as a lifestyle reference"
                 }
             ],
             "draft": true
@@ -95,8 +95,8 @@
             "layout": "hero",
             "images": [
                 {
-                    "src": "/images/DLF-Camellias-19-10-1504.jpg",
-                    "alt": "Lighting design study"
+                    "src": "/images/camellias/penthouse-tower-crown.jpg",
+                    "alt": "Upper residential tower levels at The Camellias"
                 }
             ],
             "draft": true

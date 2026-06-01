@@ -1,11 +1,11 @@
 {
     "meta": {
         "id": "amenities",
-        "name": "Amenities — The Sanctuary",
+        "name": "Amenities — The Camellias Club",
         "tagline": "A clubhouse, a spa, a sky lounge, two golf courses.",
         "description": "A guided walk-through of the lifestyle amenities — from the clubhouse and spa to the pools, fitness studios and golf practice greens. Useful as a high-level lifestyle pitch alongside any residence type.",
         "useWhen": "Pitch alongside any residence type, or as a stand-alone lifestyle introduction. Especially useful for buyers comparing super-luxury developments in NCR.",
-        "cover": "/images/1A1A9724.jpg",
+        "cover": "/images/camellias/clubhouse-water-garden.jpg",
         "accent": "#1A362D"
     },
     "slides": [
@@ -13,14 +13,14 @@
             "id": "amenities-01",
             "order": 1,
             "eyebrow": "Amenities",
-            "title": "The Sanctuary.",
-            "subtitle": "A 250,000 sq ft clubhouse, conceived as a destination.",
-            "body": "The Sanctuary is not an amenity block — it is a destination at the heart of the residence. Designed by Rockwell Group, it carries lounges, dining, spa, fitness and play across a single landscaped axis.",
+            "title": "The Camellias Club.",
+            "subtitle": "A 160,000 sq ft clubhouse, conceived as a destination.",
+            "body": "The Camellias Club is not an amenity block — it is a destination at the heart of the residence. Designed with Rockwell Group, it carries lounges, dining, spa, fitness and play across a landscaped water garden.",
             "layout": "fullbleed",
             "images": [
                 {
-                    "src": "/images/events/sustainable_effort.jpg",
-                    "alt": "The Sanctuary — towers reflected in water"
+                    "src": "/images/camellias/clubhouse-water-garden.jpg",
+                    "alt": "The Camellias Club water garden and petal roofs"
                 }
             ],
             "draft": true
@@ -34,16 +34,16 @@
             "layout": "mosaic",
             "images": [
                 {
-                    "src": "/images/1A1A9724.jpg",
-                    "alt": "Outdoor pool"
+                    "src": "/images/camellias/clubhouse-green-roof.jpg",
+                    "alt": "Green-roof clubhouse terraces beside the water garden"
                 },
                 {
-                    "src": "/images/DLF-Camellias-19-05-13075.jpg",
-                    "alt": "Spa ambience"
+                    "src": "/images/camellias/clubhouse-night-water-garden.jpg",
+                    "alt": "The Camellias Club water garden illuminated at night"
                 },
                 {
-                    "src": "/images/img236.jpg",
-                    "alt": "Lighting study"
+                    "src": "/images/camellias/clubhouse-water-garden.jpg",
+                    "alt": "Water garden walkways and clubhouse roofscape"
                 }
             ],
             "draft": true
@@ -57,8 +57,8 @@
             "layout": "split",
             "images": [
                 {
-                    "src": "/images/img234.jpg",
-                    "alt": "Aerial view of the site and golf course"
+                    "src": "/images/camellias/elevation-panorama.jpg",
+                    "alt": "Panoramic view of The Camellias residential towers"
                 }
             ],
             "draft": true
@@ -72,12 +72,12 @@
             "layout": "specsheet",
             "images": [
                 {
-                    "src": "/images/img235.jpg",
-                    "alt": "Clubhouse and tower view"
+                    "src": "/images/camellias/clubhouse-green-roof.jpg",
+                    "alt": "The Camellias Club green-roof architecture"
                 }
             ],
             "specs": [
-                { "label": "Clubhouse", "value": "The Sanctuary — ~ 250,000", "unit": "sq ft" },
+                { "label": "Clubhouse", "value": "The Camellias Club — ~ 160,000", "unit": "sq ft" },
                 { "label": "Spa", "value": "By Goco Hospitality" },
                 { "label": "Fitness", "value": "Programmed by The Wright Fit" },
                 { "label": "Pools", "value": "Indoor + outdoor + lap + plunge" },

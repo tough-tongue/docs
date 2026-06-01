@@ -52,7 +52,7 @@ export interface Slide {
 
 **Seed data:** two JSON files —
 - `src/data/slides/amenities.json` — 5 slides: Pool, Spa, Club, Gardens, Concierge
-- `src/data/slides/property-type-a.json` — 4 slides: Overview, Floor Plans, Finishes, Pricing
+- `src/data/slides/wraparound-residence.json` — 4 slides: Overview, Floor Plans, Finishes, Pricing
 
 Register both in `src/data/slides/registry.ts`.
 
