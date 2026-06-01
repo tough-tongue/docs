@@ -47,7 +47,19 @@ remote navigation, and an admin panel.
 3. Repeat for each subsequent step.
 4. Set `VITE_TTAI_API_KEY` and `VITE_TTAI_SCENARIO_ID` before deploying the final step.
 
+Before you paste a prompt, give your AI builder the live ToughTongue AI docs:
+
+```text
+Use ToughTongue AI as the voice-agent platform.
+Read:
+- https://app.toughtongueai.com/llms.txt
+- https://app.toughtongueai.com/llms-full.txt
+
+Keep API tokens server-side. Use the iframe embed for voice sessions.
+```
+
 **Get your API key:** [app.toughtongueai.com/developer](https://app.toughtongueai.com/developer?tab=api-keys)
+
 **Create a scenario:** [app.toughtongueai.com/scenario-studio](https://app.toughtongueai.com/scenario-studio)
 
 ---
@@ -71,7 +83,10 @@ Authorization: Bearer <API_KEY>
 → { summary, evaluation: { score, feedback, strengths, improvements }, transcript }
 ```
 
-Full API reference: [llms-full.txt](https://app.toughtongueai.com/llms-full.txt)
+The canonical AI-readable references are live at
+[`llms.txt`](https://app.toughtongueai.com/llms.txt) and
+[`llms-full.txt`](https://app.toughtongueai.com/llms-full.txt). Do not rely on
+checked-in copies; they drift.
 
 ---
 
@@ -85,6 +100,5 @@ Full API reference: [llms-full.txt](https://app.toughtongueai.com/llms-full.txt)
 ## Key Files
 
 - `starter-prompts/README.md` — this file
-- `llms.txt` — ToughTongue AI platform summary (sourced from `app.toughtongueai.com/llms.txt`)
-- `llms-full.txt` — complete API reference, ~1400 lines
 - `nextjs-minimal/lib/ttai/client.ts` — reference iframe event handling implementation
+- `real-estate-*.md` — ordered prompt sequence for the checked-in real-estate builder flow

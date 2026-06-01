@@ -146,37 +146,11 @@ VITE_TTAI_PAT=   # Personal Access Token — from app.toughtongueai.com/develope
 
 ## ToughTongue AI Platform Reference
 
-> Full API reference (~1400 lines, all endpoints + schemas):
-> https://app.toughtongueai.com/llms-full.txt
+Use the live AI-readable docs instead of copying API reference text into this
+prompt:
 
-# Tough Tongue AI
+- https://app.toughtongueai.com/llms.txt
+- https://app.toughtongueai.com/llms-full.txt
 
-> Voice AI agent platform. Create conversational agents, embed them anywhere, collect session data and analysis programmatically.
-
-Tough Tongue AI lets you create voice AI agents and deploy them via iframe, phone call, or meeting bot. Each interaction produces a session with transcript, evaluation scores, and extracted variables — all retrievable via API.
-
-## Quick Start
-
-- [Developer Tools](https://app.toughtongueai.com/developer): Get your API token and test endpoints
-- [API Best Practices](https://app.toughtongueai.com/docs/api-best-practices): End-to-end integration guide
-- [Full API Reference](https://app.toughtongueai.com/docs/api-reference): All endpoints (scenarios, sessions, phone, bots, analytics)
-
-## Deployment Channels
-
-- [Iframe Embedding](https://app.toughtongueai.com/docs/api-integration): Embed agent in any webpage (full, basic, minimal)
-- [Phone Integration](https://app.toughtongueai.com/docs/integrations/phone-integration): AI agents on real phone lines via SIP
-- [Google Meet Agent](https://app.toughtongueai.com/docs/integrations/google-meet-agent): Bot joins meetings autonomously
-- [Webhooks](https://app.toughtongueai.com/docs/integrations/webhooks): Real-time session lifecycle notifications
-
-## Configuration
-
-- [Custom Tools](https://app.toughtongueai.com/docs/guides/custom-tools): Extend agents with HTTP functions (CRM, email, ticketing)
-- [Tool Reference](https://app.toughtongueai.com/docs/guides/tool-reference): All available tools (cards, MCQ, whiteboard, slides, etc.)
-- [Writing AI Instructions](https://app.toughtongueai.com/docs/guides/writing-ai-instructions): Prompt patterns for effective agents
-
-## Resources
-
-- [Sample Code](https://github.com/tough-tongue/ttai-simple-course): iframe + lifecycle events + analysis
-- [API Video Walkthrough](https://www.loom.com/share/d9ae326da7b54f2f8d84120bd3399d0d): Complete integration demo
-- [Release Notes](https://app.toughtongueai.com/docs/resources/release-notes): Latest features
-- [Platform Docs](https://app.toughtongueai.com/docs): Full documentation
+Those files are the canonical ToughTongue AI platform reference for builder
+agents and should stay fresher than checked-in snippets.
