@@ -6,7 +6,8 @@
 
 Live example: The Camellias — a luxury real-estate marketing site where a voice
 AI concierge guides prospects through residence types and amenities without them
-ever touching the keyboard.
+ever touching the keyboard:
+[`ttai-marketing-agent-demo.vercel.app`](https://ttai-marketing-agent-demo.vercel.app/).
 
 ---
 
@@ -60,6 +61,12 @@ cp .env.example .env.local
 ### 3. Configure your TTAI scenario
 
 In your ToughTongue AI scenario, add a **custom function** with this schema:
+
+Set the custom-function endpoint to your deployed app plus
+`/api/agent-navigate`.
+
+For the hosted Camellias demo, the full URL is:
+`https://ttai-marketing-agent-demo.vercel.app/api/agent-navigate`.
 
 ```json
 {

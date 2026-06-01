@@ -8,7 +8,8 @@ This is a production-ready Next.js template that shows you exactly how to wire a
 so it can navigate on behalf of the user.
 
 **Live demo site:** The Camellias — a luxury real-estate marketing site where a voice
-AI concierge guides prospects through residence types and amenities.
+AI concierge guides prospects through residence types and amenities:
+[`ttai-marketing-agent-demo.vercel.app`](https://ttai-marketing-agent-demo.vercel.app/).
 
 ---
 
@@ -36,7 +37,7 @@ pnpm dev
 3. The TTAI iframe starts with the session code injected as a dynamic variable
 4. The agent reads {{ session_code }} from its ai_instructions
 5. When the agent wants to show the visitor something, it calls:
-     POST /api/agent-navigate  { session_code: "ABCD", url: "/slides/type-a/1" }
+     POST /api/agent-navigate  { session_code: "ABCD", url: "/slides/wraparound-residence/1" }
 6. Your server wakes the long-poll for session ABCD
 7. The visitor's browser navigates instantly
 ```
@@ -76,13 +77,16 @@ In your ToughTongue AI scenario, add a **custom function**:
 
 **Endpoint:** `https://your-domain.vercel.app/api/agent-navigate`
 
+For the hosted Camellias demo, the full custom-function URL is:
+`https://ttai-marketing-agent-demo.vercel.app/api/agent-navigate`.
+
 **JSON schema:**
 ```json
 {
   "type": "object",
   "properties": {
     "session_code": { "type": "string", "description": "Visitor's session code from {{ session_code }}" },
-    "url":          { "type": "string", "description": "Relative URL to navigate to, e.g. /slides/type-a/1" },
+    "url":          { "type": "string", "description": "Relative URL to navigate to, e.g. /slides/wraparound-residence/1" },
     "section":      { "type": "string", "description": "CSS selector to scroll to, e.g. #highlights" }
   },
   "required": ["session_code"]

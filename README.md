@@ -5,6 +5,22 @@
 
 ---
 
+## Live Demos
+
+Start with the flagship demo first. It shows the full co-navigation loop: a
+ToughTongue AI voice concierge embedded in a luxury real-estate site, able to
+open residence decks and guide the visitor through the page.
+
+| Demo | Link | Shows |
+|---|---|---|
+| **Main demo — The Camellias voice concierge** | [`ttai-marketing-agent-demo.vercel.app`](https://ttai-marketing-agent-demo.vercel.app/) | Voice widget, session code, agent-triggered navigation, slide decks, admin test panel |
+| Marketing co-navigation template | [`marketing-agent-demo/`](marketing-agent-demo/) | Source for the live demo; copy this for guided sales or product tours |
+| Next.js minimal starter | [`nextjs-minimal/`](nextjs-minimal/) | Authenticated app starter with iframe embed, lifecycle events, API proxy, SAT support |
+| Flask minimal starter | [`flask-minimal/`](flask-minimal/) | Small Python backend plus no-build frontend embed |
+| Builder prompts | [`starter-prompts/`](starter-prompts/) | Prompt sequences for Lovable, v0, Bolt, Cursor, and other AI builders |
+
+---
+
 ## Start Here
 
 This repo is the fastest path from “I want to build on ToughTongue AI” to a
@@ -173,7 +189,7 @@ a session code + destination; the visitor's browser is already long-polling
 `/api/navigate-commands/:sessionId/poll` and navigates the moment it receives
 the command.
 
-**Live demo:** [ttai-marketing-agent-demo.vercel.app](https://ttai-marketing-agent-demo.vercel.app)
+**Main demo:** [ttai-marketing-agent-demo.vercel.app](https://ttai-marketing-agent-demo.vercel.app/)
 
 → [Full integration guide](marketing-agent-demo/README.md)
 
