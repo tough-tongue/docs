@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, X, LayoutGrid } from "lucide-react";
+import { ArrowLeft, ArrowRight, LayoutGrid, X } from "lucide-react";
 import type { Category, Slide } from "@/data/slides/schema";
 
 // viewer-top-bar ---------------------------------------------------------------
@@ -26,7 +26,7 @@ export function ViewerTopBar({
           className="flex items-center gap-2 text-[13px] tracking-[0.24em] uppercase opacity-85 hover:opacity-100 transition-opacity"
         >
           <LayoutGrid size={14} />
-          All Decks
+          All Properties
         </button>
         <span className="hidden md:inline text-white/30">/</span>
         <span
@@ -73,7 +73,12 @@ export function ViewerBottomBar({
       <div className="flex items-end justify-between gap-6">
         <SlideCounter order={order} total={total} />
         <SlideDots slides={slides} order={order} goTo={goTo} />
-        <SlideArrows order={order} total={total} goPrev={goPrev} goNext={goNext} />
+        <SlideArrows
+          order={order}
+          total={total}
+          goPrev={goPrev}
+          goNext={goNext}
+        />
       </div>
       <p className="mt-3 text-[12px] tracking-[0.3em] uppercase text-white/45">
         ← → keys · swipe · Esc to exit
@@ -105,7 +110,7 @@ export function ViewerNotFound({
         data-testid="notfound-back"
         className="btn-hairline mt-10"
       >
-        Back to all decks
+        Back to all properties
       </button>
     </div>
   );
@@ -151,8 +156,8 @@ function SlideDots({
             s.order === order
               ? "bg-[#C5A059]"
               : s.order < order
-                ? "bg-white/55"
-                : "bg-white/15 hover:bg-white/35"
+              ? "bg-white/55"
+              : "bg-white/15 hover:bg-white/35"
           }`}
         />
       ))}

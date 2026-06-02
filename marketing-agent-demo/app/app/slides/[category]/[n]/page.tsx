@@ -6,9 +6,9 @@ import { Link2 } from "lucide-react";
 import { getCategory } from "@/data/slides/registry";
 import SlideRenderer from "@/components/slides/SlideRenderer";
 import {
-  ViewerTopBar,
   ViewerBottomBar,
   ViewerNotFound,
+  ViewerTopBar,
 } from "@/components/slides/ViewerChrome";
 import { useSlideTouchNav } from "@/hooks/useSlideTouchNav";
 
@@ -35,11 +35,15 @@ export default function SlideViewerPage({
     [router, routeCategory, total],
   );
   const goNext = useCallback(
-    () => { if (order < total) goTo(order + 1); },
+    () => {
+      if (order < total) goTo(order + 1);
+    },
     [order, total, goTo],
   );
   const goPrev = useCallback(
-    () => { if (order > 1) goTo(order - 1); },
+    () => {
+      if (order > 1) goTo(order - 1);
+    },
     [order, goTo],
   );
   const toIndex = useCallback(() => router.push("/slides"), [router]);
@@ -53,15 +57,16 @@ export default function SlideViewerPage({
   const { copied, copyLink } = useCopyLink();
   const touch = useSlideTouchNav(goNext, goPrev);
 
-  if (!cat)
+  if (!cat) {
     return (
       <ViewerNotFound
         title="Category not found"
-        hint={`No slide deck with id "${category}".`}
+        hint={`No property story with id "${category}".`}
         onBack={toIndex}
       />
     );
-  if (!slide)
+  }
+  if (!slide) {
     return (
       <ViewerNotFound
         title="Slide out of range"
@@ -69,6 +74,7 @@ export default function SlideViewerPage({
         onBack={toIndex}
       />
     );
+  }
 
   return (
     <div
@@ -149,7 +155,9 @@ function useLockBodyScroll() {
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, []);
 }
 
@@ -188,7 +196,11 @@ function usePreloadAdjacentSlides(
     if (!cat) return;
     [cat.slides[order - 2], cat.slides[order]]
       .filter(Boolean)
-      .forEach((s) => s.images?.forEach((img) => { new Image().src = img.src; }));
+      .forEach((s) =>
+        s.images?.forEach((img) => {
+          new Image().src = img.src;
+        })
+      );
   }, [cat, order]);
 }
 

@@ -1,7 +1,7 @@
-@import "tailwindcss";
-
 /* Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Figtree:wght@400;500;600&display=swap");
+
+@import "tailwindcss";
 
 /* ------------------------------------------------------------------------------
    Design tokens
@@ -89,20 +89,111 @@ body {
   color: var(--accent-green);
 }
 
+.admin-section-title {
+  display: inline-block;
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--accent-gold);
+  font-family: "Figtree", sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--accent-green);
+}
+
+.admin-disclosure {
+  border: 1px solid var(--border-soft);
+  background: #fffdf7;
+}
+
+.admin-disclosure > summary {
+  cursor: pointer;
+  padding: 0.85rem 1rem;
+  font-family: "Figtree", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.admin-disclosure > div {
+  border-top: 1px solid var(--border-soft);
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-family: "Figtree", sans-serif;
+  font-size: 0.84rem;
+  line-height: 1.75;
+}
+
+.admin-disclosure code {
+  background: #f5f3ee;
+  color: var(--text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  padding: 0.05rem 0.25rem;
+}
+
+.admin-control-button {
+  border: 1px solid var(--text-primary);
+  color: var(--text-primary);
+  padding: 0.45rem 0.7rem;
+  font-family: "Figtree", sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background 0.35s ease, color 0.35s ease;
+  background: transparent;
+  cursor: pointer;
+}
+
+.admin-control-button:hover {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: var(--bg-primary);
+}
+
+.admin-copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--border-soft);
+  color: var(--accent-green);
+  padding: 0.55rem 0.8rem;
+  font-family: "Figtree", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: #faf9f6;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.admin-copy-button:hover {
+  border-color: var(--accent-green);
+  background: white;
+}
+
 /* ------------------------------------------------------------------------------
    Animations
    ------------------------------------------------------------------------------ */
 @keyframes kenburns {
-  0%   { transform: scale(1.08) translate3d(0, 0, 0); }
-  100% { transform: scale(1.18) translate3d(-1.5%, -1.5%, 0); }
+  0% {
+    transform: scale(1.08) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.18) translate3d(-1.5%, -1.5%, 0);
+  }
 }
 .kenburns {
   animation: kenburns 18s ease-in-out infinite alternate;
 }
 
 @keyframes marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 .marquee-track {
   animation: marquee 38s linear infinite;
@@ -152,5 +243,10 @@ body {
   color: var(--bg-primary);
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

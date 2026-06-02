@@ -63,12 +63,15 @@ cp .env.example .env.local
 
 ### 2. Set environment variables
 
-| Variable                     | Required | Description                                                                    |
-| ---------------------------- | -------- | ------------------------------------------------------------------------------ |
-| `TOUGHTONGUE_API_TOKEN`      | ✅       | API token from the [Developer portal](https://app.toughtongueai.com/developer) |
-| `NEXT_PUBLIC_APP_URL`        | Prod     | Canonical URL (used in sitemap + robots)                                       |
-| `NEXT_PUBLIC_IS_DEV`         | Preview  | Set `true` to block search crawlers on preview deployments                     |
-| `NEXT_PUBLIC_ADMIN_PASSWORD` | Optional | Password for `/admin` dashboard (default: `changeme-in-prod`)                  |
+| Variable                   | Required | Scope       | Description                                                                                   |
+| -------------------------- | -------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `TOUGHTONGUE_API_TOKEN`    | ✅       | Server only | API token from the [Developer portal](https://app.toughtongueai.com/developer). Never expose. |
+| `ADMIN_PASSWORD`           | Optional | Server only | Server-checked password for `/admin`. Defaults to `changeme-in-prod`; change before sharing.  |
+| `NEXT_PUBLIC_APP_URL`      | Optional | Public      | Canonical public URL. If unset on Vercel, the app falls back to Vercel deployment URL vars.   |
+| `NEXT_PUBLIC_IS_DEV`       | Preview  | Public      | Set `true` to block search crawlers on preview deployments.                                   |
+| `UPSTASH_REDIS_REST_URL`   | Optional | Server only | Recommended on Vercel production: shared co-navigation command queue.                         |
+| `UPSTASH_REDIS_REST_TOKEN` | Optional | Server only | Redis REST token for the shared queue. Never expose this in client code.                      |
+| `TOUGHTONGUE_API_BASE`     | Optional | Server only | Override for the public ToughTongue API base URL. Rarely needed.                              |
 
 ### 3. Configure your TTAI scenario
 
@@ -86,21 +89,29 @@ For the hosted Camellias demo, the full custom-function URL is:
 ```json
 {
   "type": "object",
+  "description": "Navigate the visitor's browser. Use 'url' for page routes or 'section' for anchor scroll. Always include the session_code from your instructions.",
   "properties": {
     "session_code": {
       "type": "string",
-      "description": "Visitor's session code from {{ session_code }}"
+      "description": "The visitor's 4-character session code. This is provided to the agent as {{ session_code }}. Include it exactly as provided.",
+      "minLength": 4,
+      "maxLength": 4,
+      "pattern": "^[A-Z]{4}$"
     },
     "url": {
       "type": "string",
-      "description": "Relative URL to navigate to, e.g. /slides/wraparound-residence/1"
+      "description": "React route path to navigate to. Examples: /, /slides, /slides/wraparound-residence/1, /slides/sky-penthouse/3, /slides/amenities/2",
+      "pattern": "^/[^/]?.*$"
     },
     "section": {
       "type": "string",
-      "description": "CSS selector to scroll to, e.g. #highlights"
+      "description": "CSS anchor to scroll to on the landing page. Examples: #intro, #highlights, #sustainability, #masters, #consultation",
+      "pattern": "^#[A-Za-z][A-Za-z0-9_-]*$"
     }
   },
-  "required": ["session_code"]
+  "required": ["session_code"],
+  "anyOf": [{ "required": ["url"] }, { "required": ["section"] }],
+  "additionalProperties": false
 }
 ```
 
@@ -133,10 +144,11 @@ vercel deploy
 Set the environment variables in **Vercel Project Settings → Environment
 Variables**.
 
-> **Long-poll note:** `vercel.json` sets `maxDuration: 30` on the poll route.
-> Vercel **Pro** supports up to 300 s. **Hobby** plan caps at 10 s — the poll
-> times out early but the client retries automatically (with ~10 s latency). For
-> production scale, replace `lib/command-store.ts` with a Redis adapter.
+> **Vercel note:** `vercel.json` sets `maxDuration: 30` on the poll route. The
+> poll itself is short and the client retries automatically. For production
+> co-navigation, add Upstash Redis from the Vercel Marketplace and set
+> `UPSTASH_REDIS_REST_URL` plus `UPSTASH_REDIS_REST_TOKEN` so browser polls and
+> agent commands can meet across serverless instances.
 
 ---
 
@@ -148,18 +160,35 @@ Variables**.
 3. **Replace `components/site/`** with your own marketing sections
 4. **Update `app/admin/constants.ts`** — the section/route/slide map for manual
    testing
-5. **Delete `app/slides/`** if you don't need the slide deck system
+5. **Delete `app/slides/`** if you don't need the property story system
 
 The co-navigation core is fully independent of the demo content:
 
-| File                                       | Keep as-is                                   |
-| ------------------------------------------ | -------------------------------------------- |
-| `lib/command-store.ts`                     | ✅ in-memory store (swap for Redis at scale) |
-| `hooks/useNavigationSession.ts`            | ✅ session ID + long-poll loop               |
-| `components/widgets/NavAgentWidget.tsx`    | ✅ floating TTAI iframe panel                |
-| `components/widgets/PersistentWidgets.tsx` | ✅ keeps iframe alive across routes          |
-| `app/api/agent-navigate/route.ts`          | ✅ endpoint TTAI calls                       |
-| `app/api/navigate-commands/[sessionId]/`   | ✅ long-poll endpoints                       |
+| File                                       | Keep as-is                                 |
+| ------------------------------------------ | ------------------------------------------ |
+| `lib/command-store.ts`                     | ✅ Redis when configured, memory otherwise |
+| `hooks/useNavigationSession.ts`            | ✅ session ID + long-poll loop             |
+| `components/widgets/NavAgentWidget.tsx`    | ✅ floating TTAI iframe panel              |
+| `components/widgets/PersistentWidgets.tsx` | ✅ keeps iframe alive across routes        |
+| `app/api/agent-navigate/route.ts`          | ✅ endpoint TTAI calls                     |
+| `app/api/navigate-commands/[sessionId]/`   | ✅ long-poll endpoints                     |
+
+### Co-navigation contract
+
+Use this contract when you copy the feature into another app:
+
+| Piece            | Responsibility                                                                  |
+| ---------------- | ------------------------------------------------------------------------------- |
+| Browser session  | Generate or restore a short session code and keep long-polling for commands.    |
+| Agent context    | Inject `t_session_code` and `t_website_map` into the ToughTongue AI iframe URL. |
+| Custom function  | Accept `{ session_code, url?, section? }` at `/api/agent-navigate`.             |
+| Command delivery | Match commands by session code and wake the waiting browser poll.               |
+| Client action    | Use route navigation for `url` and anchor scrolling for `section`.              |
+| Admin testing    | Use `/admin` → Co-Navigation to copy schema, copy endpoint, and fire events.    |
+
+Keep `/api/agent-navigate` public for the ToughTongue AI custom function, but
+protect admin-only test routes and ToughTongue account routes with
+`ADMIN_PASSWORD`.
 
 ---
 
@@ -173,13 +202,15 @@ app/
 │   ├── robots.ts                   Blocks crawlers when NEXT_PUBLIC_IS_DEV=true
 │   ├── sitemap.ts                  Empty sitemap when NEXT_PUBLIC_IS_DEV=true
 │   ├── slides/
-│   │   ├── page.tsx                Slide deck index
+│   │   ├── page.tsx                Properties index
 │   │   └── [category]/[n]/         Full-screen slide viewer
 │   ├── admin/
 │   │   ├── page.tsx                Admin shell (login gate + tab switcher)
 │   │   ├── constants.ts            Site map for manual nav buttons
 │   │   └── tabs/                   AccountTab, SessionsTab, CoNavTab
 │   └── api/
+│       ├── admin-auth/             Password verification for `/admin`
+│       ├── admin-config/           Protected resolved app/custom-function URL
 │       ├── agent-navigate/         ← TTAI calls this during a live session
 │       ├── navigate-commands/      ← browser long-polls this
 │       └── ttai/                   Server-side proxy (token never leaves server)
@@ -199,14 +230,14 @@ app/
 │   ├── useParallax.ts              Parallax effect on scroll
 │   └── useSmoothScroll.ts          Lenis smooth scroll
 ├── lib/
-│   ├── command-store.ts            In-memory command store
+│   ├── command-store.ts            Redis-or-memory command store
 │   ├── config.ts                   Env-var loader (all process.env here)
+│   ├── redis-command-store.ts      Upstash Redis REST adapter
 │   ├── ttai.ts                     Scenario IDs, widget config, embed URL helper
 │   └── utils.ts                    cn() Tailwind class merger
 ├── public/
 │   ├── images/                     Site images
-│   ├── website-nav.md              Agent's navigation guide for this site
-│   └── website-map.md              Full route + anchor reference
+│   └── website-nav.md              Agent's route + anchor guide for this site
 ├── .env.example                    Environment variable template
 └── vercel.json                     maxDuration for the long-poll route
 ```
@@ -226,10 +257,11 @@ pnpm lint     # ESLint
 
 ## Production notes
 
-| Topic           | Note                                                                                                                                                                       |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Scale**       | `command-store.ts` uses in-memory maps — works within a single serverless warm instance. Add `ioredis` and swap the two maps for Redis pub/sub for multi-instance deploys. |
-| **Admin auth**  | `NEXT_PUBLIC_ADMIN_PASSWORD` is visible to the client bundle. Fine for demos; use NextAuth or a server action check for stricter security.                                 |
-| **API token**   | `TOUGHTONGUE_API_TOKEN` is server-side only — never reaches the browser.                                                                                                   |
-| **Vercel plan** | `maxDuration: 30` requires Pro. Hobby caps at 10 s; the client retries so it degrades gracefully.                                                                          |
-| **SEO**         | Set `NEXT_PUBLIC_IS_DEV=true` on preview/staging to block all crawlers automatically.                                                                                      |
+| Topic             | Note                                                                                                                                                                                |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Scale**         | Without Redis, `command-store.ts` uses process-local memory and only works when the POST and poll hit the same warm instance. Set the Upstash Redis REST vars on Vercel production. |
+| **Runtime cache** | Do not use Vercel Runtime Cache for live co-navigation commands. It is regional, non-durable, and evictable; use Redis for the command queue.                                       |
+| **Admin auth**    | `ADMIN_PASSWORD` is checked server-side. The admin UI stores the entered password locally and sends it as an `x-admin-password` header for admin API requests.                      |
+| **API token**     | `TOUGHTONGUE_API_TOKEN` is server-side only — never reaches the browser.                                                                                                            |
+| **Poll duration** | `maxDuration: 30` keeps each long-poll bounded. The client retries after timeout, so command delivery remains resilient.                                                            |
+| **SEO**           | Set `NEXT_PUBLIC_IS_DEV=true` on preview/staging to block all crawlers automatically.                                                                                               |

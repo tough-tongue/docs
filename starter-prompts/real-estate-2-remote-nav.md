@@ -1,4 +1,4 @@
-# Real Estate Marketing Site — Step 2: Remote Navigation & Slide Decks
+# Real Estate Marketing Site — Step 2: Remote Navigation & Property Stories
 
 | Field           | Value                                  |
 | --------------- | -------------------------------------- |
@@ -8,34 +8,35 @@
 
 ---
 
-Extend the site with two features: a **full-screen slide deck viewer** for
-channel partners, and a **remote navigation system** so a presenter can drive
-the visitor's browser from a separate admin tab during a live walkthrough.
+Extend the site with two features: a **full-screen property story viewer** for
+guided residence and amenity walkthroughs, and a **remote navigation system** so
+a presenter or voice agent can drive the visitor's browser from a separate admin
+tab during a live walkthrough.
 
 ---
 
-### Feature 1 — Slide Deck Viewer (`/slides`)
+### Feature 1 — Property Story Viewer (`/slides`)
 
-Full-screen, no-scroll presentation — like a PowerPoint slide, one at a time.
+Full-screen, no-scroll property story — one scene at a time.
 
 **Routes:**
 
-- `/slides` — index listing all available decks
-- `/slides/:category/:n` — single slide, full viewport, no scroll
+- `/slides` — index listing all available property stories
+- `/slides/:category/:n` — single property scene, full viewport, no scroll
 
-**Slide schema (TypeScript):**
+**Property scene schema (TypeScript):**
 
 ```typescript
-export type SlideLayout =
+export type PropertySceneLayout =
   | "hero"
   | "split"
   | "stat-grid"
   | "gallery-3"
   | "quote";
 
-export interface Slide {
+export interface PropertyScene {
   id: string;
-  layout: SlideLayout;
+  layout: PropertySceneLayout;
   category: string; // e.g. "amenities"
   n: number; // 1-indexed
   title: string;
@@ -78,11 +79,12 @@ Register both in `src/data/slides/registry.ts`.
 ```
 POST /navigate-commands/:sessionId
   Body: { url?: string; section?: string }
-  → stores command in memory (one pending command per session max)
-  → export a CommandStore interface so Map can be swapped for Redis/Mongo later
+  → validates internal route paths and CSS anchors
+  → stores commands in a FIFO queue by session
+  → export a CommandStore interface so memory can be swapped for Redis later
 
 GET /navigate-commands/:sessionId/poll
-  → long-poll: holds open up to 30 s; resolves immediately if a command is pending, then clears it
+  → long-poll: holds open up to 30 s; resolves immediately if a command is pending
 ```
 
 **Connect-session widget (bottom-left of page, `SessionWidget.tsx`):**
@@ -97,11 +99,12 @@ GET /navigate-commands/:sessionId/poll
 
 **Admin page (`/admin`):**
 
-- Password-gated — hardcoded: `changeme-in-prod`
+- Password-gated with server-side `ADMIN_PASSWORD`
 - Text input for session ID
 - One button per route + section (auto-generated from a site map)
 - Live log of last 10 dispatched commands
+- Minimal session list showing connected/idle status and recent commands
 
-**Site map file:** generate `public/sitemap.md` listing every route, navbar
-anchor, and slide deck/slide number — used by the admin to know what to
-dispatch.
+**Site navigation file:** generate `public/website-nav.md` listing every route,
+navbar anchor, and property story scene — used by the admin and the voice agent
+to know what to dispatch.

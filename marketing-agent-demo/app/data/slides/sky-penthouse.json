@@ -22,8 +22,7 @@
                     "src": "/images/camellias/penthouse-tower-crown.jpg",
                     "alt": "Upper tower elevation of The Camellias penthouse levels"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-b-02",
@@ -45,8 +44,7 @@
                     "src": "/images/camellias/clubhouse-night-water-garden.jpg",
                     "alt": "The Camellias Club water garden lit for evening entertaining"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-b-03",
@@ -68,8 +66,7 @@
                 { "label": "Frontage", "value": "4 bedrooms + living/dining face golf frontage" },
                 { "label": "Staff Areas", "value": "Double staff accommodation vs standard units" },
                 { "label": "Parking", "value": "Six covered bays + valet bay" }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-b-04",
@@ -83,8 +80,7 @@
                     "src": "/images/camellias/clubhouse-water-garden.jpg",
                     "alt": "Clubhouse water garden used as a lifestyle reference"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-b-05",
@@ -98,8 +94,7 @@
                     "src": "/images/camellias/penthouse-tower-crown.jpg",
                     "alt": "Upper residential tower levels at The Camellias"
                 }
-            ],
-            "draft": true
+            ]
         }
     ]
 }

@@ -22,8 +22,7 @@
                     "src": "/images/camellias/clubhouse-water-garden.jpg",
                     "alt": "The Camellias Club water garden and petal roofs"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "amenities-02",
@@ -45,8 +44,7 @@
                     "src": "/images/camellias/clubhouse-water-garden.jpg",
                     "alt": "Water garden walkways and clubhouse roofscape"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "amenities-03",
@@ -60,8 +58,7 @@
                     "src": "/images/camellias/elevation-panorama.jpg",
                     "alt": "Panoramic view of The Camellias residential towers"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "amenities-04",
@@ -83,8 +80,7 @@
                 { "label": "Pools", "value": "Indoor + outdoor + lap + plunge" },
                 { "label": "Dining", "value": "Member-only restaurant & private dining" },
                 { "label": "Concierge", "value": "24×7 lifestyle concierge" }
-            ],
-            "draft": true
+            ]
         }
     ]
 }

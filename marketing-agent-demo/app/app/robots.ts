@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
-import { AppConfig } from "@/lib/config";
+import { Config } from "@/lib/config";
 
 export default function robots(): MetadataRoute.Robots {
-  if (AppConfig.app.isDev) {
+  if (Config.is_dev) {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
   return {
     rules: { userAgent: "*", allow: "/", disallow: ["/admin", "/api/"] },
-    sitemap: `${AppConfig.app.url}/sitemap.xml`,
+    sitemap: `${Config.app_url}/sitemap.xml`,
   };
 }

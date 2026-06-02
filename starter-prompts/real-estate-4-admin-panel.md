@@ -1,13 +1,14 @@
 # Real Estate Marketing Site — Step 4: Agent Sessions Admin Panel
 
 **Paste this into:** the same project session after Step 3
+
 **Previous step:** `real-estate-3-integrate-tt-agents.md`
 
 ---
 
-Add a **password-protected admin panel at `/agent-admin`** that uses a ToughTongue AI
-PAT (Personal Access Token) to fetch all your scenarios and their sessions from the
-last 7 days, and displays them in a clean, readable dashboard.
+Add a **password-protected admin panel at `/agent-admin`** that uses a
+ToughTongue AI PAT (Personal Access Token) to fetch all your scenarios and their
+sessions from the last 7 days, and displays them in a clean, readable dashboard.
 
 ---
 
@@ -16,7 +17,10 @@ last 7 days, and displays them in a clean, readable dashboard.
 **1. Route: `/agent-admin`**
 
 Password-gated — same pattern as `/admin`:
-- `useState` boolean `isAuthed`, hardcoded password `changeme-in-prod`
+
+- Verify the submitted password against a server-side `ADMIN_PASSWORD`
+- After a successful login, store the entered password in `localStorage`
+- Send the stored password as `x-admin-password` on each admin API request
 - After login: full dashboard view
 
 **2. Dashboard layout (two-panel)**
@@ -33,19 +37,23 @@ Password-gated — same pattern as `/admin`:
 
 - Left panel: list of all scenarios (fetched from API)
 - Right panel: sessions for the selected scenario, filtered to the last 7 days
-- Clicking a session row expands an inline detail card (transcript summary, scores,
-  extraction results, improvement areas)
+- Clicking a session row expands an inline detail card (transcript summary,
+  scores, extraction results, improvement areas)
 
 ---
 
 ### Data fetching
 
+All ToughTongue AI requests must go through server-side routes such as
+`/api/admin/scenarios`, `/api/admin/sessions`, and `/api/admin/sessions/:id`.
+Never call the ToughTongue AI API directly from browser code with a PAT.
+
 **A. Fetch all scenarios**
 
 ```typescript
-// GET /api/public/scenarios
-const res = await fetch("https://app.toughtongueai.com/api/public/scenarios", {
-  headers: { Authorization: `Bearer ${PAT}` },
+// Browser -> your server route
+const res = await fetch("/api/admin/scenarios", {
+  headers: { "x-admin-password": adminPassword },
 });
 // → { scenarios: [{ id, name, description, created_at, ... }] }
 ```
@@ -57,12 +65,14 @@ const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
   .toISOString()
   .slice(0, 10); // "YYYY-MM-DD"
 
-// GET /api/public/v2/sessions — enriched, includes scores + report card
-const res = await fetch(
-  `https://app.toughtongueai.com/api/public/v2/sessions` +
-  `?scenario_id=${scenarioId}&$gte_created_at=${from}`,
-  { headers: { Authorization: `Bearer ${PAT}` } },
-);
+// Browser -> your server route
+const params = new URLSearchParams({
+  scenario_id: scenarioId,
+  $gte_created_at: from,
+});
+const res = await fetch(`/api/admin/sessions?${params}`, {
+  headers: { "x-admin-password": adminPassword },
+});
 // → { sessions: [{ id, user_name, user_email, created_at, status,
 //     duration_minutes, evaluation_score, report_card[], extraction_results,
 //     analytics_url, ... }] }
@@ -71,11 +81,10 @@ const res = await fetch(
 **C. Fetch full session details (on row expand)**
 
 ```typescript
-// GET /api/public/sessions/{session_id}
-const res = await fetch(
-  `https://app.toughtongueai.com/api/public/sessions/${sessionId}`,
-  { headers: { Authorization: `Bearer ${PAT}` } },
-);
+// Browser -> your server route
+const res = await fetch(`/api/admin/sessions/${sessionId}`, {
+  headers: { "x-admin-password": adminPassword },
+});
 // → { id, user_name, transcript_url, evaluation_results: { final_score,
 //     overall_score, strengths, weaknesses, detailed_feedback, report_card[] },
 //     extraction_results, improvement_results: { action_items, resources } }
@@ -87,13 +96,13 @@ const res = await fetch(
 
 Each row shows:
 
-| Field    | Source                                            |
-| -------- | ------------------------------------------------- |
-| Name     | `user_name`                                       |
-| Date     | `created_at` formatted as "DD Mon"                |
-| Score    | `evaluation_score` → "7.4 / 10" or "—" if null    |
+| Field    | Source                                             |
+| -------- | -------------------------------------------------- |
+| Name     | `user_name`                                        |
+| Date     | `created_at` formatted as "DD Mon"                 |
+| Score    | `evaluation_score` → "7.4 / 10" or "—" if null     |
 | Status   | `status` → ✓ completed · ⏳ in_progress · ✗ failed |
-| Duration | `duration_minutes` → "3 min"                      |
+| Duration | `duration_minutes` → "3 min"                       |
 
 ---
 
@@ -101,8 +110,9 @@ Each row shows:
 
 Shown inline below the row when clicked. Sections:
 
-**Score breakdown** — render `evaluation_results.report_card[]` as a horizontal bar chart
-or simple progress bars:
+**Score breakdown** — render `evaluation_results.report_card[]` as a horizontal
+bar chart or simple progress bars:
+
 ```
 Communication    ████████░░  7.5 / 10
 Problem Solving  ████████░░  8.0 / 10
@@ -111,14 +121,14 @@ Problem Solving  ████████░░  8.0 / 10
 **Strengths / Weaknesses** — two columns, plain text from
 `evaluation_results.strengths` and `evaluation_results.weaknesses`.
 
-**Extraction results** — key-value list from `extraction_results` object
-(e.g. `deal_closed: false`, `objections_raised: [...]`).
-Skip if the object is empty or null.
+**Extraction results** — key-value list from `extraction_results` object (e.g.
+`deal_closed: false`, `objections_raised: [...]`). Skip if the object is empty
+or null.
 
 **Action items** — `improvement_results.action_items` as a bulleted list.
 
-**Transcript link** — if `transcript_url` is present, a small "View transcript ↗"
-link that opens in a new tab.
+**Transcript link** — if `transcript_url` is present, a small "View transcript
+↗" link that opens in a new tab.
 
 ---
 
@@ -134,13 +144,14 @@ link that opens in a new tab.
 ### Environment variables — add to `.env.example`
 
 ```
-VITE_TTAI_PAT=   # Personal Access Token — from app.toughtongueai.com/developer?tab=api-keys
+ADMIN_PASSWORD=change-this-before-deploy
+TTAI_PAT=        # Server-side Personal Access Token from app.toughtongueai.com/developer?tab=api-keys
 ```
 
-> The PAT is the same format as the API key used in earlier steps. Use a separate
-> token for the admin panel so it can be revoked independently.
-> **Never expose this token in a public-facing page** — the `/agent-admin` route
-> must always be password-gated before any API calls are made.
+> The PAT is the same format as the API key used in earlier steps. Use a
+> separate token for the admin panel so it can be revoked independently. **Never
+> expose this token in browser code.** Keep it in server-side API routes and
+> protect those routes with `ADMIN_PASSWORD`.
 
 ---
 

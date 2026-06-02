@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { commandStore, type NavigateCommand } from "@/lib/command-store";
+import { commandStore } from "@/lib/command-store";
+import { requireAdmin } from "@/lib/admin-auth";
+import {
+  commandFromBody,
+  isValidSessionId,
+  normalizeSessionId,
+  validateNavigateCommand,
+} from "@/lib/navigation-command";
 
 interface Params {
   sessionId: string;
@@ -9,20 +16,36 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<Params> },
 ): Promise<NextResponse> {
+  const auth = requireAdmin(req);
+  if (auth) return auth;
+
   const { sessionId } = await params;
-  const body = (await req.json()) as NavigateCommand;
-
-  const cmd: NavigateCommand = {};
-  if (typeof body.url === "string") cmd.url = body.url;
-  if (typeof body.section === "string") cmd.section = body.section;
-
-  if (!cmd.url && !cmd.section) {
+  const targetSession = normalizeSessionId(sessionId);
+  if (!isValidSessionId(targetSession)) {
     return NextResponse.json(
-      { ok: false, error: "Provide at least one of: url, section" },
+      { ok: false, error: "sessionId must be 4 uppercase letters" },
       { status: 400 },
     );
   }
 
-  commandStore.deliver(sessionId.toUpperCase(), cmd);
+  const body = (await req.json().catch(() => null)) as
+    | Record<string, unknown>
+    | null;
+  if (!body || typeof body !== "object") {
+    return NextResponse.json(
+      { ok: false, error: "JSON object body is required" },
+      { status: 400 },
+    );
+  }
+
+  const cmd = commandFromBody(body);
+  const commandError = validateNavigateCommand(cmd);
+  if (commandError) {
+    return NextResponse.json({ ok: false, error: commandError }, {
+      status: 400,
+    });
+  }
+
+  await commandStore.deliver(targetSession, cmd, "admin");
   return NextResponse.json({ ok: true });
 }

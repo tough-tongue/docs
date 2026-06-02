@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "@/context/SessionContext";
 import { PersistentWidgets } from "@/components/widgets/PersistentWidgets";
-import { AppConfig } from "@/lib/config";
+import { Config } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: AppConfig.app.name,
-  description: AppConfig.app.description,
-  ...(AppConfig.app.isDev && { robots: { index: false, follow: false } }),
+  title: Config.app_name,
+  description: Config.app_description,
+  ...(Config.is_dev && { robots: { index: false, follow: false } }),
 };
 
 /**

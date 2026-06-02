@@ -24,7 +24,12 @@ export interface SlideSpec {
   unit?: string;
 }
 
-export type SlideLayout = "hero" | "split" | "mosaic" | "specsheet" | "fullbleed";
+export type SlideLayout =
+  | "hero"
+  | "split"
+  | "mosaic"
+  | "specsheet"
+  | "fullbleed";
 
 export interface Slide {
   id: string;
@@ -36,7 +41,6 @@ export interface Slide {
   layout: SlideLayout;
   images: SlideImage[];
   specs?: SlideSpec[];
-  draft?: boolean;
 }
 
 export interface Category {

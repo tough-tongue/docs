@@ -9,15 +9,15 @@
 
 Start with the flagship demo first. It shows the full co-navigation loop: a
 ToughTongue AI voice concierge embedded in a luxury real-estate site, able to
-open residence decks and guide the visitor through the page.
+open property stories and guide the visitor through the page.
 
-| Demo                                          | Link                                                                                    | Shows                                                                                 |
-| --------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| **Main demo — The Camellias voice concierge** | [`ttai-marketing-agent-demo.vercel.app`](https://ttai-marketing-agent-demo.vercel.app/) | Voice widget, session code, agent-triggered navigation, slide decks, admin test panel |
-| Marketing co-navigation template              | [`marketing-agent-demo/`](marketing-agent-demo/)                                        | Source for the live demo; copy this for guided sales or product tours                 |
-| Next.js minimal starter                       | [`nextjs-minimal/`](nextjs-minimal/)                                                    | Authenticated app starter with iframe embed, lifecycle events, API proxy, SAT support |
-| Flask minimal starter                         | [`flask-minimal/`](flask-minimal/)                                                      | Small Python backend plus no-build frontend embed                                     |
-| Builder prompts                               | [`starter-prompts/`](starter-prompts/)                                                  | Prompt sequences for Lovable, v0, Bolt, Cursor, and other AI builders                 |
+| Demo                                          | Link                                                                                    | Shows                                                                                      |
+| --------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **Main demo — The Camellias voice concierge** | [`ttai-marketing-agent-demo.vercel.app`](https://ttai-marketing-agent-demo.vercel.app/) | Voice widget, session code, agent-triggered navigation, property stories, admin test panel |
+| Marketing co-navigation template              | [`marketing-agent-demo/`](marketing-agent-demo/)                                        | Source for the live demo; copy this for guided sales or product tours                      |
+| Next.js minimal starter                       | [`nextjs-minimal/`](nextjs-minimal/)                                                    | Authenticated app starter with iframe embed, lifecycle events, API proxy, SAT support      |
+| Flask minimal starter                         | [`flask-minimal/`](flask-minimal/)                                                      | Small Python backend plus no-build frontend embed                                          |
+| Builder prompts                               | [`starter-prompts/`](starter-prompts/)                                                  | Prompt sequences for Lovable, v0, Bolt, Cursor, and other AI builders                      |
 
 ---
 
@@ -108,6 +108,30 @@ ToughTongue AI iframe embed for the voice session.
 
 ---
 
+## Co-Navigation Pattern
+
+The marketing demo defines a reusable pattern for voice agents that need to
+control a web experience during the call:
+
+1. The browser creates a short session code and long-polls your server.
+2. The ToughTongue AI iframe receives that session code as a dynamic variable.
+3. The scenario calls your custom function with
+   `{ session_code, url?,
+   section? }`.
+4. Your server delivers the command to the matching browser session.
+5. The client performs `router.push(...)` or `scrollIntoView(...)`.
+
+This is intentionally simple HTTP infrastructure. It works without WebSockets,
+keeps the ToughTongue API token server-side, and gives builders a standard
+surface to copy into product tours, real-estate demos, onboarding assistants,
+support flows, and guided sales pages.
+
+Start from [`marketing-agent-demo/`](marketing-agent-demo/) if you want the full
+implementation, copyable custom-function schema, admin test controller, and
+production notes.
+
+---
+
 ## Active quickstarts
 
 ### [`starter-prompts/`](starter-prompts/) — for vibe coders
@@ -182,7 +206,7 @@ What's included:
 
 - Floating voice widget that persists across page navigations
 - Long-poll endpoint the agent calls to drive the visitor's browser
-- Full-screen slide deck system (`/slides`) navigable by the agent
+- Full-screen property story system (`/slides`) navigable by the agent
 - Admin panel to monitor sessions, edit scenario instructions, and test
   navigation
 - SEO-safe: `robots.ts` blocks crawlers on preview/dev deployments automatically
@@ -247,6 +271,8 @@ Use the variable name expected by the example you are running:
 - Trigger or fetch analysis after `onStop`.
 - Validate webhook/custom-function requests before letting an agent mutate your
   app state.
+- Use shared storage such as Upstash Redis for live co-navigation command
+  delivery on serverless hosts; process memory is only a local-demo fallback.
 - Version important scenarios in YAML once prompts become product behavior.
 - Use the live `llms.txt` files when prompting AI builders.
 

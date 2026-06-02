@@ -1,82 +1,59 @@
-# The Camellias — Navigable Elements
+# The Camellias — Agent Navigation Guide
 
-This document is the authoritative reference for the **nav-agent** scenario. It
-lists every element on the site that a visitor can reach or view, so the agent
-can decide exactly when and where to navigate.
+This is the single source of truth for the embedded ToughTongue AI navigation
+agent. The agent receives this file as dynamic context and should use these
+routes, anchors, and intent rules when guiding a visitor.
 
----
-
-## Routing overview
-
-The site is a React SPA with two main areas:
-
-| Area                      | Base path   | Notes                        |
-| ------------------------- | ----------- | ---------------------------- |
-| Marketing landing page    | `/`         | Smooth-scrolling single page |
-| Slide presentation viewer | `/slides/…` | Full-screen, no scroll       |
-| Admin remote-nav panel    | `/admin`    | Developer use only           |
+Important naming rule: the public experience calls these pages **Properties** or
+**Property Stories**. The route remains `/slides` for backward compatibility
+with existing scenario tools and shared links.
 
 ---
 
-## 1 — Landing Page (`/`)
+## Site Areas
 
-### 1.1 Navbar anchor links
-
-| Label          | Anchor            | Scrolls to                                |
-| -------------- | ----------------- | ----------------------------------------- |
-| The Project    | `#intro`          | Narrative introduction section            |
-| Highlights     | `#highlights`     | Alternating image + text highlights       |
-| Sustainability | `#sustainability` | LEED Platinum sustainability pillars      |
-| Grand Masters  | `#masters`        | Carousel of master designers              |
-| Decks          | `/slides`         | Hard-routes to slide index (React Router) |
-
-### 1.2 Landing sections (in order)
-
-| Order | Section id        | Content                                    |
-| ----- | ----------------- | ------------------------------------------ |
-| 1     | _(none)_          | Hero — full-screen cinematic cover         |
-| 2     | `#intro`          | Project origin & architectural description |
-| 3     | `#highlights`     | Key architectural highlights               |
-| 4     | Marquee band      | Press accolades (no anchor)                |
-| 5     | `#sustainability` | Sustainability story                       |
-| 6     | `#masters`        | Grand Masters carousel                     |
-| 7     | _(none)_          | Book a Private Consultation — Priya        |
-| 8     | Footer            | Address, explore links, dev section        |
-
-### 1.3 Book a Consultation
-
-- Consultant name: **Priya**
-- Available via the phone number shown in the consultation section
-- Suitable when: visitor expresses interest in pricing, viewing, or a private
-  tour
+| Area                   | Path        | Use when                                            |
+| ---------------------- | ----------- | --------------------------------------------------- |
+| Landing page           | `/`         | Start, project story, highlights, designers, CTA    |
+| Properties collection  | `/slides`   | Let the visitor choose a residence or amenity story |
+| Property story viewer  | `/slides/…` | Full-screen guided property scenes                  |
+| Admin navigation panel | `/admin`    | Internal testing only                               |
 
 ---
 
-## 2 — Slide Presentation Viewer
+## Landing Page Anchors
 
-### 2.1 Deck index (`/slides`)
+| Visitor-facing label | Command                            | What it shows                                  |
+| -------------------- | ---------------------------------- | ---------------------------------------------- |
+| The Project          | `{ "section": "#intro" }`          | Project positioning, architecture, DLF context |
+| Highlights           | `{ "section": "#highlights" }`     | Address, residence scale, landscape            |
+| Sustainability       | `{ "section": "#sustainability" }` | LEED Platinum and green-building pillars       |
+| Grand Masters        | `{ "section": "#masters" }`        | Architecture, interiors, landscape, wellness   |
+| Properties           | `{ "url": "/slides" }`             | Property story index                           |
+| Consultation         | `{ "section": "#consultation" }`   | Private briefing CTA with Priya                |
 
-Entry point listing all three decks. Navigate here to let the visitor choose a
-deck.
+---
 
-### 2.2 Decks and slide numbers
+## Property Stories
 
-| Deck ID                | URL base                       | Slides | When to use                             |
-| ---------------------- | ------------------------------ | ------ | --------------------------------------- |
-| `wraparound-residence` | `/slides/wraparound-residence` | 5      | Show a 4-BHK wraparound-style residence |
-| `sky-penthouse`        | `/slides/sky-penthouse`        | 5      | Show the sky penthouse / duplex         |
-| `amenities`            | `/slides/amenities`            | 4      | Show clubhouse, spa, golf, lifestyle    |
+### Collection Index
 
-Legacy aliases still work:
+Use `{ "url": "/slides" }` when the visitor asks to see all properties,
+residence options, apartments, penthouses, amenities, or the full presentation.
 
-| Legacy URL base           | Canonical URL base             |
-| ------------------------- | ------------------------------ |
-| `/slides/property-type-a` | `/slides/wraparound-residence` |
-| `/slides/property-type-b` | `/slides/sky-penthouse`        |
+### Canonical Property Routes
 
-#### The Wraparound Residence (4-BHK)
+| Property story       | URL base                       | Scenes | Best use                                          |
+| -------------------- | ------------------------------ | ------ | ------------------------------------------------- |
+| Wraparound Residence | `/slides/wraparound-residence` | 5      | 4-BHK corner residence, golf views, family living |
+| Sky Penthouse        | `/slides/sky-penthouse`        | 5      | Penthouse, terrace entertaining, high vantage     |
+| Amenities and Club   | `/slides/amenities`            | 4      | Clubhouse, wellness, golf, lifestyle              |
 
-| Slide | URL                              | Headline                            |
+## Scene Index
+
+### Wraparound Residence
+
+| Scene | URL                              | Headline                            |
 | ----- | -------------------------------- | ----------------------------------- |
 | 1     | `/slides/wraparound-residence/1` | The Wraparound Residence            |
 | 2     | `/slides/wraparound-residence/2` | An open arrival, a private wing     |
@@ -84,9 +61,9 @@ Legacy aliases still work:
 | 4     | `/slides/wraparound-residence/4` | Light, gathered along the long edge |
 | 5     | `/slides/wraparound-residence/5` | Four bedrooms. Four moods           |
 
-#### The Sky Penthouse
+### Sky Penthouse
 
-| Slide | URL                       | Headline                            |
+| Scene | URL                       | Headline                            |
 | ----- | ------------------------- | ----------------------------------- |
 | 1     | `/slides/sky-penthouse/1` | The Sky Penthouse                   |
 | 2     | `/slides/sky-penthouse/2` | A garden in the sky                 |
@@ -94,71 +71,47 @@ Legacy aliases still work:
 | 4     | `/slides/sky-penthouse/4` | Double-height. Single horizon       |
 | 5     | `/slides/sky-penthouse/5` | A suite with three windows of light |
 
-#### Amenities
+### Amenities and Club
 
-| Slide | URL                   | Headline                                        |
+| Scene | URL                   | Headline                                        |
 | ----- | --------------------- | ----------------------------------------------- |
 | 1     | `/slides/amenities/1` | The Camellias Club                              |
 | 2     | `/slides/amenities/2` | Spa, pools and a fitness studio above the trees |
 | 3     | `/slides/amenities/3` | Two championship courses, one drive away        |
-| 4     | `/slides/amenities/4` | A short list, kept short (spec sheet)           |
+| 4     | `/slides/amenities/4` | A short list, kept short                        |
 
 ---
 
-## 3 — Agent Scenarios
+## Navigation Decisions
 
-| Constant                        | Scenario ID                | Purpose                                    | Trigger                                         |
-| ------------------------------- | -------------------------- | ------------------------------------------ | ----------------------------------------------- |
-| `NAV_AGENT_SCENARIO_ID`         | `6a104b56bd9dee6f4d1ab30d` | Live navigation assistant embedded in page | "Talk to Agent" floating button                 |
-| `GOOGLE_MEET_AGENT_SCENARIO_ID` | _(see config)_             | Google Meet bot for virtual property tours | "Meet Agent" floating button (toggle in footer) |
-
----
-
-## 4 — Navigation Decision Guide (for nav-agent)
-
-Use these rules to decide what to navigate to:
-
-| Visitor intent / query                      | Recommended action                                                |
-| ------------------------------------------- | ----------------------------------------------------------------- |
-| "Tell me about the project / what is this?" | Scroll to `#intro`                                                |
-| "What are the highlights?"                  | Scroll to `#highlights`                                           |
-| "Show me the apartments / flats"            | Navigate to `/slides/wraparound-residence/1`                      |
-| "What is the sky penthouse / duplex?"       | Navigate to `/slides/sky-penthouse/1`                             |
-| "Show me amenities / clubhouse / pool"      | Navigate to `/slides/amenities/1`                                 |
-| "Show me configuration / floor plan / area" | Navigate to Wraparound Residence Slide 3 or Sky Penthouse Slide 3 |
-| "Sustainability / LEED / green"             | Scroll to `#sustainability`                                       |
-| "Who designed it / architects / designers"  | Scroll to `#masters`                                              |
-| "Book a visit / consultation / call Priya"  | Scroll to bottom of page (Priya section)                          |
-| "See all decks / presentation"              | Navigate to `/slides`                                             |
-| "Go back to the main page / home"           | Navigate to `/`                                                   |
+| Visitor intent                        | Recommended command                                                                     |
+| ------------------------------------- | --------------------------------------------------------------------------------------- |
+| "Tell me about the project"           | `{ "section": "#intro" }`                                                               |
+| "What makes it special?"              | `{ "section": "#highlights" }`                                                          |
+| "Show me the apartments / residences" | `{ "url": "/slides/wraparound-residence/1" }`                                           |
+| "Show me the penthouse"               | `{ "url": "/slides/sky-penthouse/1" }`                                                  |
+| "What are the amenities?"             | `{ "url": "/slides/amenities/1" }`                                                      |
+| "Show floor plan / area / specs"      | `{ "url": "/slides/wraparound-residence/3" }` or `{ "url": "/slides/sky-penthouse/3" }` |
+| "Is it sustainable / LEED?"           | `{ "section": "#sustainability" }`                                                      |
+| "Who designed it?"                    | `{ "section": "#masters" }`                                                             |
+| "Book a visit / call / consultation"  | `{ "section": "#consultation" }`                                                        |
+| "Show all properties"                 | `{ "url": "/slides" }`                                                                  |
+| "Go home"                             | `{ "url": "/" }`                                                                        |
 
 ---
 
-## 5 — Remote Navigation Session Protocol
+## Command Protocol
 
-1. Visitor loads `https://[site]/` and clicks **Connect Session** (footer dev
-   section)
-2. A 4-character uppercase session ID appears (e.g. `XKQP`)
-3. Admin opens `/admin`, enters the session ID, clicks **Set Session**
-4. Admin clicks any navigation button to push a command
-5. Visitor's browser reacts in real-time (route change or section scroll)
-
-### Command shape
+The agent should call the configured ToughTongue AI custom function endpoint:
 
 ```json
-{ "url": "/slides/wraparound-residence/2" }     // route change
-{ "section": "#sustainability" }            // scroll to anchor
+{ "session_code": "ABCD", "url": "/slides/sky-penthouse/1" }
 ```
 
----
+or:
 
-## 6 — URLs reference
+```json
+{ "session_code": "ABCD", "section": "#highlights" }
+```
 
-| Resource                    | URL               |
-| --------------------------- | ----------------- |
-| Landing page                | `/`               |
-| Slide index                 | `/slides`         |
-| Admin panel                 | `/admin`          |
-| Website nav doc (this file) | `/website-nav.md` |
-| Website sitemap             | `/sitemap.md`     |
-| Website map                 | `/website-map.md` |
+The full deployed endpoint path is `/api/agent-navigate`.
