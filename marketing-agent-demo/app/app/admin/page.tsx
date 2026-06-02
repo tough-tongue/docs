@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Lock, LogOut, Wallet, Users, Compass, LayoutDashboard, AlertTriangle } from "lucide-react";
 import { AppConfig } from "@/lib/config";
 import { AccountTab } from "./tabs/AccountTab";
@@ -95,12 +95,12 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 export default function AdminPage() {
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      sessionStorage.getItem(AUTH_KEY) === "1",
+  );
   const [tab, setTab] = useState<TabId>("overview");
-
-  useEffect(() => {
-    if (sessionStorage.getItem(AUTH_KEY) === "1") setAuthed(true);
-  }, []);
 
   if (!authed) return <LoginGate onLogin={() => setAuthed(true)} />;
 

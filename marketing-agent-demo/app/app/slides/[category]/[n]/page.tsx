@@ -23,13 +23,16 @@ export default function SlideViewerPage({
   const { category, n } = params;
   const cat = getCategory(category);
   const order = Math.max(1, parseInt(n, 10) || 1);
+  const routeCategory = cat?.meta.id ?? category;
   const slide = cat?.slides[order - 1];
   const total = cat?.slides.length ?? 0;
 
   const goTo = useCallback(
     (idx: number) =>
-      router.push(`/slides/${category}/${Math.min(total, Math.max(1, idx))}`),
-    [router, category, total],
+      router.push(
+        `/slides/${routeCategory}/${Math.min(total, Math.max(1, idx))}`,
+      ),
+    [router, routeCategory, total],
   );
   const goNext = useCallback(
     () => { if (order < total) goTo(order + 1); },
@@ -42,6 +45,7 @@ export default function SlideViewerPage({
   const toIndex = useCallback(() => router.push("/slides"), [router]);
 
   useLockBodyScroll();
+  useCanonicalSlideUrl({ category, order, routeCategory, router });
   useKeyboardNav({ cat, router, goNext, goPrev, goTo });
   usePreloadAdjacentSlides(cat, order);
 
@@ -124,6 +128,23 @@ export default function SlideViewerPage({
 
 // hooks ------------------------------------------------------------------------
 
+function useCanonicalSlideUrl({
+  category,
+  order,
+  routeCategory,
+  router,
+}: {
+  category: string;
+  order: number;
+  routeCategory: string;
+  router: ReturnType<typeof useRouter>;
+}) {
+  useEffect(() => {
+    if (category === routeCategory) return;
+    router.replace(`/slides/${routeCategory}/${order}`);
+  }, [category, order, routeCategory, router]);
+}
+
 function useLockBodyScroll() {
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -174,9 +195,15 @@ function usePreloadAdjacentSlides(
 function useSlideTransition(order: number, category: string) {
   const [phase, setPhase] = useState("in");
   useEffect(() => {
-    setPhase("out");
-    const t = requestAnimationFrame(() => setPhase("in"));
-    return () => cancelAnimationFrame(t);
+    let inFrame = 0;
+    const outFrame = requestAnimationFrame(() => {
+      setPhase("out");
+      inFrame = requestAnimationFrame(() => setPhase("in"));
+    });
+    return () => {
+      cancelAnimationFrame(outFrame);
+      cancelAnimationFrame(inFrame);
+    };
   }, [order, category]);
   return phase;
 }

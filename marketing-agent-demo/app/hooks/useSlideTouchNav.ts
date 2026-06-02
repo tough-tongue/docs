@@ -13,7 +13,10 @@ export function useSlideTouchNav(onNext: () => void, onPrev: () => void) {
     onTouchEnd: (e: React.TouchEvent) => {
       if (touchStart.current == null) return;
       const dx = e.changedTouches[0].clientX - touchStart.current;
-      if (Math.abs(dx) > 60) dx < 0 ? onNext() : onPrev();
+      if (Math.abs(dx) > 60) {
+        if (dx < 0) onNext();
+        else onPrev();
+      }
       touchStart.current = null;
     },
   };

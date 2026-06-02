@@ -1,6 +1,7 @@
 "use client";
 
 import { Radio, Globe, Webhook, Clock, Code2, KeyRound, BookOpen, ArrowRight } from "lucide-react";
+import { AppConfig } from "@/lib/config";
 
 // overview-tab -----------------------------------------------------------------
 
@@ -67,7 +68,7 @@ const ENDPOINTS = [
     method: "POST",
     path: "/api/agent-navigate",
     note: "TTAI calls this to drive the visitor's browser",
-    example: `{ "session_code": "ABCD", "url": "/slides/type-a/1" }`,
+    example: `{ "session_code": "ABCD", "url": "/slides/wraparound-residence/1" }`,
   },
   {
     method: "POST",
@@ -84,9 +85,26 @@ const ENDPOINTS = [
 ];
 
 function QuickReferenceSection() {
+  const customFunctionUrl = getCustomFunctionUrl();
+
   return (
     <section>
       <h2 className="overline text-[#1A362D] mb-6">API endpoints</h2>
+      <div className="border border-[#C5A059] bg-[#FFFDF7] p-5 mb-3">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <span className="font-mono text-xs font-semibold text-[#1A362D] bg-[#1A362D]/8 px-2 py-0.5">
+            TTAI custom function URL
+          </span>
+          <code className="font-mono text-sm text-[#2C302E] break-all">
+            {customFunctionUrl}
+          </code>
+        </div>
+        <p className="mt-2 text-sm text-[#59615D] font-body">
+          Paste this full URL into the ToughTongue AI custom function endpoint.
+          The route path is <code className="font-mono text-xs">/api/agent-navigate</code>;
+          the deployed app domain must come before it.
+        </p>
+      </div>
       <div className="space-y-3">
         {ENDPOINTS.map(({ method, path, note, example }) => (
           <div key={path} className="border border-[#E5E0D5] p-5">
@@ -115,6 +133,11 @@ function QuickReferenceSection() {
       </a>
     </section>
   );
+}
+
+function getCustomFunctionUrl(): string {
+  const base = AppConfig.app.url || "https://ttai-marketing-agent-demo.vercel.app";
+  return `${base.replace(/\/$/, "")}/api/agent-navigate`;
 }
 
 // env-section ------------------------------------------------------------------
