@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Wallet } from "lucide-react";
 import { OUR_SCENARIOS } from "../constants";
 
 // account-tab ------------------------------------------------------------------
 
-export function AccountTab() {
+export function AccountTab({ adminPassword }: { adminPassword: string }) {
   const [balance, setBalance] = useState<Record<string, unknown> | null>(null);
   const [scenarios, setScenarios] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,9 +15,13 @@ export function AccountTab() {
     (async () => {
       try {
         const [balRes, ...scRes] = await Promise.all([
-          fetch("/api/ttai/balance").then((r) => r.json()),
+          fetch("/api/ttai/balance", {
+            headers: adminHeaders(adminPassword),
+          }).then((r) => r.json()),
           ...OUR_SCENARIOS.map((s) =>
-            fetch(`/api/ttai/scenarios/${s.id}`).then((r) => r.json()),
+            fetch(`/api/ttai/scenarios/${s.id}`, {
+              headers: adminHeaders(adminPassword),
+            }).then((r) => r.json())
           ),
         ]);
         setBalance(balRes as Record<string, unknown>);
@@ -26,18 +30,28 @@ export function AccountTab() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [adminPassword]);
 
-  if (loading)
+  if (loading) {
     return <p className="text-[#59615D] font-body text-sm mt-8">Loading…</p>;
+  }
 
   return (
     <div className="space-y-8 mt-6">
+      <details className="admin-disclosure">
+        <summary>What this page reads and writes</summary>
+        <div>
+          This tab fetches ToughTongue AI account balance and the configured
+          demo scenarios through server-side API routes. Editing instructions
+          here patches the selected scenario directly, so use it for small live
+          instruction changes rather than broad prompt rewrites.
+        </div>
+      </details>
       {balance && (
         <div className="border border-[#E5E0D5] p-6">
           <div className="flex items-center gap-2 mb-4">
             <Wallet size={16} className="text-[#1A362D]" />
-            <span className="overline">Balance</span>
+            <span className="admin-section-title">Balance</span>
           </div>
           <pre className="font-mono text-xs text-[#59615D] whitespace-pre-wrap">
             {JSON.stringify(balance, null, 2)}
@@ -45,7 +59,12 @@ export function AccountTab() {
         </div>
       )}
       {OUR_SCENARIOS.map((sc, i) => (
-        <ScenarioCard key={sc.id} label={sc.label} data={scenarios[i]} />
+        <ScenarioCard
+          key={sc.id}
+          label={sc.label}
+          data={scenarios[i]}
+          adminPassword={adminPassword}
+        />
       ))}
     </div>
   );
@@ -56,9 +75,11 @@ export function AccountTab() {
 function ScenarioCard({
   label,
   data,
+  adminPassword,
 }: {
   label: string;
   data: Record<string, unknown> | undefined;
+  adminPassword: string;
 }) {
   const [instructions, setInstructions] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -77,7 +98,10 @@ function ScenarioCard({
     setSaving(true);
     await fetch(`/api/ttai/scenarios/${data.id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...adminHeaders(adminPassword),
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ ai_instructions: instructions }),
     });
     setSaving(false);
@@ -86,10 +110,8 @@ function ScenarioCard({
 
   return (
     <div className="border border-[#E5E0D5] p-6 space-y-4">
-      <span className="overline">{label}</span>
-      {!data ? (
-        <p className="text-xs text-[#59615D]">Failed to load.</p>
-      ) : (
+      <span className="admin-section-title">{label}</span>
+      {!data ? <p className="text-xs text-[#59615D]">Failed to load.</p> : (
         <>
           <pre className="font-mono text-xs text-[#59615D] whitespace-pre-wrap">
             {JSON.stringify(
@@ -118,4 +140,8 @@ function ScenarioCard({
       )}
     </div>
   );
+}
+
+function adminHeaders(adminPassword: string): Record<string, string> {
+  return { "x-admin-password": adminPassword };
 }

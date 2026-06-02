@@ -22,8 +22,7 @@
                     "src": "/images/camellias/elevation-panorama.jpg",
                     "alt": "Panoramic elevation of The Camellias residences"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-a-02",
@@ -37,8 +36,7 @@
                     "src": "/images/camellias/campus-residence.jpg",
                     "alt": "The Camellias campus and residential tower frontage"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-a-03",
@@ -60,8 +58,7 @@
                 { "label": "Aspects", "value": "South & East" },
                 { "label": "Balconies", "value": "Three, including wraparound" },
                 { "label": "Parking", "value": "Four covered bays" }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-a-04",
@@ -83,8 +80,7 @@
                     "src": "/images/camellias/clubhouse-night-water-garden.jpg",
                     "alt": "The Camellias Club water garden illuminated at night"
                 }
-            ],
-            "draft": true
+            ]
         },
         {
             "id": "type-a-05",
@@ -98,8 +94,7 @@
                     "src": "/images/camellias/campus-residence.jpg",
                     "alt": "Residential towers with landscaped campus frontage"
                 }
-            ],
-            "draft": true
+            ]
         }
     ]
 }

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { commandStore, type NavigateCommand } from "@/lib/command-store";
+import { commandStore } from "@/lib/command-store";
+import {
+  commandFromBody,
+  isValidSessionId,
+  normalizeSessionId,
+  validateNavigateCommand,
+} from "@/lib/navigation-command";
 
-interface AgentNavigateBody {
-  session_code: string;
-  url?: string;
-  section?: string;
-}
+const ALLOWED_KEYS = new Set(["session_code", "url", "section"]);
 
 /**
  * Called by the ToughTongue AI custom function during a live session.
@@ -13,28 +15,53 @@ interface AgentNavigateBody {
  * which is injected via the `t_session_code` iframe URL parameter.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const body = (await req.json()) as AgentNavigateBody;
+  const body = (await req.json().catch(() => null)) as
+    | Record<
+      string,
+      unknown
+    >
+    | null;
 
-  const cmd: NavigateCommand = {};
-  if (typeof body.url === "string") cmd.url = body.url;
-  if (typeof body.section === "string") cmd.section = body.section;
-
-  if (!cmd.url && !cmd.section) {
+  if (!body || typeof body !== "object") {
     return NextResponse.json(
-      { ok: false, error: "Provide at least one of: url, section" },
+      { ok: false, error: "JSON object body is required" },
       { status: 400 },
     );
   }
 
-  if (!body.session_code) {
+  const unknownKeys = Object.keys(body).filter((key) => !ALLOWED_KEYS.has(key));
+  if (unknownKeys.length > 0) {
+    return NextResponse.json(
+      { ok: false, error: `Unsupported fields: ${unknownKeys.join(", ")}` },
+      { status: 400 },
+    );
+  }
+
+  const cmd = commandFromBody(body);
+  const commandError = validateNavigateCommand(cmd);
+  if (commandError) {
+    return NextResponse.json({ ok: false, error: commandError }, {
+      status: 400,
+    });
+  }
+
+  const sessionCode = body.session_code;
+  if (typeof sessionCode !== "string" || !sessionCode.trim()) {
     return NextResponse.json(
       { ok: false, error: "session_code is required" },
       { status: 400 },
     );
   }
 
-  const sessionId = body.session_code.trim().toUpperCase();
-  commandStore.deliver(sessionId, cmd);
+  const sessionId = normalizeSessionId(sessionCode);
+  if (!isValidSessionId(sessionId)) {
+    return NextResponse.json(
+      { ok: false, error: "session_code must be 4 uppercase letters" },
+      { status: 400 },
+    );
+  }
+
+  await commandStore.deliver(sessionId, cmd);
 
   return NextResponse.json({ ok: true, session: sessionId, dispatched: cmd });
 }

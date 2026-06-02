@@ -24,14 +24,6 @@ export default function SlideRenderer({ slide }: { slide: Slide }) {
       data-slide-layout={slide.layout}
     >
       <Layout slide={slide} />
-      {slide.draft && (
-        <div
-          data-testid="draft-stamp"
-          className="absolute top-24 right-6 md:right-10 z-30 px-3 py-1.5 border border-[#C5A059] text-[#C5A059] text-[10px] tracking-[0.3em] uppercase bg-black/30 backdrop-blur-sm"
-        >
-          Draft
-        </div>
-      )}
     </div>
   );
 }

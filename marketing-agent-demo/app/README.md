@@ -19,7 +19,7 @@ navigation command to your frontend.
 
 ```
 Visitor opens widget → agent starts voice session
-Agent decides to show the visitor a slide deck
+Agent decides to show the visitor a property story
 Agent calls  POST /api/agent-navigate  { session_code: "ABCD", url: "/slides/wraparound-residence/1" }
 Your server wakes the long-poll for session ABCD
 Visitor's browser navigates to /slides/wraparound-residence/1
@@ -51,12 +51,15 @@ cp .env.example .env.local
 # Edit .env.local — at minimum set TOUGHTONGUE_API_TOKEN
 ```
 
-| Variable                     | Required  | Description                                                                         |
-| ---------------------------- | --------- | ----------------------------------------------------------------------------------- |
-| `TOUGHTONGUE_API_TOKEN`      | ✅        | Your API token from the [Developer portal](https://app.toughtongueai.com/developer) |
-| `NEXT_PUBLIC_APP_URL`        | Prod only | Canonical URL (used in sitemap + robots)                                            |
-| `NEXT_PUBLIC_IS_DEV`         | Optional  | Set `true` to block search crawlers on preview deployments                          |
-| `NEXT_PUBLIC_ADMIN_PASSWORD` | Optional  | Password for the `/admin` dashboard                                                 |
+| Variable                   | Required | Scope       | Description                                                                                  |
+| -------------------------- | -------- | ----------- | -------------------------------------------------------------------------------------------- |
+| `TOUGHTONGUE_API_TOKEN`    | ✅       | Server only | Your API token from the [Developer portal](https://app.toughtongueai.com/developer).         |
+| `ADMIN_PASSWORD`           | Optional | Server only | Server-checked password for `/admin`. Defaults to `changeme-in-prod`; change before sharing. |
+| `NEXT_PUBLIC_APP_URL`      | Optional | Public      | Canonical public URL. If unset on Vercel, the app falls back to Vercel deployment URL vars.  |
+| `NEXT_PUBLIC_IS_DEV`       | Optional | Public      | Set `true` to block search crawlers on preview deployments.                                  |
+| `UPSTASH_REDIS_REST_URL`   | Optional | Server only | Recommended on Vercel production: shared co-navigation command queue.                        |
+| `UPSTASH_REDIS_REST_TOKEN` | Optional | Server only | Redis REST token for the shared queue. Never expose this in client code.                     |
+| `TOUGHTONGUE_API_BASE`     | Optional | Server only | Override for the public ToughTongue API base URL. Rarely needed.                             |
 
 ### 3. Configure your TTAI scenario
 
@@ -74,21 +77,29 @@ For the hosted Camellias demo, the full URL is:
   "description": "Navigate the visitor's browser to a URL or scroll to a section",
   "parameters": {
     "type": "object",
+    "description": "Navigate the visitor's browser. Use 'url' for page routes or 'section' for anchor scroll. Always include the session_code from your instructions.",
     "properties": {
       "session_code": {
         "type": "string",
-        "description": "The visitor's 4-char session code (from {{ session_code }} in your instructions)"
+        "description": "The visitor's 4-character session code. This is provided to the agent as {{ session_code }}. Include it exactly as provided.",
+        "minLength": 4,
+        "maxLength": 4,
+        "pattern": "^[A-Z]{4}$"
       },
       "url": {
         "type": "string",
-        "description": "Relative URL to navigate to, e.g. /slides/wraparound-residence/1"
+        "description": "React route path to navigate to. Examples: /, /slides, /slides/wraparound-residence/1, /slides/sky-penthouse/3, /slides/amenities/2",
+        "pattern": "^/[^/]?.*$"
       },
       "section": {
         "type": "string",
-        "description": "CSS selector to scroll to, e.g. #highlights"
+        "description": "CSS anchor to scroll to on the landing page. Examples: #intro, #highlights, #sustainability, #masters, #consultation",
+        "pattern": "^#[A-Za-z][A-Za-z0-9_-]*$"
       }
     },
-    "required": ["session_code"]
+    "required": ["session_code"],
+    "anyOf": [{ "required": ["url"] }, { "required": ["section"] }],
+    "additionalProperties": false
   },
   "endpoint": "https://your-domain.vercel.app/api/agent-navigate"
 }
@@ -124,11 +135,11 @@ vercel deploy
 Set the environment variables in **Vercel Project Settings → Environment
 Variables**.
 
-> **Long-poll note:** `vercel.json` sets `maxDuration: 30` on the poll route.
-> This works on **Vercel Pro** (300 s max). On the **Hobby** plan the limit is
-> 10 s — the poll will time out early but still work (client retries
-> automatically). For production at scale, swap the in-memory `commandStore` for
-> a Redis adapter.
+> **Vercel note:** `vercel.json` sets `maxDuration: 30` on the poll route. The
+> poll itself is short and the client retries automatically. The important
+> production setting is shared storage: add Upstash Redis from the Vercel
+> Marketplace and set `UPSTASH_REDIS_REST_URL` plus `UPSTASH_REDIS_REST_TOKEN`
+> so browser polls and agent commands can meet across serverless instances.
 
 ---
 
@@ -161,7 +172,8 @@ ToughTongue AI
 | ---------------------------------------------- | ------------------------------------------------------- |
 | `lib/config.ts`                                | Central env-var loader                                  |
 | `lib/ttai.ts`                                  | Scenario IDs, widget configs, embed URL helper          |
-| `lib/command-store.ts`                         | In-memory command store (swap for Redis in production)  |
+| `lib/command-store.ts`                         | Command store: Redis when configured, memory otherwise  |
+| `lib/redis-command-store.ts`                   | Upstash Redis REST adapter for Vercel production        |
 | `app/api/agent-navigate/route.ts`              | **The endpoint your TTAI scenario calls**               |
 | `app/api/navigate-commands/[id]/poll/route.ts` | Long-poll — browser waits here                          |
 | `hooks/useNavigationSession.ts`                | Session ID generation + poll loop + router integration  |
@@ -169,6 +181,22 @@ ToughTongue AI
 | `components/widgets/NavAgentWidget.tsx`        | Floating TTAI iframe widget                             |
 | `components/widgets/PersistentWidgets.tsx`     | Mounted above route tree — keeps iframe alive           |
 | `public/website-nav.md`                        | Navigation guide injected into the agent's instructions |
+
+### Co-navigation as a standard
+
+Treat co-navigation as a small protocol between the browser, your app server,
+and the ToughTongue AI agent:
+
+| Layer            | Standard behavior                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| Browser          | Creates/restores a session code and long-polls for commands.                        |
+| Agent iframe     | Receives `t_session_code` and `t_website_map` before the voice session begins.      |
+| Custom function  | Posts `{ session_code, url?, section? }` to `/api/agent-navigate`.                  |
+| Server           | Validates the command, stores it by session code, and wakes the matching long-poll. |
+| Client           | Runs `router.push(...)` for `url`, or `scrollIntoView(...)` for `section`.          |
+| Admin controller | Fires synthetic commands and copies the exact endpoint/schema for setup.            |
+
+That shape is portable. Replace the content map, keep the protocol.
 
 ### The session ID
 
@@ -189,8 +217,8 @@ visible to the agent via `window.location.search`.
    entirely)
 4. **Replace the marketing components** in `components/site/` with your own
    sections
-5. **Update `SECTIONS`, `TOP_ROUTES`, `DECKS`** in `app/admin/constants.ts` to
-   match your site map
+5. **Update `SECTIONS`, `TOP_ROUTES`, and `PROPERTY_STORIES`** in
+   `app/admin/constants.ts` to match your site map
 
 The co-navigation core (`lib/command-store.ts`, `hooks/useNavigationSession.ts`,
 `components/widgets/NavAgentWidget.tsx`, and the three API routes) is completely
@@ -208,10 +236,12 @@ app/
 │   ├── robots.ts               robots.txt — blocks crawlers when isDev=true
 │   ├── sitemap.ts              sitemap.xml — empty when isDev=true
 │   ├── slides/
-│   │   ├── page.tsx            Slide deck index
+│   │   ├── page.tsx            Properties index
 │   │   └── [category]/[n]/     Full-screen slide viewer
 │   ├── admin/page.tsx          Password-gated ops dashboard
 │   └── api/
+│       ├── admin-auth/          Password verification for `/admin`
+│       ├── admin-config/        Protected resolved app/custom-function URL
 │       ├── agent-navigate/     ← TTAI calls this
 │       ├── navigate-commands/  ← browser long-polls this
 │       └── ttai/               Server-side proxy (balance, scenarios, sessions)
@@ -230,14 +260,14 @@ app/
 │   ├── useParallax.ts          Parallax on scroll
 │   └── useSmoothScroll.ts      Lenis smooth scroll
 ├── lib/
-│   ├── command-store.ts        In-memory command store
+│   ├── command-store.ts        Redis-or-memory command store
 │   ├── config.ts               Env-var loader
+│   ├── redis-command-store.ts  Upstash Redis REST adapter
 │   ├── ttai.ts                 TTAI scenario config + helpers
 │   └── utils.ts                cn() utility
 ├── public/
 │   ├── images/                 Site images
-│   ├── website-nav.md          Agent navigation guide
-│   └── website-map.md          Full route + anchor reference
+│   └── website-nav.md          Agent route + anchor guide
 ├── .env.example                Environment variable template
 └── vercel.json                 maxDuration config for long-poll route
 ```
@@ -257,9 +287,10 @@ pnpm lint         # ESLint
 
 ## Production considerations
 
-| Topic                  | Note                                                                                                                                                                                                                         |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Long-poll at scale** | The in-memory `commandStore` only works within a single serverless instance. Add Redis (`ioredis`) and replace the two maps in `lib/command-store.ts` with `SET`/`GET`/`DEL` + Redis pub/sub for multi-instance deployments. |
-| **Admin security**     | `NEXT_PUBLIC_ADMIN_PASSWORD` is exposed to the client. For stronger auth, move the password check to a server action or add NextAuth.                                                                                        |
-| **API token**          | `TOUGHTONGUE_API_TOKEN` is server-side only and never reaches the browser.                                                                                                                                                   |
-| **Vercel plan**        | `maxDuration: 30` requires Vercel Pro. Hobby caps at 10 s — the poll times out but the client retries, so it degrades gracefully (with 3–10 s command latency).                                                              |
+| Topic               | Note                                                                                                                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Command storage** | Without Redis, `commandStore` uses process-local memory and only works when the POST and poll hit the same warm instance. Set the Upstash Redis REST vars for production Vercel deploys. |
+| **Runtime cache**   | Do not use Vercel Runtime Cache for live co-navigation commands. It is regional, non-durable, and evictable; use Redis for the command queue.                                            |
+| **Admin security**  | `ADMIN_PASSWORD` is checked server-side. The admin UI stores the entered password locally and sends it as an `x-admin-password` header for admin API requests.                           |
+| **API token**       | `TOUGHTONGUE_API_TOKEN` is server-side only and never reaches the browser.                                                                                                               |
+| **Poll duration**   | `maxDuration: 30` keeps each long-poll bounded. The client retries after timeout, so command delivery remains resilient.                                                                 |

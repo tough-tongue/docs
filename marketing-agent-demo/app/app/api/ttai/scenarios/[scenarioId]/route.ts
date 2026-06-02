@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ttaiGet, ttaiPost, ttaiError } from "../../client";
+import { requireAdmin } from "@/lib/admin-auth";
+import { ttaiError, ttaiGet, ttaiPost } from "../../client";
 
 interface Params {
   scenarioId: string;
@@ -9,6 +10,9 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<Params> },
 ): Promise<NextResponse> {
+  const auth = requireAdmin(_req);
+  if (auth) return auth;
+
   const { scenarioId } = await params;
   try {
     const data = await ttaiGet(`/scenarios/${scenarioId}`);
@@ -22,6 +26,9 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<Params> },
 ): Promise<NextResponse> {
+  const auth = requireAdmin(req);
+  if (auth) return auth;
+
   const { scenarioId } = await params;
   const { ai_instructions } = (await req.json()) as {
     ai_instructions: string;

@@ -19,22 +19,22 @@ export default function SlidesIndexPage() {
             The Camellias
           </Link>
           <span className="text-[13px] tracking-[0.24em] uppercase text-[#59615D]">
-            Sales Decks
+            Properties
           </span>
         </div>
       </header>
 
       <section className="max-w-[1480px] mx-auto px-6 md:px-12 lg:px-16 pt-20 md:pt-28 pb-12">
-        <span className="overline">Experiences</span>
+        <span className="overline">Private Collection</span>
         <h1 className="font-serif-display text-[#1A362D] text-[clamp(2.6rem,5.5vw,5rem)] leading-[1.02] tracking-tight mt-4 max-w-4xl">
-          Slide decks for the sales floor.
+          Properties, presented for a private walkthrough.
         </h1>
         <p className="mt-8 max-w-2xl text-[#59615D] font-body text-base leading-[1.95]">
-          Short, full-screen narratives — one for each residence type and one
-          for the amenities. Use the arrow keys to walk a client through; press{" "}
-          <kbd>Esc</kbd> to step back to this index. Each deck is a directory of
-          slides built from a strict schema so content can be edited without
-          touching the interface.
+          Each property story is built for a live, high-touch conversation:
+          full-screen imagery, crisp specifications, and a pace that lets the
+          concierge move from residence to lifestyle without breaking the
+          moment. Use the arrow keys to guide a client through; press{" "}
+          <kbd>Esc</kbd> to return to the collection.
         </p>
       </section>
 
@@ -58,7 +58,7 @@ export default function SlidesIndexPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
                   <div className="absolute bottom-5 left-6 right-6 text-white">
                     <span className="text-[12px] tracking-[0.3em] uppercase text-[#C5A059]">
-                      {file.slides.length} Slides
+                      {file.slides.length} Scenes
                     </span>
                     <h2 className="font-serif-display text-3xl md:text-4xl mt-2 leading-tight">
                       {c.name}
@@ -80,7 +80,7 @@ export default function SlidesIndexPage() {
                     </p>
                   </div>
                   <div className="mt-8 flex items-center gap-3 text-[13px] uppercase tracking-[0.26em] text-[#1A362D]">
-                    <span>Open deck</span>
+                    <span>Open property</span>
                     <ArrowUpRight
                       size={16}
                       className="text-[#C5A059] transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1"

@@ -1,16 +1,16 @@
 # Starter Prompts
 
 Copy-paste prompts that generate fully working websites with
-[ToughTongue AI](https://app.toughtongueai.com) voice agent integration —
-paste directly into [Lovable](https://lovable.dev), [Bolt](https://bolt.new),
+[ToughTongue AI](https://app.toughtongueai.com) voice agent integration — paste
+directly into [Lovable](https://lovable.dev), [Bolt](https://bolt.new),
 [v0](https://v0.dev), or Cursor Agent.
 
 ## The idea
 
-Each prompt sequence builds a real, deployable website.
-By the end you have a site where users can open a voice AI agent in a widget,
-have a live conversation, and see a scored analysis of their session — all
-powered by ToughTongue AI.
+Each prompt sequence builds a real, deployable website. By the end you have a
+site where users can open a voice AI agent in a widget, have a live
+conversation, and see a scored analysis of their session — all powered by
+ToughTongue AI.
 
 ---
 
@@ -23,17 +23,18 @@ site. Add new one-shot prompts here after their files are committed and tested.
 
 ## Multi-step sequences
 
-Paste each step in order into the same project session. Each step builds on the last.
+Paste each step in order into the same project session. Each step builds on the
+last.
 
 ### Real estate marketing site
 
-By Step 4 you have a luxury property microsite with a ToughTongue AI voice agent,
-remote navigation, and an admin panel.
+By Step 4 you have a luxury property microsite with a ToughTongue AI voice
+agent, remote navigation, and an admin panel.
 
 | Step | File                                   | What gets built                                                             |
 | ---- | -------------------------------------- | --------------------------------------------------------------------------- |
 | 1    | `real-estate-1-build-site.md`          | Landing page — navbar, hero, sections, footer                               |
-| 2    | `real-estate-2-remote-nav.md`          | Slide decks + remote navigation + admin panel                               |
+| 2    | `real-estate-2-remote-nav.md`          | Property stories + remote navigation + admin panel                          |
 | 3    | `real-estate-3-integrate-tt-agents.md` | Voice agent integration — pick one or all: phone CTA · meeting bot · iframe |
 | 4    | `real-estate-4-admin-panel.md`         | Sessions admin panel — scenarios list, last-7-days sessions, score cards    |
 
@@ -42,10 +43,12 @@ remote navigation, and an admin panel.
 ## How to use
 
 **Multi-step sequence:**
+
 1. Paste Step 1 into a new project — get the base site working.
 2. Paste Step 2 in the same chat session — it layers on top.
 3. Repeat for each subsequent step.
-4. Set `VITE_TTAI_API_KEY` and `VITE_TTAI_SCENARIO_ID` before deploying the final step.
+4. Set `VITE_TTAI_API_KEY` and `VITE_TTAI_SCENARIO_ID` before deploying the
+   final step.
 
 Before you paste a prompt, give your AI builder the live ToughTongue AI docs:
 
@@ -58,9 +61,11 @@ Read:
 Keep API tokens server-side. Use the iframe embed for voice sessions.
 ```
 
-**Get your API key:** [app.toughtongueai.com/developer](https://app.toughtongueai.com/developer?tab=api-keys)
+**Get your API key:**
+[app.toughtongueai.com/developer](https://app.toughtongueai.com/developer?tab=api-keys)
 
-**Create a scenario:** [app.toughtongueai.com/scenario-studio](https://app.toughtongueai.com/scenario-studio)
+**Create a scenario:**
+[app.toughtongueai.com/scenario-studio](https://app.toughtongueai.com/scenario-studio)
 
 ---
 
@@ -92,13 +97,18 @@ checked-in copies; they drift.
 
 ## Adding a new prompt
 
-1. Create `<use-case>-<platform>.md` (single-shot) or `<use-case>-<N>-<step>.md` (sequence).
-2. Follow the structure of an existing file — research/inspiration block first, then spec.
-3. Test: paste into the target platform and verify the generated app works end-to-end.
+1. Create `<use-case>-<platform>.md` (single-shot) or `<use-case>-<N>-<step>.md`
+   (sequence).
+2. Follow the structure of an existing file — research/inspiration block first,
+   then spec.
+3. Test: paste into the target platform and verify the generated app works
+   end-to-end.
 4. Update the table above.
 
 ## Key Files
 
 - `starter-prompts/README.md` — this file
-- `nextjs-minimal/lib/ttai/client.ts` — reference iframe event handling implementation
-- `real-estate-*.md` — ordered prompt sequence for the checked-in real-estate builder flow
+- `nextjs-minimal/lib/ttai/client.ts` — reference iframe event handling
+  implementation
+- `real-estate-*.md` — ordered prompt sequence for the checked-in real-estate
+  builder flow

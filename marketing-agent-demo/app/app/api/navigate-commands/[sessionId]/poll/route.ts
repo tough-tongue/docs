@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { commandStore } from "@/lib/command-store";
+import { isValidSessionId, normalizeSessionId } from "@/lib/navigation-command";
 
-// Vercel Pro: up to 300 s. Hobby: 10 s (long-poll won't work on Hobby plan).
-// Set maxDuration in vercel.json for this route.
+// Keep below common proxy timeout edges. The client immediately re-polls.
 export const maxDuration = 30;
 
 interface Params {
@@ -14,7 +14,15 @@ export async function GET(
   { params }: { params: Promise<Params> },
 ): Promise<NextResponse> {
   const { sessionId } = await params;
-  const cmd = await commandStore.poll(sessionId.toUpperCase());
+  const targetSession = normalizeSessionId(sessionId);
+  if (!isValidSessionId(targetSession)) {
+    return NextResponse.json(
+      { ok: false, error: "sessionId must be 4 uppercase letters" },
+      { status: 400 },
+    );
+  }
+
+  const cmd = await commandStore.poll(targetSession);
 
   if (!cmd) {
     return NextResponse.json({ timeout: true });

@@ -1,31 +1,55 @@
 "use client";
 
-import { useState } from "react";
-import { Lock, LogOut, Wallet, Users, Compass, LayoutDashboard, AlertTriangle } from "lucide-react";
-import { AppConfig } from "@/lib/config";
+import { useEffect, useState } from "react";
+import {
+  AlertTriangle,
+  Compass,
+  LayoutDashboard,
+  Lock,
+  LogOut,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { AccountTab } from "./tabs/AccountTab";
 import { SessionsTab } from "./tabs/SessionsTab";
 import { CoNavTab } from "./tabs/CoNavTab";
-import { OverviewTab } from "./tabs/OverviewTab";
+import { SetupTab } from "./tabs/SetupTab";
 
-const AUTH_KEY = "admin-auth-v1";
-const { password: PASSWORD, isDefaultPassword: IS_DEFAULT } = AppConfig.admin;
+const AUTH_KEY = "admin-password-v1";
 
 // login-gate -------------------------------------------------------------------
 
-function LoginGate({ onLogin }: { onLogin: () => void }) {
+function LoginGate({
+  onLogin,
+}: {
+  onLogin: (password: string, isDefaultPassword: boolean) => void;
+}) {
   const [value, setValue] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (value === PASSWORD) {
-      sessionStorage.setItem(AUTH_KEY, "1");
-      onLogin();
-    } else {
-      setError(true);
+    setLoading(true);
+    setError("");
+
+    const res = await fetch("/api/admin-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: value }),
+    });
+
+    setLoading(false);
+
+    if (!res.ok) {
+      setError("Incorrect password.");
       setValue("");
+      return;
     }
+
+    const data = (await res.json()) as { isDefaultPassword?: boolean };
+    localStorage.setItem(AUTH_KEY, value);
+    onLogin(value, Boolean(data.isDefaultPassword));
   };
 
   return (
@@ -41,27 +65,20 @@ function LoginGate({ onLogin }: { onLogin: () => void }) {
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
-            setError(false);
+            setError("");
           }}
           placeholder="Password"
           className="border border-[#E5E0D5] px-4 py-3 text-sm font-body bg-white focus:outline-none focus:border-[#1A362D]"
           autoFocus
         />
-        {error && <p className="text-red-500 text-xs">Incorrect password.</p>}
-        <button type="submit" className="btn-hairline self-start">
-          Enter
+        {error && <p className="text-red-500 text-xs">{error}</p>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-hairline self-start disabled:opacity-40"
+        >
+          {loading ? "Checking..." : "Enter"}
         </button>
-        {IS_DEFAULT && (
-          <div className="border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-800 font-body">
-            <span className="font-semibold">Default password is active.</span> Set{" "}
-            <code className="font-mono bg-amber-100 px-1">NEXT_PUBLIC_ADMIN_PASSWORD</code> in your
-            environment to secure this page.
-            <br />
-            <span className="text-amber-600 mt-1 block">
-              Current password: <code className="font-mono">{PASSWORD}</code>
-            </span>
-          </div>
-        )}
       </form>
     </div>
   );
@@ -69,15 +86,16 @@ function LoginGate({ onLogin }: { onLogin: () => void }) {
 
 // default-password-banner ------------------------------------------------------
 
-function DefaultPasswordBanner() {
-  if (!IS_DEFAULT) return null;
+function DefaultPasswordBanner({ visible }: { visible: boolean }) {
+  if (!visible) return null;
   return (
     <div className="bg-amber-50 border-b border-amber-200 px-6 md:px-12 py-2.5 flex items-center gap-3 text-xs text-amber-800 font-body">
       <AlertTriangle size={14} className="shrink-0 text-amber-500" />
       <span>
-        <span className="font-semibold">Default password is active.</span> Set{" "}
-        <code className="font-mono bg-amber-100 px-1">NEXT_PUBLIC_ADMIN_PASSWORD</code> in your
-        Vercel environment variables before sharing this URL.
+        <span className="font-semibold">Default password is active.</span> Set
+        {" "}
+        <code className="font-mono bg-amber-100 px-1">ADMIN_PASSWORD</code>{" "}
+        in your Vercel environment variables before sharing this URL.
       </span>
     </div>
   );
@@ -86,7 +104,7 @@ function DefaultPasswordBanner() {
 // admin-page -------------------------------------------------------------------
 
 const TABS = [
-  { id: "overview", label: "Overview", Icon: LayoutDashboard },
+  { id: "setup", label: "Setup", Icon: LayoutDashboard },
   { id: "account", label: "TTAI Account", Icon: Wallet },
   { id: "sessions", label: "Sessions", Icon: Users },
   { id: "conav", label: "Co-Navigation", Icon: Compass },
@@ -95,25 +113,61 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 export default function AdminPage() {
-  const [authed, setAuthed] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      sessionStorage.getItem(AUTH_KEY) === "1",
+  const [adminPassword, setAdminPassword] = useState(() =>
+    typeof window !== "undefined" ? localStorage.getItem(AUTH_KEY) ?? "" : ""
   );
-  const [tab, setTab] = useState<TabId>("overview");
+  const [isDefaultPassword, setIsDefaultPassword] = useState(false);
+  const [tab, setTab] = useState<TabId>("setup");
 
-  if (!authed) return <LoginGate onLogin={() => setAuthed(true)} />;
+  useEffect(() => {
+    if (!adminPassword) return;
+
+    let active = true;
+    fetch("/api/admin-auth", {
+      method: "POST",
+      headers: { "x-admin-password": adminPassword },
+    }).then(async (res) => {
+      if (!active) return;
+      if (!res.ok) {
+        localStorage.removeItem(AUTH_KEY);
+        setAdminPassword("");
+        setIsDefaultPassword(false);
+        return;
+      }
+
+      const data = (await res.json()) as { isDefaultPassword?: boolean };
+      setIsDefaultPassword(Boolean(data.isDefaultPassword));
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [adminPassword]);
+
+  if (!adminPassword) {
+    return (
+      <LoginGate
+        onLogin={(password, isDefault) => {
+          setAdminPassword(password);
+          setIsDefaultPassword(isDefault);
+        }}
+      />
+    );
+  }
 
   const logout = () => {
-    sessionStorage.removeItem(AUTH_KEY);
-    setAuthed(false);
+    localStorage.removeItem(AUTH_KEY);
+    setAdminPassword("");
+    setIsDefaultPassword(false);
   };
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#2C302E]">
-      <DefaultPasswordBanner />
+      <DefaultPasswordBanner visible={isDefaultPassword} />
       <header className="border-b border-[#E5E0D5] px-6 md:px-12 py-5 flex items-center justify-between">
-        <h1 className="font-serif-display text-[#1A362D] text-2xl">Admin — The Camellias</h1>
+        <h1 className="font-serif-display text-[#1A362D] text-2xl">
+          Admin — The Camellias
+        </h1>
         <button
           onClick={logout}
           className="flex items-center gap-2 text-[#59615D] hover:text-[#2C302E] transition-colors text-sm"
@@ -141,10 +195,10 @@ export default function AdminPage() {
           ))}
         </nav>
 
-        {tab === "overview" && <OverviewTab />}
-        {tab === "account" && <AccountTab />}
-        {tab === "sessions" && <SessionsTab />}
-        {tab === "conav" && <CoNavTab />}
+        {tab === "setup" && <SetupTab />}
+        {tab === "account" && <AccountTab adminPassword={adminPassword} />}
+        {tab === "sessions" && <SessionsTab adminPassword={adminPassword} />}
+        {tab === "conav" && <CoNavTab adminPassword={adminPassword} />}
       </div>
     </div>
   );

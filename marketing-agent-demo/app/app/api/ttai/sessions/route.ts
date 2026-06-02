@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ttaiGet, ttaiError } from "../client";
+import { requireAdmin } from "@/lib/admin-auth";
+import { ttaiError, ttaiGet } from "../client";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  const auth = requireAdmin(req);
+  if (auth) return auth;
+
   const { searchParams } = req.nextUrl;
   const params: Record<string, string> = {
     limit: searchParams.get("limit") || "25",
