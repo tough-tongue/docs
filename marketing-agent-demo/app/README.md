@@ -51,12 +51,12 @@ cp .env.example .env.local
 # Edit .env.local — at minimum set TOUGHTONGUE_API_TOKEN
 ```
 
-| Variable | Required | Description |
-|---|---|---|
-| `TOUGHTONGUE_API_TOKEN` | ✅ | Your API token from the [Developer portal](https://app.toughtongueai.com/developer) |
-| `NEXT_PUBLIC_APP_URL` | Prod only | Canonical URL (used in sitemap + robots) |
-| `NEXT_PUBLIC_IS_DEV` | Optional | Set `true` to block search crawlers on preview deployments |
-| `NEXT_PUBLIC_ADMIN_PASSWORD` | Optional | Password for the `/admin` dashboard |
+| Variable                     | Required  | Description                                                                         |
+| ---------------------------- | --------- | ----------------------------------------------------------------------------------- |
+| `TOUGHTONGUE_API_TOKEN`      | ✅        | Your API token from the [Developer portal](https://app.toughtongueai.com/developer) |
+| `NEXT_PUBLIC_APP_URL`        | Prod only | Canonical URL (used in sitemap + robots)                                            |
+| `NEXT_PUBLIC_IS_DEV`         | Optional  | Set `true` to block search crawlers on preview deployments                          |
+| `NEXT_PUBLIC_ADMIN_PASSWORD` | Optional  | Password for the `/admin` dashboard                                                 |
 
 ### 3. Configure your TTAI scenario
 
@@ -121,12 +121,14 @@ pnpm dev
 vercel deploy
 ```
 
-Set the environment variables in **Vercel Project Settings → Environment Variables**.
+Set the environment variables in **Vercel Project Settings → Environment
+Variables**.
 
 > **Long-poll note:** `vercel.json` sets `maxDuration: 30` on the poll route.
 > This works on **Vercel Pro** (300 s max). On the **Hobby** plan the limit is
-> 10 s — the poll will time out early but still work (client retries automatically).
-> For production at scale, swap the in-memory `commandStore` for a Redis adapter.
+> 10 s — the poll will time out early but still work (client retries
+> automatically). For production at scale, swap the in-memory `commandStore` for
+> a Redis adapter.
 
 ---
 
@@ -155,22 +157,23 @@ ToughTongue AI
 
 ### Key files
 
-| File | Purpose |
-|---|---|
-| `lib/config.ts` | Central env-var loader |
-| `lib/ttai.ts` | Scenario IDs, widget configs, embed URL helper |
-| `lib/command-store.ts` | In-memory command store (swap for Redis in production) |
-| `app/api/agent-navigate/route.ts` | **The endpoint your TTAI scenario calls** |
-| `app/api/navigate-commands/[id]/poll/route.ts` | Long-poll — browser waits here |
-| `hooks/useNavigationSession.ts` | Session ID generation + poll loop + router integration |
-| `context/SessionContext.tsx` | React context wrapping the session hook |
-| `components/widgets/NavAgentWidget.tsx` | Floating TTAI iframe widget |
-| `components/widgets/PersistentWidgets.tsx` | Mounted above route tree — keeps iframe alive |
-| `public/website-nav.md` | Navigation guide injected into the agent's instructions |
+| File                                           | Purpose                                                 |
+| ---------------------------------------------- | ------------------------------------------------------- |
+| `lib/config.ts`                                | Central env-var loader                                  |
+| `lib/ttai.ts`                                  | Scenario IDs, widget configs, embed URL helper          |
+| `lib/command-store.ts`                         | In-memory command store (swap for Redis in production)  |
+| `app/api/agent-navigate/route.ts`              | **The endpoint your TTAI scenario calls**               |
+| `app/api/navigate-commands/[id]/poll/route.ts` | Long-poll — browser waits here                          |
+| `hooks/useNavigationSession.ts`                | Session ID generation + poll loop + router integration  |
+| `context/SessionContext.tsx`                   | React context wrapping the session hook                 |
+| `components/widgets/NavAgentWidget.tsx`        | Floating TTAI iframe widget                             |
+| `components/widgets/PersistentWidgets.tsx`     | Mounted above route tree — keeps iframe alive           |
+| `public/website-nav.md`                        | Navigation guide injected into the agent's instructions |
 
 ### The session ID
 
 The 4-char session code (e.g. `ABCD`) links three things:
+
 1. The visitor's browser (long-polling `/api/navigate-commands/ABCD/poll`)
 2. The TTAI agent (received `{{ session_code }}` → `ABCD` in its instructions)
 3. The command store (delivers the command to the waiting poll)
@@ -182,9 +185,12 @@ visible to the agent via `window.location.search`.
 
 1. **Update scenario IDs** in `lib/ttai.ts`
 2. **Update `public/website-nav.md`** with your site's routes and anchors
-3. **Update the slide data** in `data/slides/` (or delete the `/slides` route entirely)
-4. **Replace the marketing components** in `components/site/` with your own sections
-5. **Update `SECTIONS`, `TOP_ROUTES`, `DECKS`** in `app/admin/constants.ts` to match your site map
+3. **Update the slide data** in `data/slides/` (or delete the `/slides` route
+   entirely)
+4. **Replace the marketing components** in `components/site/` with your own
+   sections
+5. **Update `SECTIONS`, `TOP_ROUTES`, `DECKS`** in `app/admin/constants.ts` to
+   match your site map
 
 The co-navigation core (`lib/command-store.ts`, `hooks/useNavigationSession.ts`,
 `components/widgets/NavAgentWidget.tsx`, and the three API routes) is completely
@@ -251,9 +257,9 @@ pnpm lint         # ESLint
 
 ## Production considerations
 
-| Topic | Note |
-|---|---|
+| Topic                  | Note                                                                                                                                                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Long-poll at scale** | The in-memory `commandStore` only works within a single serverless instance. Add Redis (`ioredis`) and replace the two maps in `lib/command-store.ts` with `SET`/`GET`/`DEL` + Redis pub/sub for multi-instance deployments. |
-| **Admin security** | `NEXT_PUBLIC_ADMIN_PASSWORD` is exposed to the client. For stronger auth, move the password check to a server action or add NextAuth. |
-| **API token** | `TOUGHTONGUE_API_TOKEN` is server-side only and never reaches the browser. |
-| **Vercel plan** | `maxDuration: 30` requires Vercel Pro. Hobby caps at 10 s — the poll times out but the client retries, so it degrades gracefully (with 3–10 s command latency). |
+| **Admin security**     | `NEXT_PUBLIC_ADMIN_PASSWORD` is exposed to the client. For stronger auth, move the password check to a server action or add NextAuth.                                                                                        |
+| **API token**          | `TOUGHTONGUE_API_TOKEN` is server-side only and never reaches the browser.                                                                                                                                                   |
+| **Vercel plan**        | `maxDuration: 30` requires Vercel Pro. Hobby caps at 10 s — the poll times out but the client retries, so it degrades gracefully (with 3–10 s command latency).                                                              |
