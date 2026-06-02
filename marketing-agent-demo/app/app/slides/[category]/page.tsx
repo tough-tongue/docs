@@ -4,12 +4,13 @@ import {
   getCategory,
 } from "@/data/slides/registry";
 
-export default function SlideCategoryPage({
+export default async function SlideCategoryPage({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
-  const category = getCanonicalCategoryId(params.category);
+  const { category: rawCategory } = await params;
+  const category = getCanonicalCategoryId(rawCategory);
   if (!getCategory(category)) notFound();
 
   redirect(`/slides/${category}/1`);
