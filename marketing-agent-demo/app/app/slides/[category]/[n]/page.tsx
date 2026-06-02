@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Link2 } from "lucide-react";
 import { getCategory } from "@/data/slides/registry";
@@ -17,10 +17,10 @@ import { useSlideTouchNav } from "@/hooks/useSlideTouchNav";
 export default function SlideViewerPage({
   params,
 }: {
-  params: { category: string; n: string };
+  params: Promise<{ category: string; n: string }>;
 }) {
   const router = useRouter();
-  const { category, n } = params;
+  const { category, n } = use(params);
   const cat = getCategory(category);
   const order = Math.max(1, parseInt(n, 10) || 1);
   const routeCategory = cat?.meta.id ?? category;

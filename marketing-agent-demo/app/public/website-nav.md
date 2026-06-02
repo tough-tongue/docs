@@ -67,6 +67,13 @@ deck.
 | `sky-penthouse`        | `/slides/sky-penthouse`        | 5      | Show the sky penthouse / duplex         |
 | `amenities`            | `/slides/amenities`            | 4      | Show clubhouse, spa, golf, lifestyle    |
 
+Legacy aliases still work:
+
+| Legacy URL base           | Canonical URL base             |
+| ------------------------- | ------------------------------ |
+| `/slides/property-type-a` | `/slides/wraparound-residence` |
+| `/slides/property-type-b` | `/slides/sky-penthouse`        |
+
 #### The Wraparound Residence (4-BHK)
 
 | Slide | URL                              | Headline                            |

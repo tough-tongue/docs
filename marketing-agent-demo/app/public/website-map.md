@@ -30,6 +30,17 @@ Complete reference of every route, anchor, and slide in the site. Accessible at:
 | `/slides/amenities/4`            | Amenities — Slide 4: A short list, kept short                           |
 | `/admin`                         | Admin remote-navigation panel (password-gated)                          |
 
+### Legacy Slide Aliases
+
+These older URLs remain supported and redirect to the named decks:
+
+| Legacy path                  | Redirects to                      |
+| ---------------------------- | --------------------------------- |
+| `/slides/property-type-a`    | `/slides/wraparound-residence`    |
+| `/slides/property-type-a/:n` | `/slides/wraparound-residence/:n` |
+| `/slides/property-type-b`    | `/slides/sky-penthouse`           |
+| `/slides/property-type-b/:n` | `/slides/sky-penthouse/:n`        |
+
 ---
 
 ## Landing Page Sections (scroll anchors)
