@@ -1,6 +1,6 @@
 <!-- Pinned snapshot. Do not edit by hand. Regenerate with scripts/sync-sources.sh. -->
 <!-- Source: tough-tongue-ai/py/jarvis/boxman/claude_box/repo-base/handbooks/ScenarioGuide.md @ 0c17abd29 (2026-06-19T09:08:28-07:00) -->
-<!-- Pinned at: 2026-06-19T16:15:36Z -->
+<!-- Pinned at: 2026-06-19T16:23:07Z -->
 
 # Scenario Creation Guide
 

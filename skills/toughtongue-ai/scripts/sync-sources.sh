@@ -20,9 +20,13 @@
 # Glob in <source-path> is supported via the trailing "/*.md" form — see handbook row.
 SOURCES=(
   "txt|www/public/llms-full.txt|llms-full.txt"
-  "yaml|py/jarvis/boxman/claude_box/repo-base/schema/scenario-schema.yml|scenario-schema.yml"
   "md|py/jarvis/boxman/claude_box/repo-base/handbooks/*.md|handbooks/"
 )
+
+# Structured resource schemas extracted from the public API-Reference TS source
+# via bun. Produces snapshots/scenario-schema.md and snapshots/session-schema.md
+# from the SCENARIO_SCHEMA / SESSION_SCHEMA exports.
+SCHEMA_SRC="www/app/docs/config/api-schemas.ts"
 
 set -euo pipefail
 
@@ -111,6 +115,15 @@ for row in "${SOURCES[@]}"; do
   sync_row "$style" "$src_rel" "$dest_rel"
 done
 
+# extract resource schemas (Scenario, Session) from api-schemas.ts ----
+if ! command -v bun >/dev/null 2>&1; then
+  echo "ERROR: bun is required to extract resource schemas. Install from https://bun.sh" >&2
+  exit 1
+fi
+bun "$SCRIPT_DIR/extract-schemas.mts" \
+  "$TT_SRC/$SCHEMA_SRC" "$SNAPSHOTS" \
+  "$SHORT_SHA" "$COMMIT_DATE" "$PINNED_AT"
+
 # summary ----
 echo "Synced snapshots from tough-tongue-ai @ $SHORT_SHA"
 for row in "${SOURCES[@]}"; do
@@ -122,6 +135,8 @@ for row in "${SOURCES[@]}"; do
     echo "  - $dest_rel"
   fi
 done
+echo "  - scenario-schema.md (extracted)"
+echo "  - session-schema.md  (extracted)"
 
 echo ""
 echo "Next: bump version in .claude-plugin/plugin.json if content materially changed,"

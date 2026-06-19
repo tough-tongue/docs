@@ -2,7 +2,7 @@
 
 Authoring `scenario.yml` files using the handbook system. Source-of-truth files (snapshots in this skill):
 
-- `snapshots/scenario-schema.yml` — auto-generated JSON schema (from `ScenarioEssence`)
+- `snapshots/scenario-schema.md` — public Scenario resource: required fields, types, sample JSON
 - `snapshots/handbooks/*.md` — pattern handbooks; each starts with a TLDR. Read the TLDR before the full guide.
 
 **Stale-content alarms** (cross-checked against `tough-tongue/ttai-claude-plans-and-skills/plans/ttai-system-design/03-scenario-skill-crosscheck.md`):
@@ -184,7 +184,7 @@ Each handbook starts with a TLDR — read it before the full body.
 
 ## Validation
 
-The TypeScript validator (`py/jarvis/boxman/claude_box/repo-base/tools/validate.ts`) checks `scenario.yml` against `snapshots/scenario-schema.yml`. **Do not finish until validation passes.**
+Cross-check `scenario.yml` against the field reference in `snapshots/scenario-schema.md` (public Scenario shape) plus the handbook for the scenario type. When authoring inside the monorepo there is also a TypeScript validator at `py/jarvis/boxman/claude_box/repo-base/tools/validate.ts`. **Do not finish until validation passes.**
 
 It catches:
 

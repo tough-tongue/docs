@@ -11,7 +11,8 @@ ToughTongue AI (TTAI) is a voice-agent platform for high-stakes conversation pra
 **Source-of-truth files in this skill** (read them when needed; do not invent values):
 
 - `snapshots/llms-full.txt` — public REST API + iframe + SIP + webhooks + integrations (~1500 lines)
-- `snapshots/scenario-schema.yml` — auto-generated schema for `scenario.yml` (the only authoritative enum/type/field list)
+- `snapshots/scenario-schema.md` — public Scenario resource: fields, types, sample JSON, notes
+- `snapshots/session-schema.md` — public Session resource: lifecycle, results, report card
 - `snapshots/handbooks/` — `ScenarioGuide`, `FieldsReference`, `SalesPatterns`, `ColdCallPatterns`, `CoachPatterns`, `SuperAgentGuide`, `MCPGuide`, `SampleScenario`, `FlashGuide`
 
 Reference files in this skill expand on each domain; **load only the reference that matches the user's task** (see §Reference loading rules below).
@@ -47,7 +48,8 @@ Reference files in this skill expand on each domain; **load only the reference t
 |---|---|---|
 | Embed TT in my web app | `deploy-reference.md` | `nextjs-minimal/` or `marketing-agent-demo/` |
 | Create / list / read scenarios via REST | `api-reference.md` | `nextjs-minimal/` |
-| Author a scenario in YAML | `scenario-authoring-reference.md` + `snapshots/scenario-schema.yml` + matching handbook | `scenario-manager/` |
+| Author a scenario in YAML | `scenario-authoring-reference.md` + `snapshots/scenario-schema.md` + matching handbook | `scenario-manager/` |
+| Read or shape Session results | `api-reference.md` §sessions + `snapshots/session-schema.md` | `nextjs-minimal/` |
 | Wire outbound webhooks | `integrations-reference.md` §webhooks | `nextjs-minimal/` |
 | Add a custom HTTP tool the agent calls | `integrations-reference.md` §custom-functions | `flask-minimal/` |
 | Connect an MCP server | `integrations-reference.md` §mcp + `snapshots/handbooks/MCPGuide.md` | — |
@@ -60,7 +62,7 @@ Reference files in this skill expand on each domain; **load only the reference t
 
 ## 3. Scenario authoring — quick rules
 
-**These values are the most common source of stale-content bugs. Always cross-check against `snapshots/scenario-schema.yml`.**
+**These values are the most common source of stale-content bugs. Always cross-check against `snapshots/scenario-schema.md` (public Scenario resource) and the matching handbook.**
 
 - `type:` — schema accepts `default · super · quiz · composite · coding · meet_assist`, but the handbook authoring guidance says **only use `default` or `super` in practice**; others are deprecated or internal. **Never write `super_agent`** — that is the legacy value and will fail validation.
 - `llm_provider:` ∈ `google · google_vertex · openai · cerebras`
@@ -171,12 +173,12 @@ If the user's question spans two domains, load both — but read snapshots lazil
 - **Token in client**: never expose `TOUGHTONGUE_API_TOKEN` to the browser. Proxy through a server route.
 - **Iframe sandbox**: must include `allow="microphone"`. Other sandbox flags depend on the embed style.
 - **Webhook idempotency**: there are no retries. If your handler fails, the event is lost — return 2xx fast and process async.
-- **Validation before upload**: validate `scenario.yml` against `snapshots/scenario-schema.yml` before uploading via the Jarvis CLI (`uv run jarvis scenario upload`). Schema errors block; style hints are warnings.
+- **Validation before upload**: cross-check `scenario.yml` against the field reference in `snapshots/scenario-schema.md` before uploading via the Jarvis CLI (`uv run jarvis scenario upload`). Schema errors block; style hints are warnings.
 
 ---
 
 ## Maintainer notes
 
-- This skill's reference content is derived from a pinned snapshot of `tough-tongue-ai` at commit `3ee742b3a` (2026-06-14). Regenerate with `scripts/sync-sources.sh` after each upstream release.
+- This skill's reference content is derived from pinned snapshots of `tough-tongue-ai`. Each snapshot file's header carries its source commit SHA. Regenerate with `scripts/sync-sources.sh` after each upstream release (`bun` required for resource-schema extraction).
 - Cross-checked against `tough-tongue/ttai-claude-plans-and-skills/plans/ttai-system-design/03-scenario-skill-crosscheck.md` (May 2026). That doc enumerates the stale values the older gist-based scenario-writer skill produced.
 - Code in this repo: MIT. Content in `snapshots/` and reference files: © ToughTongue AI.

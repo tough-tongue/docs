@@ -13,7 +13,7 @@ For full payloads + curl examples, read `snapshots/llms-full.txt` at the line ra
 
 ## Scenarios `[snapshot L101–L342]`
 
-A scenario defines an AI agent's behavior — prompt, rubric, tools, appearance, analysis config.
+A scenario defines an AI agent's behavior — prompt, rubric, tools, appearance, analysis config. Full field-by-field shape (with required flags + sample JSON) in `snapshots/scenario-schema.md`.
 
 | Method | Path | Notes |
 |---|---|---|
@@ -38,7 +38,7 @@ A scenario defines an AI agent's behavior — prompt, rubric, tools, appearance,
 
 ## Sessions `[snapshot L344–L451]`
 
-Every conversation creates a session. Sessions carry transcripts, scores, extracted vars.
+Every conversation creates a session. Sessions carry transcripts, scores, extracted vars. Full field-by-field shape (Identity / Lifecycle / User Info / Results / Report Card) in `snapshots/session-schema.md`.
 
 | Method | Path | Notes |
 |---|---|---|
