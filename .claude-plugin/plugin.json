@@ -1,6 +1,6 @@
 {
   "name": "toughtongue-ai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build on ToughTongue AI — REST API, iframe embeds, SIP phone calls, meeting bots, webhooks, custom HTTP tools, MCP integrations, and scenario YAML authoring (Scenario / Coach / Course formats).",
   "author": {
     "name": "ToughTongue AI",

@@ -12,7 +12,6 @@ ToughTongue AI (TTAI) is a voice-agent platform for high-stakes conversation pra
 
 - `snapshots/llms-full.txt` — public REST API + iframe + SIP + webhooks + integrations (~1500 lines)
 - `snapshots/scenario-schema.yml` — auto-generated schema for `scenario.yml` (the only authoritative enum/type/field list)
-- `snapshots/boxman-claude.md` — scenario workshop rules (communication style, validation flow)
 - `snapshots/handbooks/` — `ScenarioGuide`, `FieldsReference`, `SalesPatterns`, `ColdCallPatterns`, `CoachPatterns`, `SuperAgentGuide`, `MCPGuide`, `SampleScenario`, `FlashGuide`
 
 Reference files in this skill expand on each domain; **load only the reference that matches the user's task** (see §Reference loading rules below).
@@ -63,7 +62,7 @@ Reference files in this skill expand on each domain; **load only the reference t
 
 **These values are the most common source of stale-content bugs. Always cross-check against `snapshots/scenario-schema.yml`.**
 
-- `type:` — schema accepts `default · super · quiz · composite · coding · meet_assist`, but boxman authoring guidance says **only use `default` or `super` in practice**; others are deprecated or internal. **Never write `super_agent`** — that is the legacy value and will fail validation.
+- `type:` — schema accepts `default · super · quiz · composite · coding · meet_assist`, but the handbook authoring guidance says **only use `default` or `super` in practice**; others are deprecated or internal. **Never write `super_agent`** — that is the legacy value and will fail validation.
 - `llm_provider:` ∈ `google · google_vertex · openai · cerebras`
 - `tts_provider:` ∈ `cartesia · openai · elevenlabs`
 - `stt_provider:` ∈ `deepgram · cartesia`
@@ -172,16 +171,7 @@ If the user's question spans two domains, load both — but read snapshots lazil
 - **Token in client**: never expose `TOUGHTONGUE_API_TOKEN` to the browser. Proxy through a server route.
 - **Iframe sandbox**: must include `allow="microphone"`. Other sandbox flags depend on the embed style.
 - **Webhook idempotency**: there are no retries. If your handler fails, the event is lost — return 2xx fast and process async.
-- **Validation before upload**: the scenario YAML validator (`tools/validate.ts` in boxman) must pass before `uv run jarvis scenario upload`. Schema errors block; style hints are warnings.
-
----
-
-## 11. Tone for user-facing replies
-
-When responding to the end user (not editing files), follow boxman's communication style:
-
-- Describe WHAT you're improving — "Enhancing the interview approach to be more flexible…"
-- Do not say "Editing scenario.yml" or "Updating the ai_instructions field" — users don't think in files or YAML.
+- **Validation before upload**: validate `scenario.yml` against `snapshots/scenario-schema.yml` before uploading via the Jarvis CLI (`uv run jarvis scenario upload`). Schema errors block; style hints are warnings.
 
 ---
 

@@ -1,8 +1,7 @@
 # ToughTongue AI — Scenario Authoring Reference
 
-Authoring `scenario.yml` files using the boxman handbook system. Source-of-truth files (snapshots in this skill):
+Authoring `scenario.yml` files using the handbook system. Source-of-truth files (snapshots in this skill):
 
-- `snapshots/boxman-claude.md` — workshop rules + communication style
 - `snapshots/scenario-schema.yml` — auto-generated JSON schema (from `ScenarioEssence`)
 - `snapshots/handbooks/*.md` — pattern handbooks; each starts with a TLDR. Read the TLDR before the full guide.
 
@@ -20,14 +19,6 @@ Authoring `scenario.yml` files using the boxman handbook system. Source-of-truth
 3. **Draft `scenario.yml`** using the handbook's structure + the field reference below.
 4. **Run the validator** before saying you're done.
 5. **Upload via Jarvis CLI** when validation passes.
-
-## Communication style — read before editing for users
-
-Per `snapshots/boxman-claude.md` (workshop CLAUDE.md):
-
-- Describe WHAT you're improving — e.g. "Restructuring the conversation flow with clearer phase timing…"
-- **Do not say** "Editing scenario.yml" or "Updating the ai_instructions field." Users do not think in files or YAML.
-- **Do not** mention file paths like `agent-f5c913d4/scenario.yml` to the user.
 
 ## Type — the most-broken field
 
@@ -64,7 +55,7 @@ Constraints:
 
 - `appearance.voice` ∈ `Aoede, Charon, Fenrir, Kore, Puck`.
 - `appearance.language_code` is BCP-47 (e.g. `en-US`, `fr-FR`, `ja-JP`).
-- For STT/TTS/LLM provider enums used in the public API surface (different shape from boxman schema), see `api-reference.md` §scenarios and `snapshots/llms-full.txt`.
+- For STT/TTS/LLM provider enums used in the public API surface (different shape from the boxman-internal YAML schema), see `api-reference.md` §scenarios and `snapshots/llms-full.txt`.
 
 ## Special directives in the YAML
 

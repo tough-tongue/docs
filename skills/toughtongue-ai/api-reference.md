@@ -91,4 +91,4 @@ Mint server-side (never client). Stick to one SAT per user session — rotation 
 
 - For iframe / SIP / meeting bots / browser-tool auth → `deploy-reference.md`.
 - For webhooks / custom HTTP tools / MCP → `integrations-reference.md`.
-- For scenario YAML authoring (boxman handbooks, `$random`, `$fread@`) → `scenario-authoring-reference.md`.
+- For scenario YAML authoring (handbooks, `$random`, `$fread@`) → `scenario-authoring-reference.md`.

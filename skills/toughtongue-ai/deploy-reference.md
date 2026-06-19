@@ -204,4 +204,4 @@ Mix and match: a private scenario with SAT + passcode + time window is supported
 - REST CRUD on scenarios/sessions → `api-reference.md`
 - Webhook event payloads + signature verification → `integrations-reference.md`
 - Custom HTTP tools the agent calls into your backend → `integrations-reference.md` §custom-functions
-- Authoring `scenario.yml` for boxman upload → `scenario-authoring-reference.md`
+- Authoring `scenario.yml` → `scenario-authoring-reference.md`
