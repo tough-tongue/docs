@@ -1,0 +1,17 @@
+{
+  "name": "voice-ai-quickstart",
+  "description": "Skills and templates for building on ToughTongue AI — the voice agent platform for interviews, sales, coaching, and negotiations. Pairs with the starter apps in this repo (Next.js, Flask, marketing-agent-demo, scenario-manager).",
+  "owner": {
+    "name": "tough-tongue",
+    "url": "https://github.com/tough-tongue"
+  },
+  "plugins": [
+    {
+      "name": "toughtongue-ai",
+      "description": "Build on ToughTongue AI — voice agent platform for interviews, sales, coaching, negotiations. Covers REST API, iframe embeds, SIP phone calls, meeting bots, webhooks, custom HTTP tools, MCP integrations, and scenario YAML authoring.",
+      "source": ".",
+      "category": "ai",
+      "tags": ["voice", "agents", "livekit", "ttai", "conversation-practice"]
+    }
+  ]
+}

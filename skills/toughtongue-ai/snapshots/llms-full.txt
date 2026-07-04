@@ -1,0 +1,1542 @@
+# Pinned snapshot. Do not edit by hand. Regenerate with scripts/sync-sources.sh.
+# Source: tough-tongue-ai/www/public/llms-full.txt @ 0c17abd29 (2026-06-19T09:08:28-07:00)
+# Pinned at: 2026-06-19T16:23:07Z
+# Live mirror: https://app.toughtongueai.com/llms-full.txt
+
+# Tough Tongue AI
+
+> Voice AI agent platform. Create conversational agents, embed them anywhere, collect session data and analysis programmatically.
+
+## What It Does
+
+Tough Tongue AI lets you **create voice AI agents** and deploy them via iframe, phone call, or meeting bot. Each agent interaction produces a **session** with transcript, evaluation scores, and extracted variables — all retrievable via API.
+
+**Platform capabilities:**
+
+- Agents use tools mid-conversation: images, slides, diagrams, whiteboards, knowledge base search
+- Multimodal: reads tone, facial expressions, body language (not just words)
+- Post-session: auto-analysis with rubric scoring, variable extraction, report cards
+
+## Integration Quick Start
+
+1. Get API token → `https://app.toughtongueai.com/developer`
+2. Create a scenario (API or UI) → defines agent behavior
+3. Deploy: embed iframe, schedule phone call, or dispatch meeting bot
+4. Collect results: session transcripts, scores, extracted data via API
+5. React in real-time: webhooks notify your server on session lifecycle events
+
+## Three Agent Types
+
+| Type         | What it is                                   | Best for                                 |
+| ------------ | -------------------------------------------- | ---------------------------------------- |
+| **Scenario** | One-off conversation agent                   | Interviews, negotiations, customer calls |
+| **Coach**    | Persistent agent with memory across sessions | Ongoing training, accountability         |
+| **Course**   | Ordered sequence of scenarios + content      | Structured learning programs             |
+
+## Deployment Channels
+
+| Channel         | How                                | API                           |
+| --------------- | ---------------------------------- | ----------------------------- |
+| **Iframe**      | Embed in any webpage               | URL-based, no API call needed |
+| **Phone (SIP)** | Agent calls a phone number         | `POST /v2/sip/call`           |
+| **Phone Batch** | Agent calls a list of numbers      | `POST /v2/sip/batch`          |
+| **Meeting Bot** | Agent joins Google Meet/Zoom/Teams | `POST /v2/meeting-bots`       |
+
+## Key Links
+
+- Platform: https://app.toughtongueai.com
+- Developer Tools & API Playground: https://app.toughtongueai.com/developer
+- Documentation: https://app.toughtongueai.com/docs
+- API Best Practices: https://app.toughtongueai.com/docs/api-best-practices
+- Simple Integration Example: https://github.com/tough-tongue/ttai-simple-course
+
+---
+
+# API Overview
+
+## Base URL
+
+```
+https://app.toughtongueai.com/api/public
+```
+
+## Authentication
+
+Every request requires a Bearer token:
+
+```
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+Create tokens at: `https://app.toughtongueai.com/developer`
+
+## Core Workflow
+
+```
+Create Scenario → Deploy (iframe/phone/bot) → Session created → Fetch results
+                                                      ↓
+                                              Webhook notifies your server
+```
+
+| Step | Action              | Endpoint                              |
+| ---- | ------------------- | ------------------------------------- |
+| 1    | Create scenario     | `POST /scenarios`                     |
+| 2a   | Embed iframe        | URL: `/embed/basic/SCENARIO_ID`       |
+| 2b   | Phone call          | `POST /v2/sip/call`                   |
+| 2c   | Meeting bot         | `POST /v2/meeting-bots`               |
+| 3    | Get session results | `GET /sessions/{id}`                  |
+| 4    | Trigger analysis    | `POST /v2/sessions/{id}/post-process` |
+| 5    | Get analytics       | `GET /v2/analytics`                   |
+
+## Conventions
+
+- All responses: JSON
+- Dates: ISO 8601 (`2025-02-26T18:02:00.945000`)
+- Pagination: `page` (1-based) + `limit` query params
+- IDs: 24-character hex strings (MongoDB ObjectId)
+- Errors: `{"detail": "error message"}` with appropriate HTTP status
+- Endpoints below show full paths (e.g. `POST /api/public/scenarios`)
+
+---
+
+# API: Scenario Management
+
+A **scenario** defines the AI agent's behavior. Create one via API, then deploy it through any channel (iframe, phone, meeting bot). Every user interaction creates a **session**.
+
+## Create Scenario
+
+**`POST /api/public/scenarios`**
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/scenarios \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{
+    "name": "Sales Objection Handling",
+    "ai_instructions": "You are a skeptical enterprise buyer. The rep is selling {{ product_name }} to {{ company_name }}. Push back on pricing and demand ROI numbers.",
+    "rubrik": "Rate on: objection handling (40%), value articulation (30%), closing technique (30%)",
+    "is_public": false,
+    "is_recording": true,
+    "appearance": {
+      "voice": "Aoede",
+      "language_code": "en-US"
+    },
+    "session_analysis": {
+      "is_auto_analysis": true,
+      "enable_extraction": true,
+      "extraction_vars": [
+        {"name": "objections_raised", "description": "List of objections the prospect raised", "type": "list"},
+        {"name": "deal_closed", "description": "Did the rep successfully close", "type": "boolean"},
+        {"name": "confidence_score", "description": "Rep confidence level 1-10", "type": "number"}
+      ]
+    },
+    "tools_config": {
+      "tools": {
+        "card": {"should_register": true, "add_to_system_prompt": false, "tool_settings": null},
+        "end_session": {"should_register": true, "add_to_system_prompt": true, "tool_settings": {"disconnectDelaySeconds": 5}}
+      }
+    },
+    "user_metadata": {"department": "sales", "difficulty": "intermediate"}
+  }'
+```
+
+**Response** (200):
+
+```json
+{
+  "id": "689e283d8ff2b6aca6239d8b",
+  "name": "Sales Objection Handling",
+  "ai_instructions": "You are a skeptical enterprise buyer...",
+  "is_public": false,
+  "is_recording": true,
+  "appearance": { "voice": "Aoede", "language_code": "en-US" },
+  "user_metadata": { "department": "sales", "difficulty": "intermediate" },
+  "created_at": "2024-06-10T09:15:00Z",
+  "updated_at": "2024-06-10T09:15:00Z"
+}
+```
+
+## Update Scenario
+
+**`POST /api/public/scenarios`** (include `id` field)
+
+Only fields you include are updated. Omitted fields remain unchanged.
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/scenarios \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{"id": "689e283d8ff2b6aca6239d8b", "name": "Advanced Sales Training"}'
+```
+
+## List Scenarios
+
+**`GET /api/public/scenarios`**
+
+Returns all scenarios you own. Sensitive fields (ai_instructions, tools_config, memory) are excluded — use Get by ID for full details.
+
+## Get Scenario
+
+**`GET /api/public/scenarios/{id}`**
+
+Returns the complete scenario resource with all configuration fields.
+
+## List Featured
+
+**`GET /api/public/featured-scenarios`**
+
+Returns publicly featured scenarios from the platform library.
+
+---
+
+## Full Scenario Resource
+
+```json
+{
+  "id": "689e283d8ff2b6aca6239d8b",
+  "name": "Customer Support Training",
+  "description": "Internal team description",
+  "ai_instructions": "You are a frustrated customer with a billing issue on {{ product_name }}.",
+  "user_friendly_description": "Improve your customer service skills",
+  "rubrik": "Rate based on empathy, problem-solving, clarity",
+  "pdf_context": null,
+  "is_public": true,
+  "passcode": null,
+  "is_recording": true,
+  "analysis_access": "default",
+  "appearance": { "voice": "Aoede", "avatar_url": null, "language_code": "en-US" },
+  "memory": { "is_memory": true },
+  "session_analysis": {
+    "is_auto_analysis": true,
+    "is_auto_submit": false,
+    "admin_email": "admin@example.com",
+    "email_analysis": true,
+    "email_transcript": false,
+    "multimodal_analysis": false,
+    "evaluation_target": null,
+    "enable_extraction": true,
+    "extraction_vars": [
+      { "name": "sentiment", "description": "Overall customer sentiment", "type": "text" }
+    ]
+  },
+  "ai_model_config": { "provider": "Ocean", "model": "medium-stable" },
+  "tools_config": {
+    "tools": {
+      "timer": { "should_register": true, "add_to_system_prompt": false, "tool_settings": null },
+      "end_session": {
+        "should_register": true,
+        "add_to_system_prompt": true,
+        "tool_settings": { "disconnectDelaySeconds": 5 }
+      }
+    }
+  },
+  "user_metadata": { "department": "sales", "priority": 5 },
+  "pricing": null,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T14:20:00Z"
+}
+```
+
+---
+
+## Field Reference
+
+### Core
+
+| Field                       | Type   | Description                                           |
+| --------------------------- | ------ | ----------------------------------------------------- |
+| `id`                        | string | Omit to create, include to update                     |
+| `name`                      | string | Display name (required)                               |
+| `description`               | string | Internal admin-only description                       |
+| `ai_instructions`           | string | System prompt. Supports `{{ variable }}` placeholders |
+| `user_friendly_description` | string | Shown to end users                                    |
+| `rubrik`                    | string | Evaluation criteria for session analysis              |
+| `pdf_context`               | string | Additional context document (base64)                  |
+
+### Access & Recording
+
+| Field             | Type    | Description                                                          |
+| ----------------- | ------- | -------------------------------------------------------------------- |
+| `is_public`       | boolean | Publicly accessible (default: true)                                  |
+| `passcode`        | string  | Optional access code                                                 |
+| `is_recording`    | boolean | Record & transcribe sessions                                         |
+| `analysis_access` | string  | `"default"` / `"always"` / `"never"` — where analysis shows          |
+| `user_metadata`   | object  | Custom key-value pairs. Filterable via `meta_*` query params on List |
+
+### Appearance
+
+| Field                      | Values                                                    |
+| -------------------------- | --------------------------------------------------------- |
+| `appearance.voice`         | Aoede, Charon, Fenrir, Kore, Puck                         |
+| `appearance.avatar_url`    | Custom avatar image URL                                   |
+| `appearance.language_code` | BCP-47: "en-US", "fr-FR", "es-ES", "ja-JP", "de-DE", etc. |
+
+### AI Model
+
+| Field                      | Values                                                     |
+| -------------------------- | ---------------------------------------------------------- |
+| `ai_model_config.provider` | "Ocean", "Galaxy"                                          |
+| `ai_model_config.model`    | "medium", "medium-stable", "medium-nc", "medium-stable-nc" |
+| `memory.is_memory`         | Agent remembers past sessions with same user               |
+
+### Session Analysis
+
+| Field                                  | Description                         |
+| -------------------------------------- | ----------------------------------- |
+| `session_analysis.is_auto_analysis`    | Auto-evaluate when session ends     |
+| `session_analysis.admin_email`         | Comma-separated report recipients   |
+| `session_analysis.is_auto_submit`      | Skip user confirmation              |
+| `session_analysis.email_analysis`      | Email evaluation to admin           |
+| `session_analysis.email_transcript`    | Email transcript to admin           |
+| `session_analysis.multimodal_analysis` | Include audio/video in evaluation   |
+| `session_analysis.evaluation_target`   | Who to evaluate (multi-participant) |
+| `session_analysis.enable_extraction`   | Extract variables on session end    |
+| `session_analysis.extraction_vars`     | `[{name, description, type}]`       |
+
+Extraction types: `text`, `number`, `boolean`, `list`, `date`.
+
+### Dynamic Variables
+
+Place `{{ variable_name }}` in `ai_instructions`. Values injected at runtime:
+
+| Channel     | How to pass                                | Example                               |
+| ----------- | ------------------------------------------ | ------------------------------------- |
+| Iframe      | `t_` prefix query params                   | `?t_company_name=Acme&t_role=Manager` |
+| Phone call  | `dynamic_vars` field in request body       | `{"company_name": "Acme"}`            |
+| API session | Not yet supported — use fixed instructions | —                                     |
+
+### Tools Config
+
+```json
+"tools_config": {
+  "tools": {
+    "<tool_name>": {
+      "should_register": true,
+      "add_to_system_prompt": false,
+      "tool_settings": null
+    }
+  }
+}
+```
+
+**Available tools:** timer, whiteboard, card, mcq, mermaid, pdf_upload, memory_search, knowledge_base_search, end_session, google_slides, image_generation, notepad, slide_generation, browser, custom_function, arcade_gmail, arcade_calendar, emoji_reaction
+
+**Tool-specific settings:**
+
+| Tool            | `tool_settings`                                         |
+| --------------- | ------------------------------------------------------- |
+| `end_session`   | `{"disconnectDelaySeconds": 5}`                         |
+| `google_slides` | `{"embedUrl": "https://docs.google.com/.../pub?..."}`   |
+| `browser`       | `{"initialUrl": "https://...", "contextId": "ctx_..."}` |
+| All others      | `null`                                                  |
+
+### Pricing
+
+| Field                                | Description                                |
+| ------------------------------------ | ------------------------------------------ |
+| `pricing.enabled`                    | Require payment                            |
+| `pricing.configs[].amount`           | Price (9.99)                               |
+| `pricing.configs[].currency`         | ISO 4217: USD, EUR, GBP                    |
+| `pricing.configs[].billing_interval` | null=one-time, "month", "6_months", "year" |
+| `pricing.configs[].is_default`       | Default option shown                       |
+
+---
+
+# API: Session Management
+
+Every conversation creates a **session**. Query sessions to get transcripts, evaluation scores, extracted data, and report cards.
+
+## List Sessions
+
+**`GET /api/public/sessions`**
+
+| Parameter     | Required | Description                                    |
+| ------------- | -------- | ---------------------------------------------- |
+| `scenario_id` | ✅       | Filter by scenario                             |
+| `user_email`  | —        | Filter by email (comma-separated for multiple) |
+| `from_date`   | —        | Created on/after (YYYY-MM-DD)                  |
+| `to_date`     | —        | Created on/before (YYYY-MM-DD)                 |
+
+```bash
+curl 'https://app.toughtongueai.com/api/public/sessions?scenario_id=SCENARIO_ID&user_email=john@example.com' \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+**Response:**
+
+```json
+{
+  "sessions": [
+    {
+      "id": "67bf57183f44cdf6055a8166",
+      "scenario_id": "67bf56c23f44cdf6055a8165",
+      "scenario_name": "Customer Support Training",
+      "created_at": "2025-02-26T18:02:00.945000",
+      "completed_at": "2025-02-26T18:02:08.301000",
+      "status": "completed",
+      "user_name": "John Doe",
+      "user_email": "john.doe@example.com"
+    }
+  ]
+}
+```
+
+## List Sessions V2 (Enriched)
+
+**`GET /api/public/v2/sessions`**
+
+Returns evaluation scores, report cards, extraction results, and analytics URLs.
+
+**Additional filters:** `$gte_updated_at`, `$lte_updated_at`, `$gte_created_at`, `$lt_created_at`, `meta_*` (user_metadata filters).
+
+**Response includes:** All V1 fields plus `duration_minutes`, `evaluation_score`, `evaluation_note`, `report_card[]`, `report_card_topics`, `extraction_results`, `analytics_url`, `page_meta`.
+
+## Get Session Details
+
+**`GET /api/public/sessions/{session_id}`**
+
+Full session data including transcript, evaluation, and extracted variables.
+
+```json
+{
+  "id": "67c551e8aa4a6a7575d33955",
+  "scenario_id": "679c838ec41cfcb298fd9ace",
+  "scenario_name": "Customer Support Training",
+  "status": "completed",
+  "created_at": "2025-03-03T06:53:28.035000",
+  "completed_at": "2025-03-03T06:54:14.346000",
+  "user_name": "John Doe",
+  "user_email": "john.doe@example.com",
+  "transcript_url": "https://...s3.amazonaws.com/sessions/transcript.txt",
+  "evaluation_results": {
+    "overall_score": "8/10",
+    "final_score": 7.4,
+    "strengths": "Excellent active listening",
+    "weaknesses": "Could improve solution presentation",
+    "detailed_feedback": "The participant demonstrated strong...",
+    "report_card": [
+      {
+        "topic": "Communication",
+        "score": 7.5,
+        "score_str": "7.5/10",
+        "note": "Clear articulation",
+        "weight": 30
+      },
+      {
+        "topic": "Problem Solving",
+        "score": 8.0,
+        "score_str": "8/10",
+        "note": "Creative solutions",
+        "weight": 40
+      }
+    ]
+  },
+  "extraction_results": {
+    "objections_raised": ["pricing too high", "competitor has feature X"],
+    "deal_closed": false,
+    "confidence_score": 6
+  },
+  "improvement_results": {
+    "improvement_areas": "Solution presentation, closing technique",
+    "action_items": "1. Present solutions step-by-step\n2. Use trial closes earlier",
+    "resources": "- Objection Handling Guide: [link]"
+  }
+}
+```
+
+### Key fields:
+
+| Field                            | Description                                                 |
+| -------------------------------- | ----------------------------------------------------------- |
+| `evaluation_results.final_score` | Numeric score (0-10)                                        |
+| `evaluation_results.report_card` | Per-topic breakdown with weights                            |
+| `extraction_results`             | Object keyed by extraction var names (from scenario config) |
+| `transcript_url`                 | S3 URL to full transcript text                              |
+| `improvement_results`            | Actionable feedback and resources                           |
+
+---
+
+## Trigger Analysis
+
+**`POST /api/public/sessions/analyze`**
+
+Run evaluation on a completed session that wasn't auto-analyzed.
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/sessions/analyze \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{"session_id": "SESSION_ID"}'
+```
+
+## Post-Process (V2)
+
+**`POST /api/public/v2/sessions/{session_id}/post-process`**
+
+Run analysis and/or extraction in background. Returns `{"ok": true}` immediately — poll session details for results.
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/sessions/SESSION_ID/post-process \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{"run_analysis": true, "run_extraction": true}'
+```
+
+**Notes:**
+
+- Re-runs requested jobs — results overwrite existing
+- Extraction requires `extraction_vars` configured on the scenario
+- Successor to `POST /sessions/analyze`
+
+## Batch Post-Process
+
+**`POST /api/public/v2/sessions/batch-post-process`**
+
+Re-analyze multiple sessions at once:
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/sessions/batch-post-process \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{"session_ids": ["ID1", "ID2", "ID3"], "run_analysis": true, "run_extraction": true}'
+```
+
+---
+
+# API: Commerce & Access Tokens
+
+## Scenario Access Tokens
+
+**Endpoint**: `POST /api/public/scenario-access-token`
+
+Generate short-lived tokens (1 hour) for private scenario embedding.
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/scenario-access-token \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{"scenario_id": "SCENARIO_ID"}'
+```
+
+**Response:**
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expires_at": "2025-02-26T19:02:00.000Z"
+}
+```
+
+---
+
+## Purchases (One-Time)
+
+**Endpoint**: `GET /api/public/purchases`
+
+```bash
+# All purchases
+curl -X GET https://app.toughtongueai.com/api/public/purchases \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+
+# Filter by user
+curl -X GET "https://app.toughtongueai.com/api/public/purchases?user_email=john@example.com" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+**Response:**
+
+```json
+{
+  "purchases": [
+    {
+      "id": "67bf57183f44cdf6055a8166",
+      "user_id": "67bf56c23f44cdf6055a8165",
+      "product_id": "67bf56c23f44cdf6055a8165",
+      "product_type": "scenario",
+      "product_name": "Advanced Customer Support Training",
+      "amount": 29.99,
+      "currency": "USD",
+      "status": "completed",
+      "purchase_date": "2025-02-26T18:02:00.945000",
+      "user_name": "John Doe",
+      "user_email": "john.doe@example.com"
+    }
+  ]
+}
+```
+
+---
+
+## Subscriptions (Recurring)
+
+**Endpoint**: `GET /api/public/subscriptions`
+
+```bash
+curl -X GET https://app.toughtongueai.com/api/public/subscriptions \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+**Response:**
+
+```json
+{
+  "subscriptions": [
+    {
+      "id": "67bf57183f44cdf6055a8167",
+      "product_type": "scenario",
+      "product_name": "Advanced Customer Support Training",
+      "amount": 19.99,
+      "currency": "USD",
+      "status": "active",
+      "current_period_start": "2025-02-26T18:02:00.000000",
+      "current_period_end": "2025-03-26T18:02:00.000000",
+      "cancel_at_period_end": false,
+      "canceled_at": null,
+      "user_name": "Jane Smith",
+      "user_email": "jane.smith@example.com"
+    }
+  ]
+}
+```
+
+---
+
+## Wallet Balance
+
+**Endpoint**: `GET /api/public/balance`
+
+```bash
+curl -X GET https://app.toughtongueai.com/api/public/balance \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+**Response:**
+
+```json
+{
+  "available_minutes": 4109.7,
+  "last_updated": "2025-10-08T13:45:39.454000"
+}
+```
+
+---
+
+# API: Meeting Bots
+
+## Schedule Meeting Bot
+
+**Endpoint**: `POST /api/public/v2/meeting-bots`
+
+Schedule AI bots to join and record online meetings.
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/meeting-bots \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{
+    "scenario_id": "SCENARIO_ID",
+    "meeting_url": "https://meet.google.com/abc-defg-hij",
+    "meeting_provider": "google-meet",
+    "scheduled_ts": "2025-01-15T10:30:00Z",
+    "bot_name": "AI Assistant"
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "bots": [{ "bot_id": "67bf57183f44cdf6055a8166", "session_id": "67bf57183f44cdf6055a8167" }]
+}
+```
+
+**Features:**
+
+- **Multi-URL Support**: Separate URLs with newlines to schedule multiple bots
+- **Meeting Providers**: `google-meet`, `zoom`, `teams`
+- **Flexible Scheduling**: Set `scheduled_ts` to `null` for immediate join
+
+---
+
+## List Meeting Bots
+
+**Endpoint**: `GET /api/public/v2/meeting-bots`
+
+**Filters:** `status`, `from_date`, `to_date`, `scenario_id`, `page`, `limit`
+
+```bash
+curl -X GET "https://app.toughtongueai.com/api/public/v2/meeting-bots?status=call_ended&from_date=2024-01-01" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+---
+
+## Delete Meeting Bot
+
+**Endpoint**: `DELETE /api/public/v2/meeting-bots/{bot_id}`
+
+Only bots with status `pending` or `scheduled` can be deleted.
+
+```bash
+curl -X DELETE https://app.toughtongueai.com/api/public/v2/meeting-bots/BOT_ID \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+---
+
+# API: Phone Calls (SIP)
+
+Deploy any scenario as an outbound phone call. The AI calls a phone number, runs the conversation, then generates a session with full transcript and analysis.
+
+## Initiate Phone Call
+
+**`POST /api/public/v2/sip/call`**
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/sip/call \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{
+    "scenario_id": "SCENARIO_ID",
+    "sip_trunk_id": "SIP_TRUNK_ID",
+    "phone_number": "+14155551234",
+    "user_name": "John Doe",
+    "dynamic_vars": {
+      "patient_name": "John Doe",
+      "appointment_type": "dental checkup",
+      "date": "January 15, 2025"
+    }
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "call_id": "67bf57183f44cdf6055a8166",
+  "session_id": null,
+  "message": "Call initiated"
+}
+```
+
+### Parameters
+
+| Field          | Type   | Required | Description                                                     |
+| -------------- | ------ | -------- | --------------------------------------------------------------- |
+| `scenario_id`  | string | ✅       | Which AI agent to use                                           |
+| `sip_trunk_id` | string | ✅       | Your SIP trunk (from Settings → SIP Trunks)                     |
+| `phone_number` | string | ✅       | E.164 format: `+14155551234`                                    |
+| `user_name`    | string | —        | Recipient name (shows in session)                               |
+| `user_email`   | string | —        | Recipient email                                                 |
+| `scheduled_ts` | string | —        | ISO 8601 datetime. Omit = call immediately                      |
+| `dynamic_vars` | object | —        | Key-value pairs substituted into `{{ var }}` in ai_instructions |
+
+### Dynamic Variables
+
+If your scenario's `ai_instructions` contains `{{ variable_name }}` placeholders, pass values via `dynamic_vars`:
+
+**Scenario prompt:**
+
+```
+You are calling {{ patient_name }} to confirm their {{ appointment_type }} on {{ date }}.
+Be warm and professional. If they need to reschedule, offer the next 3 available slots.
+```
+
+**API call:**
+
+```json
+{
+  "dynamic_vars": {
+    "patient_name": "Jane Smith",
+    "appointment_type": "dental checkup",
+    "date": "January 15, 2025"
+  }
+}
+```
+
+Result: The AI speaks with all placeholders replaced by actual values.
+
+---
+
+## Batch Phone Calls
+
+**`POST /api/public/v2/sip/batch`**
+
+Dispatch the same scenario to multiple phone numbers. Each entry can have its own `dynamic_vars`.
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/sip/batch \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{
+    "scenario_id": "SCENARIO_ID",
+    "sip_trunk_id": "SIP_TRUNK_ID",
+    "entries": [
+      {
+        "phone_number": "+14155551234",
+        "user_name": "John Doe",
+        "dynamic_vars": {"patient_name": "John Doe", "date": "Jan 15"}
+      },
+      {
+        "phone_number": "+14155555678",
+        "user_name": "Jane Smith",
+        "dynamic_vars": {"patient_name": "Jane Smith", "date": "Jan 16"}
+      }
+    ]
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "batch_id": "67bf57183f44cdf6055a8168",
+  "total_calls": 2,
+  "message": "Created 2 call records, batch processing scheduled"
+}
+```
+
+**Batch behavior:**
+
+- Processes every 5 minutes
+- Concurrency limited by trunk's `max_concurrency` setting
+- Track progress: `GET /api/public/v2/sip/calls?batch_id=BATCH_ID`
+
+---
+
+## List Phone Calls
+
+**`GET /api/public/v2/sip/calls`**
+
+| Filter                  | Values                                                    |
+| ----------------------- | --------------------------------------------------------- |
+| `status`                | pending, scheduled, in_call_recording, call_ended, failed |
+| `scenario_id`           | Filter by scenario                                        |
+| `batch_id`              | Filter by batch                                           |
+| `from_date` / `to_date` | Date range                                                |
+| `page` / `limit`        | Pagination                                                |
+
+---
+
+## Delete Phone Call
+
+**`DELETE /api/public/v2/sip/calls/{call_id}`**
+
+Only calls with status `pending` or `scheduled` can be deleted.
+
+---
+
+# API: Analytics
+
+## Unified Analytics
+
+**Endpoint**: `GET /api/public/v2/analytics`
+
+Get comprehensive analytics data in a single API call.
+
+```bash
+curl -X GET "https://app.toughtongueai.com/api/public/v2/analytics?is_org=false&start_date=2024-01-01&end_date=2024-12-31" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+**Response:**
+
+```json
+{
+  "scenarios": [
+    {
+      "id": "67bf56c23f44cdf6055a8165",
+      "name": "Customer Support Training",
+      "created_at": "2025-02-26T18:01:38.734000",
+      "is_public": true,
+      "session_count": 15,
+      "total_duration_seconds": 6750.5
+    }
+  ],
+  "org_dashboard": {
+    "summary": {
+      "total_sessions": 25,
+      "completed_sessions": 23,
+      "total_minutes": 125.5,
+      "wallet_balance": 874.5
+    },
+    "usage_by_member": [{ "user_id": "user_123", "total_minutes": 45.2, "session_count": 8 }],
+    "time_series": [{ "date": "2024-01-15", "session_count": 5, "total_minutes": 42.3 }]
+  },
+  "member_usage": {
+    "members": [
+      {
+        "user_id": "user_123",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "session_count": 8,
+        "total_minutes": 45.2
+      }
+    ]
+  }
+}
+```
+
+**Parameters:**
+
+- `is_org` — filter for org-level or personal data
+- `start_date` / `end_date` — date range (YYYY-MM-DD)
+
+---
+
+# Embedding Scenarios (Iframes)
+
+Embed any scenario in your website with a single `<iframe>`. Three embed styles, dynamic variables, event hooks, and browser auth.
+
+## Embed Styles
+
+| Style   | URL Path                     | Height | Best for                                      |
+| ------- | ---------------------------- | ------ | --------------------------------------------- |
+| Full    | `/embed/SCENARIO_ID`         | 800px  | Complete experience with recording + analysis |
+| Basic   | `/embed/basic/SCENARIO_ID`   | 600px  | Standard interactive avatar (recommended)     |
+| Minimal | `/embed/minimal/SCENARIO_ID` | 300px  | Compact preview for landing pages             |
+
+```html
+<iframe
+  src="https://app.toughtongueai.com/embed/basic/SCENARIO_ID"
+  width="100%"
+  height="600px"
+  frameborder="0"
+  allow="microphone"
+>
+</iframe>
+```
+
+---
+
+## Private Scenario Access
+
+For non-public scenarios, generate a short-lived access token and append it:
+
+```html
+<iframe
+  src="https://app.toughtongueai.com/embed/SCENARIO_ID?scenarioAccessToken=YOUR_TOKEN"
+  width="100%"
+  height="800px"
+  frameborder="0"
+  allow="microphone"
+>
+</iframe>
+```
+
+- Use `scenarioAccessToken` (not `accessToken`)
+- Tokens expire after 1 hour — generate server-side per user session
+- See API: Commerce section for token generation endpoint
+
+---
+
+## User Identification
+
+Skip the name/email dialog by passing user info:
+
+```
+?userName=John%20Doe&userEmail=john@example.com
+```
+
+---
+
+## Customization Parameters
+
+| Parameter        | Description               | Example                      |
+| ---------------- | ------------------------- | ---------------------------- |
+| `name`           | Custom conversation title | `?name=Support%20Training`   |
+| `color`          | Accent color              | `?color=violet-500`          |
+| `background`     | Background color          | `?background=black`          |
+| `showPulse`      | Pulse animation           | `?showPulse=false`           |
+| `hidePoweredBy`  | Hide ToughTongue branding | `?hidePoweredBy=true`        |
+| `maxDuration`    | Auto-end after N seconds  | `?maxDuration=600`           |
+| `voice`          | Override AI voice         | `?voice=Aoede`               |
+| `accent`         | Override TTS accent (BCP-47 language code) | `?accent=en-GB` |
+| `avatarUrl`      | Custom avatar image       | `?avatarUrl=https://...`     |
+| `avatarId`       | Default avatar (1-5)      | `?avatarId=3`                |
+| `restoreSession` | Resume session            | `?restoreSession=SESSION_ID` |
+
+---
+
+## Dynamic Variables
+
+Substitute `{{ variable_name }}` placeholders in `ai_instructions` at runtime using `t_` prefixed params:
+
+```html
+<iframe
+  src="https://app.toughtongueai.com/embed/SCENARIO_ID?t_company_name=Acme%20Corp&t_role=Engineering%20Manager&t_product=CloudSync"
+  width="100%"
+  height="600px"
+  frameborder="0"
+  allow="microphone"
+>
+</iframe>
+```
+
+**Rules:**
+
+- Prefix every variable with `t_` in the URL
+- Variable name after `t_` must match what's in `ai_instructions`
+- URL-encode values (spaces → `%20`)
+- Works with all embed styles (full, basic, minimal)
+
+**Example scenario prompt:**
+
+```
+You are interviewing {{ candidate_name }} for the {{ role }} position at {{ company_name }}.
+Focus on their experience with {{ tech_stack }}.
+```
+
+**Embed URL:** `?t_candidate_name=Jane&t_role=SRE&t_company_name=Acme&t_tech_stack=Kubernetes`
+
+---
+
+## Browser Tool Authentication
+
+If your scenario uses the `browser` tool, pre-authenticate so users don't have to log in during conversations:
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/scenarios/browser/authenticate \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"scenario_id": "SCENARIO_ID", "initial_url": "https://app.example.com/login"}'
+```
+
+Returns `embed_url` — open it in a browser, log in to your app, click **Save & Close**. The authenticated session (`contextId`) persists for all future conversations on that scenario.
+
+---
+
+## Iframe Events
+
+Embedded scenarios emit events via `window.postMessage`:
+
+| Event          | When fired                               |
+| -------------- | ---------------------------------------- |
+| `onStart`      | Session begins (agent connected)         |
+| `onStop`       | Session ends (agent disconnected)        |
+| `onTerminated` | Session force-terminated (timeout/error) |
+| `onSubmit`     | Post-session submission completed        |
+
+**Payload:**
+
+```json
+{ "event": "onStop", "sessionId": "abc123", "timestamp": 1705312800000 }
+```
+
+**Listener:**
+
+```javascript
+window.addEventListener("message", (event) => {
+  const { event: name, sessionId } = event.data || {};
+  if (name === "onStop") {
+    // Session ended — fetch results via API
+    fetchSessionResults(sessionId);
+  }
+  if (name === "onSubmit") {
+    // Analysis complete — redirect or show results
+    window.location.href = `/results/${sessionId}`;
+  }
+});
+```
+
+---
+
+## Sending Data to Iframe
+
+Inject evaluator notes into the running session:
+
+```javascript
+const iframe = document.querySelector('iframe');
+iframe.contentWindow.postMessage(
+  {
+    type: "session_notes",
+    notes: [
+      {
+        text: "Strong opening, needs work on closing",
+        timestamp: Date.now(),
+        source: "evaluator",
+      },
+    ],
+  },
+  "*",
+);
+```
+
+---
+
+# Integrations
+
+## Google Meet Bot
+
+AI agents join Google Meet calls. Produces transcript + analysis like any session.
+
+**API**: `POST /api/public/v2/meeting-bots` (see Meeting Bots API section)
+
+**UI Setup:**
+
+1. Create scenario
+2. Library → Scenario → Meeting Bot
+3. Choose mode:
+   - **Custom**: Provide meeting URL + scheduled time
+   - **Calendar**: Grant access, optionally filter by keyword (e.g., "interview")
+
+**Supported platforms**: Google Meet (Zoom, Teams coming soon)
+
+**Limitations**: Best in quiet rooms with one speaker at a time.
+
+---
+
+## Google Slides
+
+AI navigates an existing Google Slides deck during conversation. Enable: `tools_config.tools.google_slides`.
+
+Share the deck publicly or with the platform service account. Agent can advance slides, jump to specific slides, and describe content.
+
+---
+
+## Phone Integration (SIP)
+
+Voice agents make real phone calls via your SIP trunk.
+
+**API**: `POST /api/public/v2/sip/call` and `POST /api/public/v2/sip/batch` (see Phone Calls API section)
+
+**Setup:**
+
+1. Create SIP Trunk in your telephony provider (Twilio, Plivo, Exotel, Telnyx, Vonage)
+2. Get: Termination URI, SIP Username, SIP Password
+3. Assign phone number to trunk
+4. In Tough Tongue AI: Scenario → Phone Call → SIP Configuration → Save
+
+**Calling:**
+
+- Single: API or UI
+- Batch: API with `entries[]` array, or CSV upload in UI
+- Scheduled: set `scheduled_ts` field
+- Dynamic context: `dynamic_vars` substitutes `{{ var }}` in prompt
+
+---
+
+## Outbound Webhooks
+
+Real-time HTTP notifications when session lifecycle events occur.
+
+### Events
+
+| Event                | When                | Typical action             |
+| -------------------- | ------------------- | -------------------------- |
+| `session.started`    | Session created     | Log start, update CRM      |
+| `session.completed`  | Session ended       | Fetch transcript           |
+| `session.analyzed`   | Scores ready        | Display results in your UI |
+| `session.extracted`  | Variables extracted | Push to database           |
+| `session.terminated` | Force-terminated    | Log failure                |
+
+**Scope**: Organisation-only. Personal sessions don't fire webhooks.
+
+### Setup
+
+1. Create POST endpoint (must respond 2xx within 10s)
+2. Developer → Webhooks → Add → select events → Create
+3. Copy signing secret (shown once)
+
+### Signature Verification
+
+Every request includes `webhook-id`, `webhook-timestamp`, `webhook-signature` headers.
+
+```python
+# Python
+from standardwebhooks import Webhook
+wh = Webhook(signing_secret)
+wh.verify(request.body, dict(request.headers))
+```
+
+```javascript
+// Node.js
+import { Webhook } from "standardwebhooks";
+const wh = new Webhook(signingSecret);
+wh.verify(rawBody, headers);
+```
+
+Reject if timestamp > 5 minutes old (replay protection).
+
+### Payload
+
+```json
+{
+  "event": "session.analyzed",
+  "id": "evt_abc123",
+  "ts": "2026-05-13T10:00:00.000Z",
+  "data": {
+    "session_id": "664a1f...",
+    "org_id": "663e2a...",
+    "scenario_id": "6621bc..."
+  }
+}
+```
+
+`data` contains IDs only — fetch full details from `GET /sessions/{session_id}`.
+
+### Delivery Behavior
+
+- No retries. Use `id` for idempotency.
+- 7-day delivery log in dashboard.
+- Heavy processing should be async (respond 200 immediately, process in background).
+
+---
+
+# Scenario Configuration Guide
+
+## Custom Functions (HTTP Tools)
+
+Extend agents with HTTP tools that call your APIs during conversation — same pattern as OpenAI function calling.
+
+1. Define: name, description, HTTP method, URL, headers, JSON Schema for params
+2. AI decides when to invoke during conversation
+3. Platform POSTs to your endpoint with AI-generated arguments
+4. Your server responds (text or JSON, max 15,000 chars)
+5. AI speaks the result to the user
+
+**Use cases:** CRM lookup, send email, book appointment, update database, trigger workflow.
+
+---
+
+## Available Agent Tools
+
+Enable per-scenario via `tools_config.tools.<name>.should_register = true`:
+
+| Tool             | Key                     | What it does                                     |
+| ---------------- | ----------------------- | ------------------------------------------------ |
+| Cards            | `card`                  | Display info cards, frameworks, takeaways        |
+| MCQ              | `mcq`                   | Multiple-choice quiz questions                   |
+| Slide Generation | `slide_generation`      | AI-generated slide decks with images             |
+| Google Slides    | `google_slides`         | Navigate an existing slide deck                  |
+| Memory Search    | `memory_search`         | Recall info from past sessions (stateful agents) |
+| Knowledge Base   | `knowledge_base_search` | RAG over uploaded documents                      |
+| Image Generation | `image_generation`      | On-demand AI images                              |
+| Mermaid Diagrams | `mermaid`               | Flowcharts, sequence diagrams                    |
+| Whiteboard       | `whiteboard`            | Interactive drawing canvas                       |
+| Browser          | `browser`               | Cloud browser (navigate, click, fill forms)      |
+| Custom Function  | `custom_function`       | Call your HTTP endpoints (see above)             |
+| Arcade Gmail     | `arcade_gmail`          | Send/read Gmail via Arcade.dev                   |
+| Arcade Calendar  | `arcade_calendar`       | Create/read Google Calendar events               |
+| Emoji Reaction   | `emoji_reaction`        | Floating emoji reactions                         |
+| PDF Upload       | `pdf_upload`            | Accept documents mid-session                     |
+| Timer            | `timer`                 | Countdown for exercises                          |
+| Notepad          | `notepad`               | Shared notes during session                      |
+| End Session      | `end_session`           | Programmatic session termination                 |
+
+**Tool config structure:**
+
+```json
+"tools_config": {
+  "tools": {
+    "browser": {
+      "should_register": true,
+      "add_to_system_prompt": true,
+      "tool_settings": {"initialUrl": "https://app.example.com", "contextId": "ctx_abc123"}
+    },
+    "end_session": {
+      "should_register": true,
+      "add_to_system_prompt": true,
+      "tool_settings": {"disconnectDelaySeconds": 5}
+    }
+  }
+}
+```
+
+---
+
+## Browser Tool Authentication
+
+Pre-authenticate a cloud browser so users skip login during sessions:
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/scenarios/browser/authenticate \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"scenario_id": "SCENARIO_ID", "initial_url": "https://example.com/login"}'
+```
+
+Response returns `embed_url` — open it, log in, click **Save & Close**. The `contextId` persists for all future sessions on that scenario.
+
+---
+
+## Conversation Strategies
+
+| Strategy      | Behavior                                                     |
+| ------------- | ------------------------------------------------------------ |
+| **Talkative** | AI leads conversation; continues even if user is silent      |
+| **Quiz**      | Session ends → immediate analysis; no avatar shown           |
+| **Conductor** | Timed prompts at specific moments; auto-ends at set duration |
+
+---
+
+## Writing AI Instructions
+
+The `ai_instructions` field is the system prompt. Best practices:
+
+- **Role**: Start with "You are [Role]" — define persona, tone, expertise level
+- **Agenda**: List questions/topics in order; specify follow-up depth
+- **Dynamic content**: Use `{{ variable }}` placeholders (see Dynamic Variables)
+- **Boundaries**: State what the AI should NOT discuss or reveal
+- **Evaluation**: Pair with `rubrik` for post-session scoring criteria
+
+Example:
+
+```
+You are an HR interviewer conducting a behavioral interview for a {{ role_title }} position at {{ company_name }}.
+
+Ask 4 questions using the STAR method:
+1. Leadership challenge
+2. Conflict resolution
+3. Technical decision under pressure
+4. Cross-functional collaboration
+
+For each answer: probe for specifics, ask "what was the outcome?", challenge vague responses.
+Do NOT reveal the scoring rubric. End after all 4 questions with a brief summary.
+```
+
+---
+
+## Scenario Patterns
+
+### Minimal (embed immediately):
+
+```json
+{
+  "name": "Sales Objection Handler",
+  "ai_instructions": "You are a skeptical prospect. Push back on pricing.",
+  "is_public": true
+}
+```
+
+### Full-featured (analysis + extraction + tools):
+
+```json
+{
+  "name": "Customer Support QA",
+  "ai_instructions": "You are a frustrated customer with a billing dispute on {{ product_name }}.",
+  "is_recording": true,
+  "session_analysis": {
+    "is_auto_analysis": true,
+    "enable_extraction": true,
+    "extraction_vars": [
+      { "name": "resolution_offered", "description": "What solution was proposed", "type": "text" },
+      {
+        "name": "customer_satisfied",
+        "description": "Did customer express satisfaction",
+        "type": "boolean"
+      },
+      { "name": "escalation_needed", "description": "Was escalation requested", "type": "boolean" }
+    ]
+  },
+  "tools_config": {
+    "tools": {
+      "card": { "should_register": true, "add_to_system_prompt": false, "tool_settings": null },
+      "knowledge_base_search": {
+        "should_register": true,
+        "add_to_system_prompt": true,
+        "tool_settings": null
+      },
+      "end_session": {
+        "should_register": true,
+        "add_to_system_prompt": true,
+        "tool_settings": { "disconnectDelaySeconds": 3 }
+      }
+    }
+  }
+}
+```
+
+### Phone agent with dynamic vars:
+
+```json
+{
+  "name": "Appointment Reminder",
+  "ai_instructions": "Call {{ patient_name }} to confirm their {{ appointment_type }} on {{ date }}. Be warm and professional.",
+  "is_recording": true,
+  "session_analysis": {
+    "is_auto_analysis": true,
+    "enable_extraction": true,
+    "extraction_vars": [
+      { "name": "confirmed", "description": "Did they confirm", "type": "boolean" },
+      { "name": "reschedule_date", "description": "New date if rescheduling", "type": "date" }
+    ]
+  }
+}
+```
+
+Then dispatch via phone:
+
+```bash
+curl -X POST https://app.toughtongueai.com/api/public/v2/sip/call \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scenario_id": "SCENARIO_ID",
+    "phone_number": "+14155551234",
+    "dynamic_vars": {"patient_name": "Jane Smith", "appointment_type": "dental checkup", "date": "Jan 15"}
+  }'
+```
+
+---
+
+# Integration Patterns & Session Management
+
+## End-to-End Integration Pattern
+
+```
+Your Backend                    Tough Tongue AI
+───────────                    ───────────────
+1. POST /scenarios             → Create scenario (returns scenario_id)
+2. Render iframe with ID       → User starts session
+3. Listen postMessage onStop   → Get session_id
+4. POST /v2/sessions/{id}/post-process → Trigger analysis + extraction
+5. Webhook: session.analyzed   ← Your server notified
+6. GET /sessions/{id}          → Fetch scores, transcript, extracted vars
+```
+
+## Sample Repositories
+
+- **Simple Course** (iframe + lifecycle events + analysis): https://github.com/tough-tongue/ttai-simple-course
+- **AI Course Creation** (OpenAI generates scenarios): https://github.com/ajitesh123/tough-tongue-starter
+
+---
+
+## Choosing Iframe Type
+
+| Type    | URL path                     | Transcription           | Analysis            | Best for              |
+| ------- | ---------------------------- | ----------------------- | ------------------- | --------------------- |
+| Full    | `/embed/SCENARIO_ID`         | ✅                      | ✅                  | Formal evaluations    |
+| Basic   | `/embed/basic/SCENARIO_ID`   | Off (enable via config) | Only if transcribed | Most integrations     |
+| Minimal | `/embed/minimal/SCENARIO_ID` | Off                     | No                  | Landing page previews |
+
+Enable transcription on basic/minimal by setting `is_recording: true` on the scenario.
+
+---
+
+## User Identity Mapping
+
+Pass user info on every iframe to track sessions per user:
+
+```
+/embed/basic/SCENARIO_ID?userName=John%20Doe&userEmail=john@company.com
+```
+
+Then filter sessions by email: `GET /sessions?scenario_id=X&user_email=john@company.com`
+
+---
+
+## Session Lifecycle
+
+| State         | Meaning                              |
+| ------------- | ------------------------------------ |
+| `in_progress` | Agent connected, conversation active |
+| `completed`   | Session ended normally               |
+| `terminated`  | Force-terminated (timeout, system)   |
+
+**Duration**: ~12 min guaranteed. High token usage may shorten. Auto-retries on connection drops.
+
+**Restore**: `?restoreSession=SESSION_ID` in iframe URL to resume interrupted sessions.
+
+---
+
+## Post-Session Data Pipeline
+
+After session completes:
+
+1. **Analysis** (if `is_auto_analysis: true`): Produces `evaluation_results` with overall_score, strengths, weaknesses, report_card
+2. **Extraction** (if `enable_extraction: true`): Produces `extraction_results` with your defined variables
+3. **Webhook** fires `session.analyzed` / `session.extracted` to your server
+
+**Manual trigger**: `POST /v2/sessions/{id}/post-process` with `{"run_analysis": true, "run_extraction": true}`
+
+---
+
+## Organizations & Multi-Tenant
+
+- Create org with custom subdomain and branding
+- Assign scenarios to org
+- Team members get role-based access (View / View all sessions / Edit)
+- API tokens scoped to org
+- Webhooks are org-scoped
+- Transfer minutes between members
+
+---
+
+## Language & Voice
+
+| Config             | Where                      | Example                           |
+| ------------------ | -------------------------- | --------------------------------- |
+| Voice accent       | `appearance.language_code` | `"fr-FR"`, `"es-ES"`, `"ja-JP"`   |
+| Response language  | `ai_instructions`          | "Always respond in French"        |
+| Voice selection    | `appearance.voice`         | Aoede, Charon, Fenrir, Kore, Puck |
+| Override voice per-embed | iframe `?voice=`     | `?voice=Aoede`                    |
+| Override accent per-embed | iframe `?accent=`   | `?accent=en-GB`, `?accent=fr-FR`  |
+
+---
+
+## Secure Access Patterns
+
+**Private scenario + access token:**
+
+1. `POST /scenario-access-token` → get 1-hour token
+2. Embed: `/embed/SCENARIO_ID?scenarioAccessToken=TOKEN`
+
+**Single-use links** (UI-generated):
+
+- Each link works once only
+- 24-hour expiry
+- Tracks session to your dashboard
+
+**Passcode protection:**
+
+- Set `passcode` on scenario
+- User must enter code before session starts
+
+---
+
+# Resources
+
+## Support
+
+- **Technical Support**: help@getarchieai.com
+- **30min Consultation**: https://cal.com/ajitesh/30min
+- **Community (Discord)**: https://discord.gg/NfTPT3HsSj
+
+## Video Walkthroughs
+
+- **API Integration Guide**: https://www.loom.com/share/d9ae326da7b54f2f8d84120bd3399d0d
+- **Platform Demo**: https://www.loom.com/share/04a13f04a22b4547bf0dd9bd99a9db62
+
+## Documentation Links
+
+- Full docs: https://app.toughtongueai.com/docs
+- API reference: https://app.toughtongueai.com/docs/api-reference
+- API best practices: https://app.toughtongueai.com/docs/api-best-practices
+- Webhook docs: https://app.toughtongueai.com/docs/integrations/webhooks
+- Phone integration: https://app.toughtongueai.com/docs/integrations/phone-integration
+- Google Meet agent: https://app.toughtongueai.com/docs/integrations/google-meet-agent
+- Custom tools guide: https://app.toughtongueai.com/docs/guides/custom-tools
+- Tool reference: https://app.toughtongueai.com/docs/guides/tool-reference
+- Release notes: https://app.toughtongueai.com/docs/resources/release-notes
+
+## Sample Code
+
+- **iframe + events + analysis**: https://github.com/tough-tongue/ttai-simple-course
+- **AI-generated scenarios**: https://github.com/ajitesh123/tough-tongue-starter
+
+---
+
+## Known Limitations
+
+| Limitation       | Detail                                            |
+| ---------------- | ------------------------------------------------- |
+| Session duration | ~10–12 min per session                            |
+| Browser          | Chrome recommended; Safari has recording issues   |
+| Meeting bots     | Google Meet only (Zoom/Teams coming)              |
+| Meeting bots     | Background noise sensitive; best with one speaker |
+| Webhooks         | No retries; org-scoped only                       |
+| Phone calls      | Outbound only (inbound coming)                    |
